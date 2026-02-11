@@ -1,5 +1,5 @@
 # Ballerz Stat App
-Search NBA players and teams for full season stats. 
+Overall, our app should allow users to create an account, save their favorite teams, look at all NBA games and the stats for them. Users also will have the capability to look at team and individual stats for teams and players throughout the NBA season.
 
 ## Getting Started
 ```bash
