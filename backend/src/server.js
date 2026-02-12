@@ -1,8 +1,14 @@
 // Backend entry point that initializes and starts the Express server
+require('dotenv').config();
 const express = require('express');
+const { connectDB } = require('./config/database');
 // Import API route modules
-const playersRoutes = require("./routes/players");
-const teamsRoutes = require("./routes/teams");
+const playersRoutes = require('./routes/players');
+const teamsRoutes = require('./routes/teams');
+
+// Connect to MongoDB
+connectDB();
+
 // Create the Express application instance
 const app = express();
 
