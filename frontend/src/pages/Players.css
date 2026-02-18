@@ -1,0 +1,105 @@
+.players-page {
+  background-color: #0d0d0d;
+  min-height: 100vh;
+  color: white;
+  font-family: sans-serif;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 40px;
+  position: relative;
+}
+
+.nav-links {
+  display: flex;
+  background: white;
+  border-radius: 999px;
+  padding: 8px 24px;
+  gap: 24px;
+}
+
+.nav-links a {
+  color: black;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.nav-links a.active {
+  background: #ccc;
+}
+
+.search-btn {
+  position: absolute;
+  right: 24px;
+  background: white;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.columns-container {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px;
+}
+
+.stat-column {
+  width: 300px;
+}
+
+.column-header {
+  background: linear-gradient(135deg, #6b0000, #1a1a4e);
+  border-radius: 40px;
+  text-align: center;
+  font-size: 36px;
+  font-weight: bold;
+  padding: 16px;
+  margin-bottom: -16px;
+  position: relative;
+  z-index: 1;
+}
+
+.column-body {
+  background: #3a3a3a;
+  border-radius: 16px;
+  padding: 16px;
+  padding-top: 28px;
+  min-height: 600px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.filter-btn.active {
+  background: #888;
+}
+
+.sort-row {
+  text-align: right;
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 8px;
+  cursor: pointer;
+}
