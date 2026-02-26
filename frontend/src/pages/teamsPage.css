@@ -1,0 +1,60 @@
+.teams-page {
+    background-color: #111;
+    min-height: 100vh;
+    padding: 40px;
+    color: white;
+  }
+  
+  .page-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+  }
+  
+  .division-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* centers the nav pill */
+    margin-bottom: 28px;
+  }
+  
+  .navpill {
+    display: inline-flex;
+    gap: 18px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(6px);
+  }
+  
+  .navitem {
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  
+  .navitem.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+  }
+  
+  .searchpill {
+    position: absolute;
+    right: 0; /* pins it to the top right */
+    border: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(6px);
+  }

@@ -1,4 +1,4 @@
-
+import TeamsPage from "./pages/TeamsPage";
 import Players from './pages/Players';
 import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
@@ -6,11 +6,6 @@ import { Routes, Route, Link } from 'react-router-dom';
 
 function Home() {
   return <h2>Welcome to Ballerz</h2>;
-}
-
-
-function Teams() {
-  return <h2>Teams Page</h2>;
 }
 
 
@@ -28,12 +23,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/players" element={<Players />} />
-        <Route path="/teams" element={<Teams />} />
+        <Route path="/teams" element={<TeamsPage />} />
       </Routes>
 
     </div>
   );
 }
+
 
 
 export default App;
