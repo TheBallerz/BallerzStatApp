@@ -1,0 +1,73 @@
+/* ── Fixed top bar ──────────────────────────────────────── */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  background-color: #111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Nav pill ───────────────────────────────────────────── */
+
+.navpill {
+  display: inline-flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.navitem {
+  border: none;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.navitem:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.navitem.active {
+  background: rgba(0, 0, 0, 0.13);
+  color: #111;
+  font-weight: 500;
+}
+
+/* ── Search pill ────────────────────────────────────────── */
+
+.searchpill {
+  position: absolute;
+  right: 28px;
+  border: none;
+  cursor: pointer;
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1a1a1a;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.searchpill:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* ── Layout content offset ──────────────────────────────── */
+
+/* Pushes page content below the fixed nav (topbar height ≈ 61px) */
+.layout-content {
+  padding-top: 61px;
+}

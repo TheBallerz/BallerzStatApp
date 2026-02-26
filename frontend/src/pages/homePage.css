@@ -1,0 +1,193 @@
+/* ── Page shell (flex row: content + stats panels) ──────── */
+
+.home-page {
+  background-color: #111;
+  height: calc(100vh - 61px); /* 61px = fixed nav height */
+  display: flex;
+  flex-direction: row;
+  color: white;
+}
+
+/* ── Scrollable left content ────────────────────────────── */
+
+.home-content {
+  flex: 1;
+  min-width: 0; /* allow flex child to shrink below content size */
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+/* ── Section layout ─────────────────────────────────────── */
+
+.home-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 8px 0;
+  letter-spacing: 0.03em;
+}
+
+/* ── Games grids (Recent Games & Coming Up) ─────────────── */
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.game-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* Shows exactly 2 cards at a time; remaining cards accessible by scroll */
+.card-scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(2 * 90px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.card-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+.game-card {
+  flex-shrink: 0;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  height: 90px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.game-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background-color: #202020;
+}
+
+.game-card.card-active {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #252525;
+}
+
+/* ── Favorites section ──────────────────────────────────── */
+
+.favorites-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.favorites-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Shows exactly 2 cards at a time; remaining cards accessible by scroll */
+.favorites-scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(2 * 150px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.favorites-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+.favorite-card {
+  flex-shrink: 0;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  height: 150px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.favorite-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background-color: #202020;
+}
+
+.favorite-card.card-active {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: #252525;
+}
+
+/* ── Stats panels container ─────────────────────────────── */
+
+.stats-panels-container {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  padding: 12px 12px 12px 0;
+  flex-shrink: 0;
+}
+
+/* Single panel */
+.stats-panels-container.panels-1 .stats-panel {
+  width: 360px;
+}
+
+/* Two panels — each narrower to fit side by side */
+.stats-panels-container.panels-2 .stats-panel {
+  width: 268px;
+}
+
+/* ── Individual stats panel ─────────────────────────────── */
+
+.stats-panel {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: panel-slide-in 0.22s ease-out;
+}
+
+@keyframes panel-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.stats-panel-header {
+  padding: 22px 22px 18px;
+}
+
+.stats-panel-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.stats-panel-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
