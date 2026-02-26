@@ -1,13 +1,11 @@
-import TeamsPage from "./pages/TeamsPage";
-import Players from './pages/Players';
+import TeamsPage from '../pages/Teams/TeamsPage';
+import Players from '../pages/Players/Players';
 import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
-
 
 function Home() {
   return <h2>Welcome to Ballerz</h2>;
 }
-
 
 function App() {
   return (
@@ -25,11 +23,8 @@ function App() {
         <Route path="/players" element={<Players />} />
         <Route path="/teams" element={<TeamsPage />} />
       </Routes>
-
     </div>
   );
 }
-
-
 
 export default App;

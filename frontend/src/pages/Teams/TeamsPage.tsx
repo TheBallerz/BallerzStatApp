@@ -1,6 +1,6 @@
-import DivisionCard from "../components/teams/DivisionCard";
-import { divisions } from "../__mocks__/mockTeams";
-import TopNav from "../components/layout/TopNav";
+import DivisionCard from "../../components/teams/DivisionCard";
+import { divisions } from "../../__mocks__/mockTeams";
+import TopNav from "../../components/layout/TopNav";
 import "./teamsPage.css";
 
 export default function TeamsPage() {
