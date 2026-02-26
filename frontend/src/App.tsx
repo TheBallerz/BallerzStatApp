@@ -18,8 +18,22 @@ function App() {
   return (
     <div className="app">
       <h1>Ballerz Stat App</h1>
+
+      <nav>
+        <Link to="/">Home</Link>
+        <Link to="/players">Players</Link>
+        <Link to="/teams">Teams</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/players" element={<Players />} />
+        <Route path="/teams" element={<Teams />} />
+      </Routes>
+
     </div>
   );
 }
+
 
 export default App;
