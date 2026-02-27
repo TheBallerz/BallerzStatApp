@@ -1,0 +1,141 @@
+/* ── Page shell ─────────────────────────────────────────── */
+
+.login-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #000;
+  color: white;
+  overflow: hidden;
+}
+
+/* ── Blue radial glow ───────────────────────────────────── */
+
+.login-glow {
+  position: absolute;
+  top: -160px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 780px;
+  height: 560px;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(22, 52, 180, 0.85) 0%,
+    rgba(12, 28, 100, 0.45) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+.login-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 40px 24px;
+  gap: 0px;
+}
+
+.login-welcome {
+  font-size: 20px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: -10px;
+}
+
+.login-title {
+  font-size: clamp(64px, 8vw, 100px);
+  font-weight: 800;
+  color: white;
+  margin: 0 0 20px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* ── CTA buttons ────────────────────────────────────────── */
+
+.login-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.login-action-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-action-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.login-btn {
+  background: white;
+  color: #111;
+  border: none;
+  padding: 12px 36px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  min-width: 140px;
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* ── Divider ────────────────────────────────────────────── */
+
+.carousel-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+/* ── Carousel ───────────────────────────────────────────── */
+
+.carousel-section {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  padding: 16px 0 20px;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  will-change: transform; /* position driven by JS via requestAnimationFrame */
+}
+
+/* ── Individual card ────────────────────────────────────── */
+
+.carousel-card {
+  flex-shrink: 0;
+  width: clamp(320px, 34vw, 520px);
+  height: 100%; /* fills the full carousel-section height */
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  box-sizing: border-box;
+}
+
+.carousel-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}

@@ -41,18 +41,7 @@ function StatColumn({ title }: { title: string }) {
 export default function Players() {
   return (
     <div className="players-page">
-      <nav className="navbar">
-        <div className="nav-links">
-          <a href="#">Home</a>
-          <a href="#">Teams</a>
-          <a href="#" className="active">Players</a>
-          <a href="#">Favorites</a>
-          <a href="#">Standings</a>
-          <a href="#">Schedule</a>
-          <a href="#">Account</a>
-        </div>
-        <button className="search-btn">Search</button>
-      </nav>
+      
       <div className="columns-container">
         <StatColumn title="All-time" />
         <StatColumn title="Season" />
