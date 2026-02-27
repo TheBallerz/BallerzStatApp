@@ -1,0 +1,29 @@
+.placeholder-page {
+  background-color: #111;
+  min-height: 100vh;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: white;
+}
