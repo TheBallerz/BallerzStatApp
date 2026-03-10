@@ -2,7 +2,7 @@ import TeamsPage from '../pages/Teams/TeamsPage';
 import Players from '../pages/Players/Players';
 import LoginPage from "../pages/Login/LoginPage";
 import HomePage from "../pages/Home/HomePage";
-import FavoritesPage from "../pages/FavoritesPage";
+import FavoritesPage from "../pages/Favorites/FavoritesPage";
 import StandingsPage from "../pages/StandingsPage";
 /*import PlayersPage from "./pages/PlayersPage";*/
 import SchedulePage from "../pages/SchedulePage";
