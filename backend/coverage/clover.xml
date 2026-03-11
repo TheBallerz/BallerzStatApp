@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1773257042895" clover="3.2.0">
+  <project timestamp="1773257042895" name="All files">
+    <metrics statements="23" coveredstatements="23" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0" elements="23" coveredelements="23" complexity="0" loc="23" ncloc="23" packages="1" files="7" classes="7"/>
+    <file name="Player.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/Player.js">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="61" count="1" type="stmt"/>
+    </file>
+    <file name="PlayerGameStats.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/PlayerGameStats.js">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="41" count="1" type="stmt"/>
+    </file>
+    <file name="PlayerSeasonStats.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/PlayerSeasonStats.js">
+      <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="37" count="1" type="stmt"/>
+      <line num="39" count="1" type="stmt"/>
+    </file>
+    <file name="Team.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/Team.js">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="54" count="1" type="stmt"/>
+    </file>
+    <file name="TeamGameStats.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/TeamGameStats.js">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="36" count="1" type="stmt"/>
+    </file>
+    <file name="TeamSeasonStats.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/TeamSeasonStats.js">
+      <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="33" count="1" type="stmt"/>
+      <line num="35" count="1" type="stmt"/>
+    </file>
+    <file name="User.js" path="/Users/williamportugal/Desktop/CSC 308/BallerzStatApp/backend/src/models/User.js">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="38" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>
