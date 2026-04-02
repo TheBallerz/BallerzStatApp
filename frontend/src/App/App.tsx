@@ -8,7 +8,7 @@ import StandingsPage from "../pages/StandingsPage";
 import SchedulePage from "../pages/SchedulePage";
 import AccountPage from "../pages/AccountPage";
 import './App.css';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route} from 'react-router-dom';
 import Layout from "../components/layout/Layout";
 
 
