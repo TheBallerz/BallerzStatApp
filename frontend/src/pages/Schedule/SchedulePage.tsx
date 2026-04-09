@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import "./SchedulePage.css";
 
-// ─── Types (mirror your Mongoose models) ─────────────────────────────────────
-
 interface Team {
   _id: string;
   name: string;
@@ -11,11 +9,10 @@ interface Team {
   logoUrl?: string;
 }
 
-// A single game entry from TeamGameStats — populated with opponent team info
 interface TeamGameStats {
   _id: string;
-  gameDate: string;          // ISO date string
-  opponentTeamId: Team;      // populated
+  gameDate: string;
+  opponentTeamId: Team;      
   points: number;
   oppPoints: number;
   rebounds: number;
@@ -293,7 +290,6 @@ export default function SchedulePage() {
 
             <div className="sched-today-list">
               {todaysGames.map((game) => {
-                // Highlight the card if either team is a user favourite
                 const isFav = favoriteTeams.some(
                   (t) =>
                     t._id === game.homeTeam._id ||
