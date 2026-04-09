@@ -5,7 +5,7 @@ import HomePage from "../pages/Home/HomePage";
 import FavoritesPage from "../pages/Favorites/FavoritesPage";
 import StandingsPage from "../pages/StandingsPage";
 /*import PlayersPage from "./pages/PlayersPage";*/
-import SchedulePage from "../pages/SchedulePage";
+import SchedulePage from "../pages/Schedule/SchedulePage";
 import AccountPage from "../pages/AccountPage";
 import './App.css';
 import { Routes, Route} from 'react-router-dom';
