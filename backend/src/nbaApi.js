@@ -1,19 +1,36 @@
 // Load variables from the .env file into process.env
 require("dotenv").config();
-// Load the URL from the .env 
-const NBA_URL = process.env.NBA_API_BASE_URL;
-// Load the password from the .env
-const NBA_API_KEY = process.env.NBA_API_KEY;
 
+const axios = require('axios');
 
-// Skeleton for the get request function
-async function nbaGet(path) {
-    // Checking for api URL before making request
-  if (!NBA_URL) {
-    throw new Error("NBA_API_URL is not defined");
-  }
-  // To indicate the function isnt completed
-  throw new Error("NBA api not implemented yet");
+const NBA_URL = 'https://stats.nba.com/stats';
+
+// Prevents API from blocking user
+const NBA_HEADERS = {
+  'User-Agent': 'Mozilla/5.0',
+  Referer: 'https://www.nba.com/',
+  Origin: 'https://www.nba.com',
+};
+
+// HTTP GET request to pull from NBA's internal API; Builds URL and returns JSON data
+async function nbaGet(path, params = {}) {
+   const response = await axios.get(`${NBA_URL}/${path}`, {
+    params, headers: NBA_HEADERS,
+   });
+
+   return response.data;
 }
+
+async function getPlayers(){
+  return nbaGet('playerindex', {
+    LeagueID: '00',
+    Season: '2025-26',
+  });
+}
+
 // Export nbaGet so it can be used in other backend modules
-module.exports = { nbaGet };
+module.exports = {
+  nbaGet,
+  getPlayers,
+  getPlayerCareerStats,
+};
