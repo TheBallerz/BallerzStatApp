@@ -28,11 +28,48 @@ BallerzStatApp/
 │
 ├── backend/                 # Express.js API server
 │   ├── src/
-│   │   └── server.js        # Express server entry point
+│   │   ├── __tests__/
+│   │   │   ├── setup.js         # mongodb-memory-server setup for tests
+│   │   │   └── models.test.js   # Unit tests for all Mongoose models
+│   │   ├── config/
+│   │   │   └── database.js      # MongoDB connection
+│   │   ├── models/              # Mongoose schemas (Team, Player, User, stats)
+│   │   ├── routes/              # Express route handlers
+│   │   └── server.js            # Express server entry point
+│   ├── jest.config.js
 │   ├── eslint.config.mjs
 │   └── package.json
 │
 └── README.md
+```
+
+## Testing
+
+### Backend
+The backend uses [Jest](https://jestjs.io/) with [mongodb-memory-server](https://github.com/typegoose/mongodb-memory-server) to run an in-memory MongoDB instance — no live database connection required.
+
+All tests live in a single file: `backend/src/__tests__/models.test.js`
+
+The suite covers all 7 Mongoose models (Team, Player, User, TeamGameStats, PlayerGameStats, TeamSeasonStats, PlayerSeasonStats) with 48 tests total, verifying:
+- Document creation and field persistence
+- Default values
+- Required field validation
+- Enum and min/max constraint enforcement
+- Unique and compound unique index enforcement
+- Read, update, and delete operations
+
+Run from the `backend/` directory:
+```bash
+npm test                # run all tests
+npm run test:coverage   # run tests with coverage report
+```
+
+### Frontend
+The frontend uses [Jest](https://jestjs.io/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+
+Run from the `frontend/` directory:
+```bash
+npm test
 ```
 
 ## Linting and Formatting
