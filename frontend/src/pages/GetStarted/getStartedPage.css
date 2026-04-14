@@ -123,6 +123,14 @@
   background: rgba(255, 255, 255, 0.88);
 }
 
+/* ── Error message ───────────────────────────────────────── */
+
+.gs-error {
+  margin: 0;
+  font-size: 13px;
+  color: #ff4d4f;
+}
+
 /* ── Step 2: card variant ───────────────────────────────── */
 
 .gs-card--step2 {
