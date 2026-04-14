@@ -103,7 +103,11 @@ export default function LoginPage() {
         <div className="login-actions">
           <div className="login-action-group">
             <span className="login-action-label">New users</span>
-            <button className="login-btn" type="button">
+            <button
+              className="login-btn"
+              type="button"
+              onClick={() => navigate("/get-started")}
+            >
               Get Started
             </button>
           </div>
@@ -112,7 +116,7 @@ export default function LoginPage() {
             <button
               className="login-btn"
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/login-form")}
             >
               Login
             </button>
