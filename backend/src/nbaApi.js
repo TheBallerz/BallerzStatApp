@@ -21,10 +21,18 @@ async function nbaGet(path, params = {}) {
    return response.data;
 }
 
-async function getPlayers(){
-  return nbaGet('playerindex', {
+async function getPlayers(isOnlyCurrentSeason = '1') {
+  return nbaGet('commonallplayers', {
+    IsOnlyCurrentSeason: isOnlyCurrentSeason,
     LeagueID: '00',
-    Season: '2025-26',
+    Season: '2024-25',
+  });
+}
+
+async function getPlayerCareerStats(playerId) {
+  return nbaGet('playercareerstats', {
+    PlayerID: playerId,
+    PerMode: 'PerGame',
   });
 }
 
