@@ -36,9 +36,44 @@ async function getPlayerCareerStats(playerId) {
   });
 }
 
+async function getTeams() {
+  return nbaGet("leaguedashteamstats", {
+    Conference: "",
+    DateFrom: "",
+    DateTo: "",
+    Division: "",
+    GameScope: "",
+    GameSegment: "",
+    LastNGames: "0",
+    LeagueID: "00",
+    Location: "",
+    MeasureType: "Base",
+    Month: "0",
+    OpponentTeamID: "0",
+    Outcome: "",
+    PORound: "0",
+    PaceAdjust: "N",
+    PerMode: "PerGame",
+    Period: "0",
+    PlayerExperience: "",
+    PlayerPosition: "",
+    PlusMinus: "N",
+    Rank: "N",
+    Season: "2024-25",
+    SeasonType: "Regular Season",
+    ShotClockRange: "",
+    StarterBench: "",
+    TeamID: "0",
+    TwoWay: "0",
+    VsConference: "",
+    VsDivision: "",
+  });
+}
+
 // Export nbaGet so it can be used in other backend modules
 module.exports = {
   nbaGet,
   getPlayers,
   getPlayerCareerStats,
+  getTeams,
 };
