@@ -55,8 +55,7 @@ router.post('/login', async (req, res) => {
   // Look up the user by email
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
-    // Use the same generic message for both "not found" and "wrong password" to avoid
-    // leaking whether an email address has an account
+    // Send message if no user with that email is found
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
 
