@@ -1,0 +1,213 @@
+/* ── Page shell ─────────────────────────────────────────── */
+
+.gs-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #000;
+  color: white;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+.gs-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 40px 24px;
+}
+
+/* ── Content area (card + arrows) ───────────────────────── */
+
+.gs-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Form card ───────────────────────────────────────────── */
+
+.gs-card {
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 28px;
+  padding: 28px 32px 36px;
+  width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* ── Card title ─────────────────────────────────────────── */
+
+.gs-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: white;
+}
+
+.gs-step-label {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ── Form fields ─────────────────────────────────────────── */
+
+.gs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gs-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.gs-field input {
+  background: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: white;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: background 0.15s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.gs-field input:focus {
+  background: #1c1c1e;
+}
+
+/* ── Navigation arrow buttons ───────────────────────────── */
+
+.gs-arrow {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.gs-arrow--left {
+  left: 40px;
+}
+
+.gs-arrow--right {
+  right: 40px;
+}
+
+.gs-arrow:hover {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* ── Error message ───────────────────────────────────────── */
+
+.gs-error {
+  margin: 0;
+  font-size: 13px;
+  color: #ff4d4f;
+}
+
+/* ── Step 2: card variant ───────────────────────────────── */
+
+.gs-card--step2 {
+  width: 460px;
+  gap: 12px;
+}
+
+/* ── Step 2: card header row (title + skip) ─────────────── */
+
+.gs-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Step 2: skip button ────────────────────────────────── */
+
+.gs-skip-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 5px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.gs-skip-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Step 2: section label ──────────────────────────────── */
+
+.gs-section-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+/* ── Step 2: search bar ─────────────────────────────────── */
+
+.gs-search-bar {
+  display: flex;
+  align-items: center;
+  background: #111;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gs-search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 14px;
+  color: white;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+}
+
+.gs-search-icon {
+  background: transparent;
+  border: none;
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.gs-search-icon:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+

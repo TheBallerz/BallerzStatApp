@@ -1,29 +1,373 @@
-.placeholder-page {
-  background-color: #111;
+/* ─── Favorites Page ─── */
+.fav-page {
+  display: flex;
   min-height: 100vh;
-  padding: 40px;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  background: #0d0d0d;
+  color: #fff;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+/* Sidebar */
+.fav-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.fav-sidebar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #aaa;
+  margin-bottom: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fav-team-list {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
+  gap: 0.5rem;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-.logout-btn {
-  background: rgba(255, 255, 255, 0.88);
-  color: #111;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
+.fav-team-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: #1a1a1a;
   cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+  text-align: left;
 }
 
-.logout-btn:hover {
-  background: white;
+.fav-team-item:hover {
+  background: #242424;
+  transform: translateX(2px);
+}
+
+.fav-team-logo-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fav-team-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.fav-team-abbr {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Main Panel */
+.fav-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.fav-panel {
+  background: #151515;
+  border: 1px solid #2a2a2a;
+  border-radius: 20px;
+  padding: 2rem;
+  min-height: 80vh;
+}
+
+/* Team Header */
+.fav-team-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.fav-team-logo-lg-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fav-team-logo-lg {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.fav-team-info {
+  flex: 1;
+}
+
+.fav-team-name {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.5rem;
+}
+
+.fav-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.fav-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fav-stat-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.fav-stat-lbl {
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fav-stat-sep {
+  font-size: 1.4rem;
+  color: #555;
+}
+
+.fav-stat-pill {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.fav-next-games {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fav-next-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.fav-next-game-tag {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  color: #bbb;
+}
+
+.fav-divider {
+  height: 2px;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+/* Roster Grid */
+.fav-roster-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.fav-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.fav-player-card {
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: #fff;
+}
+
+.fav-player-card:hover {
+  background: #242424;
+  border-color: var(--team-color, #555);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.fav-player-card-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #111;
+  border: 2px solid var(--team-primary, #333);
+  flex-shrink: 0;
+}
+
+.fav-player-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.fav-player-card-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-player-card-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.fav-player-card-stats {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: #aaa;
+}
+
+/* Player Detail */
+.fav-back-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.15s;
+}
+
+.fav-back-btn:hover {
+  color: #fff;
+}
+
+.fav-player-detail-inner {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.fav-player-detail-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 16px;
+  object-fit: cover;
+  background: #111;
+  border: 2px solid #333;
+}
+
+.fav-player-detail-name {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0 0 0.25rem;
+}
+
+.fav-player-detail-meta {
+  font-size: 1rem;
+  color: #888;
+  margin: 0 0 1.5rem;
+}
+
+.fav-player-stats-grid {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.fav-player-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  min-width: 80px;
+}
+
+.fav-player-stat-val {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fav-player-stat-lbl {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.25rem;
+}
+
+/* ─── State helpers ─── */
+.fav-loading {
+  color: #666;
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+}
+.fav-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+}
+.fav-placeholder {
+  color: #444;
+  font-size: 0.875rem;
+  padding: 2rem 0;
+}
+.fav-extra-stats {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+.fav-player-card-hint {
+  font-size: 0.68rem;
+  color: #555;
+  margin-top: 0.1rem;
 }
