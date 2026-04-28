@@ -2,14 +2,19 @@ import type { Division } from "../../__mocks__/mockTeams";
 import { TEAM_LOGOS } from "../../assets/teamLogos";
 import "./divisionCard.css";
 
-type Props = {
-  division: Division;
+type SelectedTeam = {
+  name: string;
+  division: string;
 };
 
-export default function DivisionCard({ division }: Props) {
-  const teams = division?.teams ?? []; 
-  // TEMP placeholder (later connect to real state)
-  const isSelected = false;
+type Props = {
+  division: Division;
+  selectedTeams?: SelectedTeam[];
+  onTeamClick?: (team: SelectedTeam) => void;
+};
+
+export default function DivisionCard({ division, selectedTeams = [], onTeamClick }: Props) {
+  const teams = division?.teams ?? [];
 
   return (
     <div className="division-card">
@@ -18,10 +23,13 @@ export default function DivisionCard({ division }: Props) {
       <ul>
         {teams.map((team) => {
           const logoSrc = TEAM_LOGOS?.[team.name];
-          
+          const isSelected = selectedTeams.some((s) => s.name === team.name);
+
           return (
-            <li key={team.name} 
-            className={`team-row ${isSelected ? "selected" : ""}`}
+            <li
+              key={team.name}
+              className={`team-row ${isSelected ? "selected" : ""}`}
+              onClick={() => onTeamClick?.({ name: team.name, division: division.name })}
             >
               {logoSrc ? (
                 <img

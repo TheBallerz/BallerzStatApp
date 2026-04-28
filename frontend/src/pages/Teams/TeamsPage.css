@@ -10,8 +10,50 @@
   margin-bottom: 30px;
 }
 
+/* ── Panel-open layout (flex row) ───────────────────────── */
+
+.teams-page.has-panel {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 61px); /* 61px = fixed nav height */
+  min-height: unset;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ── Default 3-column grid (no panel) ───────────────────── */
+
 .division-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
+}
+
+/* ── 1-column team list (panel open) ────────────────────── */
+
+.teams-list {
+  width: 33.333%;
+  flex-shrink: 0;
+  padding: 40px 20px 40px 40px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-content: start;
+  scrollbar-width: none;
+}
+
+.teams-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Team detail panels container ───────────────────────── */
+
+.team-panels-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  padding: 12px 12px 12px 8px;
+  min-width: 0;
 }
