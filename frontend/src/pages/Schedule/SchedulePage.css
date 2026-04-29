@@ -9,9 +9,9 @@
   gap: 1.5rem;
 }
 
-/* Sidebar */
+/* ─── Sidebar ──────────────────────────────────────────────────────────────── */
 .sched-sidebar {
-  width: 220px;
+  width: 210px;
   flex-shrink: 0;
 }
 
@@ -30,13 +30,18 @@
   gap: 0.5rem;
   max-height: calc(100vh - 8rem);
   overflow-y: auto;
+  padding-right: 4px;
 }
+
+.sched-team-list::-webkit-scrollbar { width: 4px; }
+.sched-team-list::-webkit-scrollbar-track { background: transparent; }
+.sched-team-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
 
 .sched-team-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.8rem;
+  gap: 0.65rem;
+  padding: 0.55rem 0.8rem;
   border-radius: 14px;
   border: 1px solid transparent;
   background: #1a1a1a;
@@ -44,6 +49,7 @@
   transition: all 0.2s ease;
   color: #fff;
   text-align: left;
+  width: 100%;
 }
 
 .sched-team-item:hover {
@@ -52,8 +58,8 @@
 }
 
 .sched-team-logo-wrap {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -62,35 +68,33 @@
 }
 
 .sched-team-logo {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
 
 .sched-team-text {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .sched-team-abbr {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.05em;
 }
 
 .sched-team-next {
-  font-size: 0.72rem;
-  color: #888;
+  font-size: 0.65rem;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.sched-team-opp {
-  font-size: 0.76rem;
-  color: #bbb;
-  font-weight: 600;
-}
-
-/* Main Panel */
+/* ─── Main Panel ───────────────────────────────────────────────────────────── */
 .sched-main {
   flex: 1;
   min-width: 0;
@@ -102,230 +106,293 @@
   border-radius: 20px;
   padding: 2rem;
   min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
-/* Section titles */
+/* ─── Section titles ───────────────────────────────────────────────────────── */
 .sched-section-title {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #666;
+  color: #777;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  margin-bottom: 0.75rem;
+  margin: 0 0 1rem;
 }
 
-/* Today's Games */
+/* ─── Today's Games strip ──────────────────────────────────────────────────── */
 .sched-today-section {
-  flex-shrink: 0;
+  margin-bottom: 1.75rem;
 }
 
 .sched-today-list {
   display: flex;
   gap: 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .sched-today-card {
-  background: #1e1e1e;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.35rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.2s ease;
   color: #fff;
-  text-align: center;
   min-width: 120px;
-  flex-shrink: 0;
 }
 
-.sched-today-card:hover,
-.sched-today-card.active {
-  background: #252525;
-  border-color: #555;
+.sched-today-card:hover {
+  background: #222;
+  border-color: #444;
   transform: translateY(-2px);
 }
 
-.sched-today-card.fav-game {
-  border-color: #444;
-  background: #1a1f1a;
+.sched-today-card.active {
+  background: #1e1e2e;
+  border-color: #555;
 }
 
-.sched-today-card.active {
-  border-color: #888;
+.sched-today-card.fav-game {
+  border-color: #3a3a2a;
+  background: #1e1e18;
+}
+
+.sched-today-card.fav-game.active {
+  border-color: #888844;
 }
 
 .sched-today-time {
-  font-size: 0.72rem;
-  color: #888;
+  font-size: 0.68rem;
+  color: #555;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .sched-today-matchup {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.88rem;
-  font-weight: 700;
-  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
 .sched-at {
+  font-size: 0.72rem;
   color: #555;
-  font-size: 0.75rem;
+  font-weight: 400;
 }
 
 .sched-status {
-  font-size: 0.7rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  color: #666;
+  font-weight: 600;
 }
 
 .sched-status.live {
-  color: #22c55e;
-  animation: pulse 1.5s infinite;
+  color: #4ade80;
+  animation: pulse-green 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes pulse-green {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50%       { opacity: 0.5; }
 }
 
-/* Divider */
+/* ─── Divider ──────────────────────────────────────────────────────────────── */
 .sched-divider {
   height: 1px;
   background: #222;
-  flex-shrink: 0;
+  margin-bottom: 1.75rem;
 }
 
-/* Full Schedule */
+/* ─── Full schedule section ────────────────────────────────────────────────── */
 .sched-full-section {
-  flex: 1;
+  /* no extra styles needed — inherits from panel */
 }
 
 .sched-full-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .sched-logo-sm-wrap {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .sched-logo-sm {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
 }
 
 .sched-full-title {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  font-size: 1.3rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: 0.05em;
 }
 
+/* ─── Schedule Table ───────────────────────────────────────────────────────── */
 .sched-table-wrap {
   overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #222;
 }
 
 .sched-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
+  min-width: 560px;
 }
 
-.sched-table th {
-  text-align: left;
-  color: #555;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.5rem 1rem 0.5rem 0;
-  border-bottom: 1px solid #222;
-}
-
-.sched-table td {
-  padding: 0.65rem 1rem 0.65rem 0;
-  border-bottom: 1px solid #1e1e1e;
-  color: #ccc;
-}
-
-.sched-table tbody tr:hover td {
+.sched-table thead tr {
   background: #1a1a1a;
 }
 
-.sched-table .upcoming-row td {
-  opacity: 0.75;
-}
-
-.upcoming-badge {
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 0.15rem 0.5rem;
+.sched-table th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  color: #555;
+  font-weight: 600;
   font-size: 0.72rem;
-  color: #888;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #222;
+  white-space: nowrap;
 }
 
-.win {
-  color: #22c55e;
-  font-weight: 600;
+.sched-table th:not(:first-child):not(:nth-child(2)) {
+  text-align: right;
 }
 
-.loss {
-  color: #ef4444;
-  font-weight: 600;
+.sched-table tbody tr {
+  border-bottom: 1px solid #1c1c1c;
+  transition: background 0.15s ease;
 }
 
-/* Placeholder */
-.sched-placeholder {
+.sched-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.sched-table tbody tr:hover {
+  background: #1e1e1e;
+}
+
+.sched-table td {
+  padding: 0.6rem 1rem;
+  color: #ccc;
+  white-space: nowrap;
+}
+
+.sched-table td:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
+  text-align: right;
+}
+
+.sched-date-col {
+  color: #777;
+  font-size: 0.78rem;
+}
+
+.sched-opp-cell {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: #444;
-  font-size: 0.9rem;
+  gap: 0.5rem;
 }
 
-/* ─── State helpers ─── */
+.sched-ha-badge {
+  font-size: 0.65rem;
+  color: #555;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  width: 18px;
+  text-align: center;
+}
+
+.sched-opp-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.sched-opp-abbr {
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+/* Win / Loss result cell */
+.sched-result {
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+}
+
+.sched-result.win  { color: #4ade80; }
+.sched-result.loss { color: #f87171; }
+
+/* Score display */
+.sched-score {
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+/* ─── State helpers ────────────────────────────────────────────────────────── */
 .sched-loading {
   color: #666;
   font-size: 0.85rem;
   padding: 0.5rem 0;
 }
+
 .sched-error {
   color: #ef4444;
   font-size: 0.85rem;
   padding: 0.5rem 0;
 }
 
-/* Opponent cell with mini logo */
-.sched-opp-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.sched-opp-logo {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+.sched-placeholder {
+  color: #444;
+  font-size: 0.875rem;
+  padding: 1rem 0;
 }
 
-/* Extra table columns */
-.sched-table td,
-.sched-table th {
-  padding: 0.65rem 0.75rem 0.65rem 0;
+/* ─── Team picker (no-favorites fallback) ──────────────────────────────────── */
+.sched-team-picker-wrap {
+  margin-top: 1rem;
+}
+
+.sched-team-picker-label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.sched-team-picker {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  color: #ccc;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sched-team-picker:focus {
+  border-color: #444;
 }
