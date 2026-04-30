@@ -1,10 +1,15 @@
-import type { Division } from "../../__mocks__/mockTeams";
 import { TEAM_LOGOS } from "../../assets/teamLogos";
 import "./divisionCard.css";
 
 type SelectedTeam = {
   name: string;
   division: string;
+  teamId: number;
+};
+
+type Division = {
+  name: string;
+  teams: SelectedTeam[];
 };
 
 type Props = {
@@ -13,7 +18,11 @@ type Props = {
   onTeamClick?: (team: SelectedTeam) => void;
 };
 
-export default function DivisionCard({ division, selectedTeams = [], onTeamClick }: Props) {
+export default function DivisionCard({
+  division,
+  selectedTeams = [],
+  onTeamClick,
+}: Props) {
   const teams = division?.teams ?? [];
 
   return (
@@ -29,7 +38,13 @@ export default function DivisionCard({ division, selectedTeams = [], onTeamClick
             <li
               key={team.name}
               className={`team-row ${isSelected ? "selected" : ""}`}
-              onClick={() => onTeamClick?.({ name: team.name, division: division.name })}
+              onClick={() =>
+                onTeamClick?.({
+                  name: team.name,
+                  division: division.name,
+                  teamId: team.teamId,
+                })
+              }
             >
               {logoSrc ? (
                 <img
