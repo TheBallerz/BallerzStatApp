@@ -12,6 +12,26 @@ const NBA_HEADERS = {
   Origin: 'https://www.nba.com',
 };
 
+// Insead of hard coding "current season" we have this function to get current season
+function getCurrentSeason() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0 = Jan, 9 = Oct
+
+  if (month >= 9) {
+    // October–December → new season
+    const nextYear = (year + 1).toString().slice(-2);
+    return `${year}-${nextYear}`;
+  } else {
+    // January–September → still previous season
+    const prevYear = year - 1;
+    const nextYear = year.toString().slice(-2);
+    return `${prevYear}-${nextYear}`;
+  }
+}
+
+const CURRENT_SEASON = getCurrentSeason();
+
 // HTTP GET request to pull from NBA's internal API; Builds URL and returns JSON data
 async function nbaGet(path, params = {}) {
    const response = await axios.get(`${NBA_URL}/${path}`, {
@@ -104,6 +124,7 @@ async function getTeamInfo(teamId, season = CURRENT_SEASON) {
 }
 
 module.exports = {
+  CURRENT_SEASON,
   nbaGet,
   getPlayers,
   getPlayerCareerStats,
