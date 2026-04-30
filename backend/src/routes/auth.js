@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -70,6 +71,73 @@ router.post('/login', async (req, res) => {
     token,
     user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email },
   });
+});
+
+// PATCH /api/auth/favorites
+// Saves the user's favorite players and/or teams to their profile.
+// Protected — requires a valid JWT in the Authorization header.
+// Body: { favoritePlayers?: string[], favoriteTeams?: string[] }
+// Only the fields provided are updated; omitted fields are left untouched.
+router.patch('/favorites', requireAuth, async (req, res) => {
+  const { favoritePlayers, favoriteTeams } = req.body;
+
+  // Build the update object from only the fields that were supplied
+  const update = {};
+  if (Array.isArray(favoritePlayers)) update.favoritePlayers = favoritePlayers;
+  if (Array.isArray(favoriteTeams))   update.favoriteTeams   = favoriteTeams;
+
+  if (Object.keys(update).length === 0) {
+    return res.status(400).json({ message: 'No favorites provided.' });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.userId,
+    { $set: update },
+    { new: true, select: '-passwordHash' }, // return updated doc, exclude password hash
+  );
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+
+  res.json({
+    user: {
+      id:              user._id,
+      firstName:       user.firstName,
+      lastName:        user.lastName,
+      email:           user.email,
+      favoritePlayers: user.favoritePlayers,
+      favoriteTeams:   user.favoriteTeams,
+    },
+  });
+});
+
+// GET /api/auth/me
+// Returns the authenticated user with deeply populated favoritePlayers and favoriteTeams.
+// favoritePlayers: each Player doc has its teamId populated (abbreviation only).
+// favoriteTeams: each Team doc is returned in full (name, abbreviation, logoUrl).
+router.get('/me', requireAuth, async (req, res) => {
+  const user = await User.findById(req.userId)
+    .select('-passwordHash')
+    .populate({
+      path: 'favoritePlayers',
+      select: 'firstName lastName nbaId imageUrl teamId',
+      populate: {
+        path: 'teamId',
+        select: 'abbreviation',
+      },
+    })
+    .populate({
+      path: 'favoriteTeams',
+      select: 'name abbreviation logoUrl',
+    })
+    .lean();
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+
+  res.json({ user });
 });
 
 module.exports = router;
