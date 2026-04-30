@@ -5,7 +5,7 @@ import LoginFormPage from "../pages/Login/LoginFormPage";
 import GetStartedPage from "../pages/GetStarted/GetStartedPage";
 import HomePage from "../pages/Home/HomePage";
 import FavoritesPage from "../pages/Favorites/FavoritesPage";
-import StandingsPage from "../pages/StandingsPage";
+import StandingsPage from "../pages/Standings/StandingsPage";
 /*import PlayersPage from "./pages/PlayersPage";*/
 import SchedulePage from "../pages/Schedule/SchedulePage";
 import AccountPage from "../pages/AccountPage";

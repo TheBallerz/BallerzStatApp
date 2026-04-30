@@ -1,0 +1,56 @@
+.standings-page {
+    background-color: #111;
+    min-height: 100vh;
+    color: white;
+    padding: 32px;
+  }
+  
+  .page-title {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .standings-subtitle {
+    color: #bbb;
+    margin-bottom: 24px;
+  }
+  
+  .standings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  
+  .standings-section {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 20px;
+  }
+  
+  .standings-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .standings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  
+  .standings-table th,
+  .standings-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #2a2a2a;
+    text-align: left;
+    white-space: nowrap;
+  }
+  
+  .standings-table th {
+    color: #aaa;
+    font-size: 14px;
+  }
+  
+  .standings-table tr:hover {
+    background: #202020;
+  }

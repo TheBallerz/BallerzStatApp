@@ -6,11 +6,6 @@ const axios = require('axios');
 // Base URL for all NBA Stats API endpoints.
 const NBA_URL = 'https://stats.nba.com/stats';
 
-// The current NBA season. Used as the default parameter for all API functions
-// so callers don't need to pass it explicitly in the common case.
-// Update this constant at the start of each new season.
-const CURRENT_SEASON = '2025-26';
-
 // Custom HTTP headers required to avoid being blocked by stats.nba.com.
 // The NBA API has progressive anti-scraping protections that reject requests
 // that don't look like they came from a real browser navigating nba.com.
@@ -33,6 +28,44 @@ const NBA_HEADERS = {
   Origin:          'https://www.nba.com',
   'Accept-Language': 'en-US,en;q=0.9',
 };
+
+// Insead of hard coding "current season" we have this function to get current season
+function getCurrentSeason() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0 = Jan, 9 = Oct
+
+  if (month >= 9) {
+    // October–December → new season
+    const nextYear = (year + 1).toString().slice(-2);
+    return `${year}-${nextYear}`;
+  } else {
+    // January–September → still previous season
+    const prevYear = year - 1;
+    const nextYear = year.toString().slice(-2);
+    return `${prevYear}-${nextYear}`;
+  }
+}
+
+// Insead of hard coding "current season" we have this function to get current season
+function getCurrentSeason() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0 = Jan, 9 = Oct
+
+  if (month >= 9) {
+    // October–December → new season
+    const nextYear = (year + 1).toString().slice(-2);
+    return `${year}-${nextYear}`;
+  } else {
+    // January–September → still previous season
+    const prevYear = year - 1;
+    const nextYear = year.toString().slice(-2);
+    return `${prevYear}-${nextYear}`;
+  }
+}
+
+const CURRENT_SEASON = getCurrentSeason();
 
 // Core HTTP helper — sends a GET request to the NBA Stats API.
 // All other functions in this module call nbaGet() rather than axios directly,
@@ -391,7 +424,40 @@ async function getTeams(season = CURRENT_SEASON) {
   });
 }
 
+// Returns identity and metadata for a single NBA team from the
+// 'teaminfocommon' endpoint.
+//
+// Input:
+//   teamId — NBA team ID (e.g. 1610612738 for Boston Celtics)
+//
+// Key fields returned in resultSets[0]:
+//   TEAM_ID             — unique team identifier
+//   TEAM_CITY           — city (e.g. "Boston")
+//   TEAM_NAME           — team name (e.g. "Celtics")
+//   TEAM_ABBREVIATION   — 3-letter code (e.g. "BOS")
+//   TEAM_CONFERENCE     — "East" or "West"
+//   TEAM_DIVISION       — division (e.g. "Atlantic")
+//   W, L                — wins and losses (also available here)
+//
+// This function is used to populate:
+//   - team header (Boston Celtics)
+//   - division label (Atlantic Division)
+//   - conference if needed later
+//
+// Note: This endpoint does NOT include per-game stats like PPG, RPG, APG.
+// Those come from getTeams().
+
+async function getTeamInfo(teamId, season = CURRENT_SEASON) {
+  return nbaGet('teaminfocommon', {
+    LeagueID: '00',
+    Season: season,
+    SeasonType: 'Regular Season',
+    TeamID: teamId,
+  });
+}
+
 module.exports = {
+  CURRENT_SEASON,
   CURRENT_SEASON,      // Exported so other modules use the same season string
   nbaGet,              // Low-level helper (available if routes need custom calls)
   // Level 1 — static/roster data
@@ -406,4 +472,5 @@ module.exports = {
   getPlayerGameLog,    // NEW
   // Legacy
   getTeams,
+  getTeamInfo
 };
