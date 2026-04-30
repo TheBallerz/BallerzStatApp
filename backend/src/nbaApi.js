@@ -71,9 +71,42 @@ async function getTeams() {
 }
 
 // Export nbaGet so it can be used in other backend modules
+// Returns identity and metadata for a single NBA team from the
+// 'teaminfocommon' endpoint.
+//
+// Input:
+//   teamId — NBA team ID (e.g. 1610612738 for Boston Celtics)
+//
+// Key fields returned in resultSets[0]:
+//   TEAM_ID             — unique team identifier
+//   TEAM_CITY           — city (e.g. "Boston")
+//   TEAM_NAME           — team name (e.g. "Celtics")
+//   TEAM_ABBREVIATION   — 3-letter code (e.g. "BOS")
+//   TEAM_CONFERENCE     — "East" or "West"
+//   TEAM_DIVISION       — division (e.g. "Atlantic")
+//   W, L                — wins and losses (also available here)
+//
+// This function is used to populate:
+//   - team header (Boston Celtics)
+//   - division label (Atlantic Division)
+//   - conference if needed later
+//
+// Note: This endpoint does NOT include per-game stats like PPG, RPG, APG.
+// Those come from getTeams().
+
+async function getTeamInfo(teamId, season = CURRENT_SEASON) {
+  return nbaGet('teaminfocommon', {
+    LeagueID: '00',
+    Season: season,
+    SeasonType: 'Regular Season',
+    TeamID: teamId,
+  });
+}
+
 module.exports = {
   nbaGet,
   getPlayers,
   getPlayerCareerStats,
   getTeams,
+  getTeamInfo
 };
