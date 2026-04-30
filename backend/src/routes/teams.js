@@ -3,8 +3,35 @@ const express = require("express");
 const router = express.Router();
 const { getTeams } = require("../nbaApi");
 const { rowsToObjects } = require("../utils/nbaUtils");
+const Team = require('../models/Team');
 
-// GET /api/teams 
+/**
+ * GET /api/teams/search?q=<query>
+ *
+ * Searches the Team collection in MongoDB (not the NBA API) for teams
+ * whose name matches the query string.
+ * Returns all matching teams (max 30): [{ _id, name }]
+ * Returns [] if the query is empty or no teams match.
+ */
+router.get('/teams/search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+
+    if (!q) return res.json([]);
+
+    const regex = new RegExp(q, 'i');
+    const teams = await Team.find({ name: regex })
+      .select('_id name')
+      .lean();
+
+    res.json(teams);
+  } catch (error) {
+    console.error('Error searching teams:', error.message);
+    res.status(500).json({ error: 'Failed to search teams', details: error.message });
+  }
+});
+
+// GET /api/teams
 router.get("/teams", async (req, res) => {
   try {
     const data = await getTeams();
