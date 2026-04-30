@@ -7,10 +7,12 @@ const playersRoutes = require('./routes/players');
 const teamsRoutes = require('./routes/teams');
 const scheduleRoutes = require('./routes/schedule');
 const authRoutes = require('./routes/auth');
+const standingsRoutes = require("./routes/standings");
 // Import the nightly sync job scheduler.
 // startNightlySync() registers a node-cron task that runs at 2:00 AM every night
 // to ingest new game stats from the NBA API and update season averages in MongoDB.
 const { startNightlySync } = require('./jobs/nightlySync');
+
 
 // Connect to MongoDB first, then start the scheduled sync job.
 // Chaining on .then() ensures the cron job is only registered after the database
@@ -39,6 +41,7 @@ app.use("/api", playersRoutes);
 app.use("/api", teamsRoutes);
 app.use("/api", scheduleRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api", standingsRoutes);
 //hard coded used for testing front to back response
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: 'backend is alive' });

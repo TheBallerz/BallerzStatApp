@@ -6,11 +6,6 @@ const axios = require('axios');
 // Base URL for all NBA Stats API endpoints.
 const NBA_URL = 'https://stats.nba.com/stats';
 
-// The current NBA season. Used as the default parameter for all API functions
-// so callers don't need to pass it explicitly in the common case.
-// Update this constant at the start of each new season.
-const CURRENT_SEASON = '2025-26';
-
 // Custom HTTP headers required to avoid being blocked by stats.nba.com.
 // The NBA API has progressive anti-scraping protections that reject requests
 // that don't look like they came from a real browser navigating nba.com.
@@ -51,8 +46,6 @@ function getCurrentSeason() {
     return `${prevYear}-${nextYear}`;
   }
 }
-
-const CURRENT_SEASON = getCurrentSeason();
 
 // Insead of hard coding "current season" we have this function to get current season
 function getCurrentSeason() {
