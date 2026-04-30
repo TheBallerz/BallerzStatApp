@@ -117,9 +117,73 @@
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
 <a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,17 +239,39 @@
 &nbsp;
 const teamSchema = new mongoose.Schema(
   {
+    // --- NEW FIELD ---
+    // The NBA Stats API's internal numeric team ID (e.g., 1610612738 for Boston Celtics).
+    // This is written once by the syncTeamNbaIds.js script and never changes.
+    // It is the bridge between our MongoDB documents and every NBA API response,
+    // since the API identifies teams by this number rather than our ObjectId.
+    // sparse: true means the unique index only applies to docs that have this field,
+    // so existing docs without it won't conflict during the transition period before
+    // the sync script has been run.
+    nbaId: {
+      type: Number,
+      unique: true,
+      sparse: true,
+    },
+&nbsp;
+    // Full team name as it appears in the NBA API (e.g., "Boston Celtics").
+    // Must match exactly, since syncTeamNbaIds.js uses this field to look up teams.
     name: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
+&nbsp;
+    // City the team plays in (e.g., "Boston").
     city: {
       type: String,
       required: true,
       trim: true,
     },
+&nbsp;
+    // Standard 2–3 letter abbreviation used throughout the NBA API (e.g., "BOS").
+    // Used by nightlySync.js to resolve opponent teams from the MATCHUP field
+    // (e.g., "BOS vs. MIA" → opponent abbreviation "MIA").
     abbreviation: {
       type: String,
       required: true,
@@ -193,11 +279,15 @@ const teamSchema = new mongoose.Schema(
       uppercase: true,
       trim: true,
     },
+&nbsp;
+    // NBA conference this team belongs to. Restricted to the two valid values.
     conference: {
       type: String,
       enum: ['Eastern', 'Western'],
       required: true,
     },
+&nbsp;
+    // NBA division within the conference.
     division: {
       type: String,
       enum: [
@@ -210,10 +300,15 @@ const teamSchema = new mongoose.Schema(
       ],
       required: true,
     },
+&nbsp;
+    // URL to the team's official logo image. Populated optionally.
     logoUrl: {
       type: String,
       trim: true,
     },
+&nbsp;
+    // Array of ObjectId references to Player documents on this team's roster.
+    // Written by seed.js and kept in sync when players are added or traded.
     roster: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -221,6 +316,7 @@ const teamSchema = new mongoose.Schema(
       },
     ],
   },
+  // Automatically adds createdAt and updatedAt timestamps to every document.
   { timestamps: true },
 );
 &nbsp;
@@ -232,7 +328,7 @@ module.exports = mongoose.model('Team', teamSchema);
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-11T19:24:02.887Z
+                at 2026-04-30T07:59:03.550Z
             </div>
         <script src="prettify.js"></script>
         <script>
