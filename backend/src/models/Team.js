@@ -69,6 +69,16 @@ const teamSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    
+    primaryColor: {
+      type: String,
+      trim: true,
+    },
+
+    secondaryColor: {
+      type: String,
+      trim: true,
+    },
 
     // Array of ObjectId references to Player documents on this team's roster.
     // Written by seed.js and kept in sync when players are added or traded.

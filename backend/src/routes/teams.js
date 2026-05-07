@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { getTeams, getTeamInfo, CURRENT_SEASON } = require("../nbaApi");
 const { rowsToObjects } = require("../utils/nbaUtils");
+const Team = require("../models/Team");
 
 const TEAM_ABBREVIATIONS = {
   1610612737: "ATL",
@@ -50,19 +51,40 @@ router.get("/teams", async (req, res) => {
     if (!resultSet) {
       return res.status(500).json({ error: "Team data missing" });
     }
-    console.log(resultSet.headers);
-    const teams = rowsToObjects(resultSet).map((team) => ({
-      teamId: team.TEAM_ID,
-      teamName: team.TEAM_NAME,
-      teamAbbreviation: TEAM_ABBREVIATIONS[team.TEAM_ID],
-      wins: team.W,
-      losses: team.L,
-      record: `${team.W}-${team.L}`,
-      ppg: team.PTS,
-      rpg: team.REB,
-      apg: team.AST,
-      fgPct: team.FG_PCT,
-    }));
+
+    const dbTeams = await Team.find();
+
+    const dbTeamByAbbr = {};
+    dbTeams.forEach((team) => {
+      dbTeamByAbbr[team.abbreviation] = team;
+    });
+
+    const teams = rowsToObjects(resultSet).map((team) => {
+      const abbreviation = TEAM_ABBREVIATIONS[team.TEAM_ID];
+      const dbTeam = dbTeamByAbbr[abbreviation];
+
+      return {
+        teamId: team.TEAM_ID,
+        teamName: team.TEAM_NAME,
+        teamAbbreviation: abbreviation,
+        wins: team.W,
+        losses: team.L,
+        record: `${team.W}-${team.L}`,
+        ppg: team.PTS,
+        rpg: team.REB,
+        apg: team.AST,
+        fgPct: team.FG_PCT,
+
+        // added from MongoDB
+        mongoId: dbTeam?._id,
+        primaryColor: dbTeam?.primaryColor,
+        secondaryColor: dbTeam?.secondaryColor,
+        logoUrl: dbTeam?.logoUrl,
+        city: dbTeam?.city,
+        conference: dbTeam?.conference,
+        division: dbTeam?.division,
+      };
+    });
 
     res.json(teams);
   } catch (error) {
