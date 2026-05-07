@@ -1,13 +1,26 @@
 .team-detail-panel {
   flex: 1;
   background-color: #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-image:
+    radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--team-primary), transparent 35%),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--team-primary), transparent 75%),
+      color-mix(in srgb, var(--team-secondary), transparent 88%),
+      #1a1a1a 70%
+    );
+  border: 1px solid color-mix(in srgb, var(--team-primary), white 20%);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: team-panel-slide-in 0.22s ease-out;
   min-width: 0;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--team-primary), transparent 65%);
 }
 
 @keyframes team-panel-slide-in {
@@ -103,19 +116,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  background: #222;
-  border-radius: 10px;
+  padding: 12px 16px;
+
+  background: rgba(0, 0, 0, 0.55); /* darker */
+  border-radius: 12px;
+
+  backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.team-stat-row:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.8),
+    0 0 12px var(--team-primary);
 }
 
 .team-stat-label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.75); /* brighter */
   font-weight: 500;
 }
 
 .team-stat-value {
-  font-size: 15px;
-  font-weight: 600;
-  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff; /* full white */
 }

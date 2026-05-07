@@ -10,18 +10,18 @@
   margin-bottom: 30px;
 }
 
-/* ── Panel-open layout (flex row) ───────────────────────── */
+/* ── Panel-open layout ── */
 
 .teams-page.has-panel {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 61px); /* 61px = fixed nav height */
+  height: calc(100vh - 61px);
   min-height: unset;
   padding: 0;
   overflow: hidden;
 }
 
-/* ── Default 3-column grid (no panel) ───────────────────── */
+/* ── Default 3-column grid ── */
 
 .division-grid {
   display: grid;
@@ -29,7 +29,7 @@
   gap: 40px;
 }
 
-/* ── 1-column team list (panel open) ────────────────────── */
+/* ── 1-column team list ── */
 
 .teams-list {
   width: 33.333%;
@@ -47,7 +47,7 @@
   display: none;
 }
 
-/* ── Team detail panels container ───────────────────────── */
+/* ── Team detail panels container ── */
 
 .team-panels-container {
   flex: 1;
@@ -56,4 +56,51 @@
   gap: 8px;
   padding: 12px 12px 12px 8px;
   min-width: 0;
+}
+
+/* ── Hero section ── */
+
+.teams-hero {
+  margin-bottom: 32px;
+  padding: 28px 32px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 35%),
+    linear-gradient(135deg, #202020, #141414);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teams-hero h1 {
+  margin: 0;
+  font-size: 42px;
+}
+
+.teams-hero p {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,0.6);
+}
+
+.teams-summary {
+  display: flex;
+  gap: 14px;
+}
+
+.teams-summary div {
+  background: rgba(0,0,0,0.35);
+  border-radius: 18px;
+  padding: 14px 20px;
+  text-align: center;
+}
+
+.teams-summary strong {
+  display: block;
+  font-size: 24px;
+}
+
+.teams-summary span {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
 }
