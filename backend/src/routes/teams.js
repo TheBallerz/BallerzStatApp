@@ -65,7 +65,7 @@ router.get("/teams", async (req, res) => {
 
       return {
         teamId: team.TEAM_ID,
-        teamName: team.TEAM_NAME,
+        teamName: dbTeam?.name || team.TEAM_NAME,
         teamAbbreviation: abbreviation,
         wins: team.W,
         losses: team.L,
