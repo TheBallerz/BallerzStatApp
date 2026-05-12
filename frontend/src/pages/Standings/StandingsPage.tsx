@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
-import { fetchStandings, type StandingsResponse, type StandingTeam } from "../../services/standingsService";
-import "./standingsPage.css";
+import { useEffect, useState } from 'react';
+import {
+  fetchStandings,
+  type StandingsResponse,
+  type StandingTeam,
+} from '../../services/standingsService';
+import './standingsPage.css';
 
 function StandingsTable({
   title,
@@ -53,7 +57,7 @@ function StandingsTable({
 export default function StandingsPage() {
   const [data, setData] = useState<StandingsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadStandings() {
@@ -61,9 +65,9 @@ export default function StandingsPage() {
         setLoading(true);
         const standings = await fetchStandings();
         setData(standings);
-        setError("");
+        setError('');
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
         setLoading(false);
       }

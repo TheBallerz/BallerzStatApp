@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout, getToken } from '../services/authService';
-import { getUsers, deleteUser, setUserAdmin, type AdminUser } from '../services/adminService';
+import {
+  getUsers,
+  deleteUser,
+  setUserAdmin,
+  type AdminUser,
+} from '../services/adminService';
 import './accountPage.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface MeUser {
-  _id:       string;
+  _id: string;
   firstName: string;
-  lastName:  string;
-  email:     string;
-  isAdmin:   boolean;
+  lastName: string;
+  email: string;
+  isAdmin: boolean;
 }
 
 // ── Admin panel sub-component ──────────────────────────────────────────────────
@@ -21,9 +26,9 @@ interface AdminPanelProps {
 }
 
 function AdminPanel({ currentUserId }: AdminPanelProps) {
-  const [users,   setUsers]   = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   // Track which row is mid-request so we can disable its controls
   const [busy, setBusy] = useState<Set<string>>(new Set());
 
@@ -35,24 +40,36 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
         const data = await getUsers();
         if (!cancelled) setUsers(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load users.');
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : 'Failed to load users.',
+          );
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     fetchUsers();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const markBusy   = (id: string) => setBusy((prev) => new Set(prev).add(id));
-  const clearBusy  = (id: string) => setBusy((prev) => { const n = new Set(prev); n.delete(id); return n; });
+  const markBusy = (id: string) => setBusy((prev) => new Set(prev).add(id));
+  const clearBusy = (id: string) =>
+    setBusy((prev) => {
+      const n = new Set(prev);
+      n.delete(id);
+      return n;
+    });
 
   const handleToggleAdmin = async (user: AdminUser) => {
     markBusy(user._id);
     try {
       const updated = await setUserAdmin(user._id, !user.isAdmin);
-      setUsers((prev) => prev.map((u) => (u._id === updated._id ? updated : u)));
+      setUsers((prev) =>
+        prev.map((u) => (u._id === updated._id ? updated : u)),
+      );
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Could not update role.');
     } finally {
@@ -61,7 +78,12 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
   };
 
   const handleDelete = async (user: AdminUser) => {
-    if (!window.confirm(`Delete ${user.firstName} ${user.lastName}? This cannot be undone.`)) return;
+    if (
+      !window.confirm(
+        `Delete ${user.firstName} ${user.lastName}? This cannot be undone.`,
+      )
+    )
+      return;
     markBusy(user._id);
     try {
       await deleteUser(user._id);
@@ -77,7 +99,7 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
       <p className="admin-section-title">Admin — User Management</p>
 
       {loading && <p className="admin-status">Loading users…</p>}
-      {error   && <p className="admin-error">{error}</p>}
+      {error && <p className="admin-error">{error}</p>}
 
       {!loading && !error && (
         <table className="admin-table">
@@ -90,7 +112,7 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
           </thead>
           <tbody>
             {users.map((user) => {
-              const isSelf    = user._id === currentUserId;
+              const isSelf = user._id === currentUserId;
               const isRowBusy = busy.has(user._id);
 
               return (
@@ -99,7 +121,9 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
                   <td>
                     <div className="admin-user-name">
                       {user.firstName} {user.lastName}
-                      {user.isAdmin && <span className="admin-badge">Admin</span>}
+                      {user.isAdmin && (
+                        <span className="admin-badge">Admin</span>
+                      )}
                     </div>
                     <div className="admin-user-email">{user.email}</div>
                   </td>
@@ -129,7 +153,11 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
                       type="button"
                       disabled={isRowBusy || isSelf}
                       onClick={() => handleDelete(user)}
-                      title={isSelf ? 'You cannot delete your own account' : `Delete ${user.firstName}`}
+                      title={
+                        isSelf
+                          ? 'You cannot delete your own account'
+                          : `Delete ${user.firstName}`
+                      }
                     >
                       Delete
                     </button>
@@ -149,7 +177,7 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
 export default function AccountPage() {
   const navigate = useNavigate();
 
-  const [user,    setUser]    = useState<MeUser | null>(null);
+  const [user, setUser] = useState<MeUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fetch the live user record from the backend on mount so isAdmin is always
@@ -179,7 +207,9 @@ export default function AccountPage() {
     }
 
     fetchMe();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleLogout = () => {
@@ -197,14 +227,15 @@ export default function AccountPage() {
 
   return (
     <div className="account-page">
-
       {/* ── Profile section ──────────────────────────── */}
       <div className="account-section">
         <p className="account-section-title">Account</p>
 
         {user ? (
           <>
-            <p className="account-name">{user.firstName} {user.lastName}</p>
+            <p className="account-name">
+              {user.firstName} {user.lastName}
+            </p>
             <p className="account-email">{user.email}</p>
           </>
         ) : (
@@ -217,10 +248,7 @@ export default function AccountPage() {
       </div>
 
       {/* ── Admin panel (visible to admins only) ─────── */}
-      {user?.isAdmin && (
-        <AdminPanel currentUserId={user._id} />
-      )}
-
+      {user?.isAdmin && <AdminPanel currentUserId={user._id} />}
     </div>
   );
 }

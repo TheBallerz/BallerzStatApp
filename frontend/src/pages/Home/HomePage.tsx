@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
-import "./homePage.css";
-import GameCard from "../../components/games/GameCard";
-import TopPlayerCard, { type TopPlayer } from "../../components/players/TopPlayerCard";
-import FavoritePlayerCard, { type FavoritePlayer } from "../../components/players/FavoritePlayerCard";
-import FavoriteTeamCard, { type FavoriteTeam } from "../../components/teams/FavoriteTeamCard";
-import { getToken } from "../../services/authService";
+import { useState, useEffect } from 'react';
+import './homePage.css';
+import GameCard from '../../components/games/GameCard';
+import TopPlayerCard, {
+  type TopPlayer,
+} from '../../components/players/TopPlayerCard';
+import FavoritePlayerCard, {
+  type FavoritePlayer,
+} from '../../components/players/FavoritePlayerCard';
+import FavoriteTeamCard, {
+  type FavoriteTeam,
+} from '../../components/teams/FavoriteTeamCard';
+import { getToken } from '../../services/authService';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -25,16 +31,16 @@ interface RecentGame {
 }
 
 interface RecentGameDay {
-  date: string;       // e.g. "Apr 28th"
+  date: string; // e.g. "Apr 28th"
   games: RecentGame[];
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface TopPlayersData {
-  points:   TopPlayer[];
-  threes:   TopPlayer[];
-  assists:  TopPlayer[];
+  points: TopPlayer[];
+  threes: TopPlayer[];
+  assists: TopPlayer[];
   rebounds: TopPlayer[];
 }
 
@@ -44,10 +50,10 @@ const EMPTY_FAVORITE_COUNT = 4; // number of placeholder boxes when no favorites
 
 // Stat column definitions — order determines left-to-right column order
 const TOP_PLAYER_COLUMNS = [
-  { key: 'points'   as const, label: 'Points Per Game', suffix: 'PPG' },
-  { key: 'threes'   as const, label: '3-Pointers',      suffix: '3PM' },
-  { key: 'assists'  as const, label: 'Assists',          suffix: 'APG' },
-  { key: 'rebounds' as const, label: 'Rebounds',         suffix: 'RPG' },
+  { key: 'points' as const, label: 'Points Per Game', suffix: 'PPG' },
+  { key: 'threes' as const, label: '3-Pointers', suffix: '3PM' },
+  { key: 'assists' as const, label: 'Assists', suffix: 'APG' },
+  { key: 'rebounds' as const, label: 'Rebounds', suffix: 'RPG' },
 ];
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -67,7 +73,9 @@ export default function HomePage() {
 
     async function fetchRecentGames() {
       try {
-        const res = await fetch('/api/games/recent', { signal: controller.signal });
+        const res = await fetch('/api/games/recent', {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: RecentGameDay[] = await res.json();
         setRecentDays(data);
@@ -87,7 +95,7 @@ export default function HomePage() {
   // ── Top players state ────────────────────────────────────────────────────────
   const [topPlayers, setTopPlayers] = useState<TopPlayersData | null>(null);
   const [topLoading, setTopLoading] = useState(true);
-  const [topError,   setTopError]   = useState<string | null>(null);
+  const [topError, setTopError] = useState<string | null>(null);
 
   // Fetch top-5 players per stat category on mount.
   useEffect(() => {
@@ -95,7 +103,9 @@ export default function HomePage() {
 
     async function fetchTopPlayers() {
       try {
-        const res = await fetch('/api/players/top', { signal: controller.signal });
+        const res = await fetch('/api/players/top', {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: TopPlayersData = await res.json();
         setTopPlayers(data);
@@ -114,7 +124,7 @@ export default function HomePage() {
 
   // ── Favorites state ──────────────────────────────────────────────────────────
   const [favoritePlayers, setFavoritePlayers] = useState<FavoritePlayer[]>([]);
-  const [favoriteTeams,   setFavoriteTeams]   = useState<FavoriteTeam[]>([]);
+  const [favoriteTeams, setFavoriteTeams] = useState<FavoriteTeam[]>([]);
 
   // Fetch the logged-in user's favorites on every mount.
   // Silently skips the request if no token is present (user not logged in).
@@ -131,7 +141,10 @@ export default function HomePage() {
           signal: controller.signal,
         });
         if (!res.ok) {
-          console.error('[Favorites] GET /api/auth/me failed with status', res.status);
+          console.error(
+            '[Favorites] GET /api/auth/me failed with status',
+            res.status,
+          );
           return;
         }
         const data = await res.json();
@@ -173,7 +186,6 @@ export default function HomePage() {
     <div className="home-page">
       {/* ── Scrollable content ─────────────────────────────── */}
       <div className="home-content">
-
         {/* ── Recent Games ──────────────────────────────────── */}
         <section className="home-section">
           <h2 className="section-title">Recent Games</h2>
@@ -185,7 +197,11 @@ export default function HomePage() {
                   <span className="card-date">—</span>
                   <div className="card-scroll-container">
                     {Array.from({ length: 2 }).map((_, i) => (
-                      <div key={i} className="game-card" style={{ opacity: 0.35 }} />
+                      <div
+                        key={i}
+                        className="game-card"
+                        style={{ opacity: 0.35 }}
+                      />
                     ))}
                   </div>
                 </div>
@@ -194,7 +210,9 @@ export default function HomePage() {
           )}
 
           {gamesError && (
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>{gamesError}</p>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+              {gamesError}
+            </p>
           )}
 
           {!gamesLoading && !gamesError && (
@@ -240,7 +258,11 @@ export default function HomePage() {
                     <span className="card-date">{col.label}</span>
                     <div className="top-players-column">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="favorite-card" style={{ opacity: 0.25 }} />
+                        <div
+                          key={i}
+                          className="favorite-card"
+                          style={{ opacity: 0.25 }}
+                        />
                       ))}
                     </div>
                   </div>
@@ -250,7 +272,9 @@ export default function HomePage() {
           )}
 
           {topError && (
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>{topError}</p>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+              {topError}
+            </p>
           )}
 
           {!topLoading && !topError && topPlayers && (

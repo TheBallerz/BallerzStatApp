@@ -1,15 +1,15 @@
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import "./loginPage.css";
+import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './loginPage.css';
 
 const carouselItems: string[] = [
-  "Track Players",
-  "View Team Stats",
-  "Build Teams",
-  "Compare Players",
-  "Compare Teams",
-  "Add Friends",
-  "See How You Compare",
+  'Track Players',
+  'View Team Stats',
+  'Build Teams',
+  'Compare Players',
+  'Compare Teams',
+  'Add Friends',
+  'See How You Compare',
 ];
 
 // Duplicate so the track is 2× one set wide — position resets by
@@ -17,19 +17,19 @@ const carouselItems: string[] = [
 const duplicatedItems = [...carouselItems, ...carouselItems];
 
 const AUTO_SCROLL_SPEED = 0.6; // px per frame (~36 px/s at 60 fps)
-const RESUME_DELAY_MS   = 1200; // ms after last wheel event before auto-scroll resumes
+const RESUME_DELAY_MS = 1200; // ms after last wheel event before auto-scroll resumes
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const trackRef        = useRef<HTMLDivElement>(null);
-  const sectionRef      = useRef<HTMLElement>(null);
-  const positionRef     = useRef(0);          // current translateX in px (≤ 0)
-  const pausedRef       = useRef(false);
-  const resumeTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const positionRef = useRef(0); // current translateX in px (≤ 0)
+  const pausedRef = useRef(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const track   = trackRef.current;
+    const track = trackRef.current;
     const section = sectionRef.current;
     if (!track || !section) return;
 
@@ -40,7 +40,7 @@ export default function LoginPage() {
     const normalise = () => {
       const h = halfWidth();
       if (positionRef.current <= -h) positionRef.current += h;
-      if (positionRef.current  >  0) positionRef.current -= h;
+      if (positionRef.current > 0) positionRef.current -= h;
     };
 
     // ── Auto-scroll ticker ───────────────────────────────────────────
@@ -69,25 +69,26 @@ export default function LoginPage() {
       }, RESUME_DELAY_MS);
 
       // Prefer horizontal delta (trackpad swipe); fall back to vertical
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      const delta =
+        Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       positionRef.current -= delta;
       normalise();
     };
 
     // Must use addEventListener (not onWheel) to pass { passive: false }
-    section.addEventListener("wheel", handleWheel, { passive: false });
+    section.addEventListener('wheel', handleWheel, { passive: false });
 
     // Resume auto-scroll the moment the cursor leaves the carousel
     const handleMouseLeave = () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
       pausedRef.current = false;
     };
-    section.addEventListener("mouseleave", handleMouseLeave);
+    section.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       cancelAnimationFrame(rafId);
-      section.removeEventListener("wheel", handleWheel);
-      section.removeEventListener("mouseleave", handleMouseLeave);
+      section.removeEventListener('wheel', handleWheel);
+      section.removeEventListener('mouseleave', handleMouseLeave);
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     };
   }, []);
@@ -106,7 +107,7 @@ export default function LoginPage() {
             <button
               className="login-btn"
               type="button"
-              onClick={() => navigate("/get-started")}
+              onClick={() => navigate('/get-started')}
             >
               Get Started
             </button>
@@ -116,7 +117,7 @@ export default function LoginPage() {
             <button
               className="login-btn"
               type="button"
-              onClick={() => navigate("/login-form")}
+              onClick={() => navigate('/login-form')}
             >
               Login
             </button>

@@ -33,7 +33,7 @@
     filter 0.25s ease;
 }
 
-.team-row input[type="checkbox"] {
+.team-row input[type='checkbox'] {
   width: 20px;
   height: 20px;
 }

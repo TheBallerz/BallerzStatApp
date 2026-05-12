@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import TopNav from "./TopNav";
+import type { ReactNode } from 'react';
+import TopNav from './TopNav';
 
 type Props = {
   children: ReactNode;

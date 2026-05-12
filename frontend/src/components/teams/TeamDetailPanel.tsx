@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { TEAM_LOGOS } from "../../assets/teamLogos";
-import { fetchTeam } from "../../services/nbaApi";
-import "./teamDetailPanel.css";
+import { useEffect, useState } from 'react';
+import { TEAM_LOGOS } from '../../assets/teamLogos';
+import { fetchTeam } from '../../services/nbaApi';
+import './teamDetailPanel.css';
 
 type SelectedTeam = {
   name: string;
@@ -36,19 +36,19 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
   const logoSrc = TEAM_LOGOS?.[team.name];
   const [teamDetail, setTeamDetail] = useState<TeamDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadTeamDetail() {
       try {
         setLoading(true);
-        setError("");
+        setError('');
 
         const data = await fetchTeam(team.teamId);
         setTeamDetail(data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load team data.");
+        setError('Failed to load team data.');
       } finally {
         setLoading(false);
       }
@@ -59,14 +59,14 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
 
   return (
     <div
-        className="team-detail-panel"
-        style={
-          {
-            "--team-primary": team.primaryColor,
-            "--team-secondary": team.secondaryColor,
-          } as React.CSSProperties
-        }
-      >
+      className="team-detail-panel"
+      style={
+        {
+          '--team-primary': team.primaryColor,
+          '--team-secondary': team.secondaryColor,
+        } as React.CSSProperties
+      }
+    >
       <div className="team-detail-header">
         <div className="team-detail-identity">
           {logoSrc ? (
@@ -83,7 +83,9 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
               {teamDetail ? `${teamDetail.city} ${teamDetail.name}` : team.name}
             </h2>
             <span className="team-detail-division">
-              {teamDetail ? `${teamDetail.division} Division` : `${team.division} Division`}
+              {teamDetail
+                ? `${teamDetail.division} Division`
+                : `${team.division} Division`}
             </span>
           </div>
         </div>
@@ -104,7 +106,7 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
         ) : error || !teamDetail ? (
           <div className="team-stat-row">
             <span className="team-stat-label">Error</span>
-            <span className="team-stat-value">{error || "No data found"}</span>
+            <span className="team-stat-value">{error || 'No data found'}</span>
           </div>
         ) : (
           <>
@@ -130,7 +132,9 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
 
             <div className="team-stat-row">
               <span className="team-stat-label">FG%</span>
-              <span className="team-stat-value">{(teamDetail.fgPct * 100).toFixed(1)}%</span>
+              <span className="team-stat-value">
+                {(teamDetail.fgPct * 100).toFixed(1)}%
+              </span>
             </div>
           </>
         )}

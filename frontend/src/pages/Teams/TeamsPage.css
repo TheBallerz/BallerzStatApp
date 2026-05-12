@@ -65,9 +65,13 @@
   padding: 28px 32px;
   border-radius: 28px;
   background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 35%),
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.12),
+      transparent 35%
+    ),
     linear-gradient(135deg, #202020, #141414);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -80,7 +84,7 @@
 
 .teams-hero p {
   margin: 8px 0 0;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .teams-summary {
@@ -89,7 +93,7 @@
 }
 
 .teams-summary div {
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.35);
   border-radius: 18px;
   padding: 14px 20px;
   text-align: center;
@@ -102,5 +106,5 @@
 
 .teams-summary span {
   font-size: 12px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
 }

@@ -4,8 +4,8 @@
 // other parts of the app can read them without making additional network requests.
 
 const API_BASE = `${import.meta.env.VITE_API_BASE}/auth`;
-const TOKEN_KEY = "ballerz_token"; // localStorage key for the JWT
-const USER_KEY = "ballerz_user";   // localStorage key for the serialized user object
+const TOKEN_KEY = 'ballerz_token'; // localStorage key for the JWT
+const USER_KEY = 'ballerz_user'; // localStorage key for the serialized user object
 
 // Shape of the user object returned by the backend and stored locally
 export interface AuthUser {
@@ -28,17 +28,17 @@ export async function register(
   firstName: string,
   lastName: string,
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ firstName, lastName, email, password }),
   });
 
   const data = await res.json();
   // Throw so the calling component can catch it and display the error message
-  if (!res.ok) throw new Error(data.message || "Registration failed.");
+  if (!res.ok) throw new Error(data.message || 'Registration failed.');
 
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -49,17 +49,17 @@ export async function register(
 // On success, persists the JWT and user object to localStorage.
 export async function login(
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
 
   const data = await res.json();
   // Throw so the calling component can catch it and display the error message
-  if (!res.ok) throw new Error(data.message || "Login failed.");
+  if (!res.ok) throw new Error(data.message || 'Login failed.');
 
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));

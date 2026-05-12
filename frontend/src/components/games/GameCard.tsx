@@ -40,11 +40,14 @@ export default function GameCard({
       onClick={onClick}
     >
       <div className="game-card-inner" style={{ background: gradient }}>
-
         {/* ── Away team: logo on far left, score+abbr to its right ── */}
         <div className="gc-half gc-half--away">
           {awayAsset.logoUrl ? (
-            <img className="gc-logo" src={awayAsset.logoUrl} alt={awayTeam.abbr} />
+            <img
+              className="gc-logo"
+              src={awayAsset.logoUrl}
+              alt={awayTeam.abbr}
+            />
           ) : (
             <div className="gc-logo-placeholder" />
           )}
@@ -60,7 +63,11 @@ export default function GameCard({
         {/* ── Home team: score+abbr on left, logo on far right ───── */}
         <div className="gc-half gc-half--home">
           {homeAsset.logoUrl ? (
-            <img className="gc-logo" src={homeAsset.logoUrl} alt={homeTeam.abbr} />
+            <img
+              className="gc-logo"
+              src={homeAsset.logoUrl}
+              alt={homeTeam.abbr}
+            />
           ) : (
             <div className="gc-logo-placeholder" />
           )}
@@ -69,7 +76,6 @@ export default function GameCard({
             <span className="gc-abbr">{homeTeam.abbr}</span>
           </div>
         </div>
-
       </div>
     </div>
   );

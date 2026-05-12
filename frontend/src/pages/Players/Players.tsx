@@ -7,11 +7,11 @@ interface Player {
   playerId: number;
   fullName: string;
   teamId: number;
-  team: string;          // abbreviation e.g. "LAL"
+  team: string; // abbreviation e.g. "LAL"
   teamName: string;
   fromYear: string;
   toYear: string;
-  rosterStatus: number;  // 1 = active
+  rosterStatus: number; // 1 = active
 }
 
 interface CareerSeason {
@@ -110,17 +110,17 @@ function useDebounce<T>(value: T, delay: number): T {
 
 export default function Players() {
   // ── Sidebar state ──────────────────────────────────────────────────────────
-  const [searchQuery, setSearchQuery]       = useState('');
-  const [activeOnly, setActiveOnly]         = useState(true);
-  const [players, setPlayers]               = useState<Player[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeOnly, setActiveOnly] = useState(true);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [loadingPlayers, setLoadingPlayers] = useState(false);
-  const [errorPlayers, setErrorPlayers]     = useState<string | null>(null);
+  const [errorPlayers, setErrorPlayers] = useState<string | null>(null);
 
   // ── Detail state ───────────────────────────────────────────────────────────
-  const [selectedPlayer, setSelectedPlayer]   = useState<Player | null>(null);
-  const [careerStats, setCareerStats]         = useState<CareerStats | null>(null);
-  const [loadingCareer, setLoadingCareer]     = useState(false);
-  const [errorCareer, setErrorCareer]         = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [careerStats, setCareerStats] = useState<CareerStats | null>(null);
+  const [loadingCareer, setLoadingCareer] = useState(false);
+  const [errorCareer, setErrorCareer] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
@@ -160,7 +160,7 @@ export default function Players() {
       setCareerStats(null);
       try {
         const res = await fetch(
-          `${API_BASE}/players/${selectedPlayer.playerId}/career`
+          `${API_BASE}/players/${selectedPlayer.playerId}/career`,
         );
         if (!res.ok) throw new Error(`${res.status}`);
         const data: CareerStats = await res.json();
@@ -181,7 +181,7 @@ export default function Players() {
   // Most recent season for the stat highlights in the header
   const latestSeason = careerStats?.seasons?.length
     ? [...careerStats.seasons].sort((a, b) =>
-        b.season.localeCompare(a.season)
+        b.season.localeCompare(a.season),
       )[0]
     : null;
 
@@ -192,7 +192,6 @@ export default function Players() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="players-page">
-
       {/* ── Sidebar ── */}
       <aside className="players-sidebar">
         <h2 className="players-sidebar-title">Players</h2>
@@ -225,7 +224,7 @@ export default function Players() {
 
         {/* Status */}
         {loadingPlayers && <p className="players-loading">Loading…</p>}
-        {errorPlayers   && <p className="players-error">{errorPlayers}</p>}
+        {errorPlayers && <p className="players-error">{errorPlayers}</p>}
 
         {/* Count */}
         {!loadingPlayers && players.length > 0 && (
@@ -237,7 +236,7 @@ export default function Players() {
         {/* List */}
         <div className="players-list" ref={listRef}>
           {players.map((player) => {
-            const c        = getColors(player.team);
+            const c = getColors(player.team);
             const isActive = selectedPlayer?.playerId === player.playerId;
             return (
               <button
@@ -281,7 +280,6 @@ export default function Players() {
       {/* ── Main Panel ── */}
       <main className="players-main">
         <div className="players-panel">
-
           {/* Empty state */}
           {!selectedPlayer && (
             <p className="players-placeholder">
@@ -332,7 +330,10 @@ export default function Players() {
                         {selectedPlayer.team}
                       </span>
                     ) : (
-                      <span className="players-team-pill" style={{ borderColor: '#333' }}>
+                      <span
+                        className="players-team-pill"
+                        style={{ borderColor: '#333' }}
+                      >
                         Free Agent
                       </span>
                     )}
@@ -367,12 +368,12 @@ export default function Players() {
                   {latestSeason && (
                     <div className="players-highlights">
                       {[
-                        { val: fmtStat(latestSeason.points),   lbl: 'PPG' },
-                        { val: fmtStat(latestSeason.rebounds),  lbl: 'RPG' },
-                        { val: fmtStat(latestSeason.assists),   lbl: 'APG' },
-                        { val: fmtStat(latestSeason.steals),    lbl: 'SPG' },
-                        { val: fmtStat(latestSeason.blocks),    lbl: 'BPG' },
-                        { val: fmtPct(latestSeason.fgPct),      lbl: 'FG%' },
+                        { val: fmtStat(latestSeason.points), lbl: 'PPG' },
+                        { val: fmtStat(latestSeason.rebounds), lbl: 'RPG' },
+                        { val: fmtStat(latestSeason.assists), lbl: 'APG' },
+                        { val: fmtStat(latestSeason.steals), lbl: 'SPG' },
+                        { val: fmtStat(latestSeason.blocks), lbl: 'BPG' },
+                        { val: fmtPct(latestSeason.fgPct), lbl: 'FG%' },
                       ].map(({ val, lbl }) => (
                         <div
                           key={lbl}
@@ -444,7 +445,12 @@ export default function Players() {
                               <td>{fmtStat(s.gamesPlayed)}</td>
                               <td>{fmtStat(s.gamesStarted)}</td>
                               <td>{fmtStat(s.minutes)}</td>
-                              <td style={{ color: colors.secondary, fontWeight: 700 }}>
+                              <td
+                                style={{
+                                  color: colors.secondary,
+                                  fontWeight: 700,
+                                }}
+                              >
                                 {fmtStat(s.points)}
                               </td>
                               <td>{fmtStat(s.rebounds)}</td>
@@ -452,9 +458,15 @@ export default function Players() {
                               <td>{fmtStat(s.steals)}</td>
                               <td>{fmtStat(s.blocks)}</td>
                               <td>{fmtStat(s.turnovers)}</td>
-                              <td className="players-pct-cell">{fmtPct(s.fgPct)}</td>
-                              <td className="players-pct-cell">{fmtPct(s.fg3Pct)}</td>
-                              <td className="players-pct-cell">{fmtPct(s.ftPct)}</td>
+                              <td className="players-pct-cell">
+                                {fmtPct(s.fgPct)}
+                              </td>
+                              <td className="players-pct-cell">
+                                {fmtPct(s.fg3Pct)}
+                              </td>
+                              <td className="players-pct-cell">
+                                {fmtPct(s.ftPct)}
+                              </td>
                             </tr>
                           ))}
                       </tbody>

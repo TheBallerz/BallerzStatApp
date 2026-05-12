@@ -2,10 +2,10 @@ import './favoriteTeamCard.css';
 import { getTeamAsset } from '../../assets/teamAssets';
 
 export interface FavoriteTeam {
-  _id:          string;
-  name:         string;
+  _id: string;
+  name: string;
   abbreviation: string;
-  logoUrl:      string | null;
+  logoUrl: string | null;
 }
 
 interface FavoriteTeamCardProps {
@@ -18,7 +18,7 @@ interface FavoriteTeamCardProps {
  * favorites section boxes.
  */
 export default function FavoriteTeamCard({ team }: FavoriteTeamCardProps) {
-  const asset   = getTeamAsset(team.abbreviation);
+  const asset = getTeamAsset(team.abbreviation);
   const logoUrl = team.logoUrl ?? asset.logoUrl;
 
   // Team color fills the left side and fades to dark

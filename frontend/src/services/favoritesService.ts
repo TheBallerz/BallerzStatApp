@@ -15,10 +15,10 @@ export async function saveFavorites(payload: {
   if (!token) throw new Error('Not authenticated.');
 
   const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/favorites`, {
-    method:  'PATCH',
+    method: 'PATCH',
     headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
   });

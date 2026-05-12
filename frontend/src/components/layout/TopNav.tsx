@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
-import "./topNav.css";
+import { NavLink } from 'react-router-dom';
+import './topNav.css';
 
 type NavItem = {
   label: string;
@@ -7,14 +7,14 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Home",       path: "/"          },
-  { label: "Teams",      path: "/teams"     },
-  { label: "Players",    path: "/players"   },
-  { label: "Fantasy",    path: "/fantasy"   },
-  { label: "Favorites",  path: "/favorites" },
-  { label: "Standings",  path: "/standings" },
-  { label: "Schedule",   path: "/schedule"  },
-  { label: "Account",    path: "/account"   },
+  { label: 'Home', path: '/' },
+  { label: 'Teams', path: '/teams' },
+  { label: 'Players', path: '/players' },
+  { label: 'Fantasy', path: '/fantasy' },
+  { label: 'Favorites', path: '/favorites' },
+  { label: 'Standings', path: '/standings' },
+  { label: 'Schedule', path: '/schedule' },
+  { label: 'Account', path: '/account' },
 ];
 
 export default function TopNav() {
@@ -25,8 +25,8 @@ export default function TopNav() {
           <NavLink
             key={item.label}
             to={item.path}
-            end={item.path === "/"}
-            className={({ isActive }) => `navitem${isActive ? " active" : ""}`}
+            end={item.path === '/'}
+            className={({ isActive }) => `navitem${isActive ? ' active' : ''}`}
           >
             {item.label}
           </NavLink>

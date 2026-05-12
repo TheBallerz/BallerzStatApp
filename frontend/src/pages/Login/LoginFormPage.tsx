@@ -1,27 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService";
-import "./loginPage.css";
-import "../GetStarted/getStartedPage.css";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../../services/authService';
+import './loginPage.css';
+import '../GetStarted/getStartedPage.css';
 
 export default function LoginFormPage() {
   const navigate = useNavigate();
 
   // Form fields
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Error message displayed in red below the form fields
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   // Disables the login arrow while the request is in flight
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    setError("");
+    setError('');
 
     // Client-side validation before hitting the network
     if (!email || !password) {
-      setError("Email and password are required.");
+      setError('Email and password are required.');
       return;
     }
 
@@ -29,10 +29,10 @@ export default function LoginFormPage() {
     try {
       setLoading(true);
       await login(email, password);
-      navigate("/");
+      navigate('/');
     } catch (err: unknown) {
       // Display the error message returned by the backend (e.g. invalid credentials)
-      setError(err instanceof Error ? err.message : "Login failed.");
+      setError(err instanceof Error ? err.message : 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function LoginFormPage() {
         <button
           className="gs-arrow gs-arrow--left"
           type="button"
-          onClick={() => navigate("/login")}
+          onClick={() => navigate('/login')}
           aria-label="Go back"
         >
           ←
@@ -94,7 +94,7 @@ export default function LoginFormPage() {
           disabled={loading}
           aria-label="Log in"
         >
-          {loading ? "…" : "→"}
+          {loading ? '…' : '→'}
         </button>
       </div>
     </div>

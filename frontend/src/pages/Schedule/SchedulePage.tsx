@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import "./SchedulePage.css";
+import { useState, useEffect } from 'react';
+import './SchedulePage.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,12 +15,12 @@ interface Team {
 interface TodayGame {
   _id: string;
   gameDate: string;
-  startTime: string;       // "7:30 pm ET" | "Q3 4:22" | "Final"
+  startTime: string; // "7:30 pm ET" | "Q3 4:22" | "Final"
   homeTeam: Team;
   awayTeam: Team;
   homeScore: number | null;
   awayScore: number | null;
-  status: "Upcoming" | "Live" | "Final";
+  status: 'Upcoming' | 'Live' | 'Final';
 }
 
 // Shape returned by GET /api/schedule?team=LAL
@@ -29,7 +29,7 @@ interface TeamGame {
   gameDate: string;
   opponentTeamId: Team;
   isHome: boolean;
-  wl: "W" | "L";
+  wl: 'W' | 'L';
   points: number;
   oppPoints: number;
   rebounds: number;
@@ -42,33 +42,82 @@ interface TeamGame {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE       = import.meta.env.VITE_API_BASE;
-const CURRENT_SEASON = "2024-25";
+const API_BASE = import.meta.env.VITE_API_BASE;
+const CURRENT_SEASON = '2024-25';
 
 // All 30 teams for the fallback picker when favorites aren't set up yet
 const ALL_TEAMS = [
-  "ATL","BOS","BKN","CHA","CHI","CLE","DAL","DEN","DET","GSW",
-  "HOU","IND","LAC","LAL","MEM","MIA","MIL","MIN","NOP","NYK",
-  "OKC","ORL","PHI","PHX","POR","SAC","SAS","TOR","UTA","WAS",
+  'ATL',
+  'BOS',
+  'BKN',
+  'CHA',
+  'CHI',
+  'CLE',
+  'DAL',
+  'DEN',
+  'DET',
+  'GSW',
+  'HOU',
+  'IND',
+  'LAC',
+  'LAL',
+  'MEM',
+  'MIA',
+  'MIL',
+  'MIN',
+  'NOP',
+  'NYK',
+  'OKC',
+  'ORL',
+  'PHI',
+  'PHX',
+  'POR',
+  'SAC',
+  'SAS',
+  'TOR',
+  'UTA',
+  'WAS',
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const NBA_CDN_IDS: Record<string, string> = {
-  LAL:"1610612747", GSW:"1610612744", BOS:"1610612738", CHI:"1610612741",
-  MIA:"1610612748", NYK:"1610612752", LAC:"1610612746", PHX:"1610612756",
-  DEN:"1610612743", MIL:"1610612749", DAL:"1610612742", PHI:"1610612755",
-  BKN:"1610612751", TOR:"1610612761", ATL:"1610612737", CLE:"1610612739",
-  IND:"1610612754", CHA:"1610612766", ORL:"1610612753", WAS:"1610612764",
-  MEM:"1610612763", NOP:"1610612740", SAS:"1610612759", OKC:"1610612760",
-  UTA:"1610612762", POR:"1610612757", SAC:"1610612758", MIN:"1610612750",
-  HOU:"1610612745", DET:"1610612765",
+  LAL: '1610612747',
+  GSW: '1610612744',
+  BOS: '1610612738',
+  CHI: '1610612741',
+  MIA: '1610612748',
+  NYK: '1610612752',
+  LAC: '1610612746',
+  PHX: '1610612756',
+  DEN: '1610612743',
+  MIL: '1610612749',
+  DAL: '1610612742',
+  PHI: '1610612755',
+  BKN: '1610612751',
+  TOR: '1610612761',
+  ATL: '1610612737',
+  CLE: '1610612739',
+  IND: '1610612754',
+  CHA: '1610612766',
+  ORL: '1610612753',
+  WAS: '1610612764',
+  MEM: '1610612763',
+  NOP: '1610612740',
+  SAS: '1610612759',
+  OKC: '1610612760',
+  UTA: '1610612762',
+  POR: '1610612757',
+  SAC: '1610612758',
+  MIN: '1610612750',
+  HOU: '1610612745',
+  DET: '1610612765',
 };
 
 function getLogoUrl(team: Team): string {
   if (team.logoUrl) return team.logoUrl;
   const id = NBA_CDN_IDS[team.abbreviation];
-  return id ? `https://cdn.nba.com/logos/nba/${id}/global/L/logo.svg` : "";
+  return id ? `https://cdn.nba.com/logos/nba/${id}/global/L/logo.svg` : '';
 }
 
 function formatDate(raw: string): string {
@@ -76,71 +125,70 @@ function formatDate(raw: string): string {
   // scoreboardv2 returns ISO-like "2025-04-01T00:00:00"
   const d = new Date(raw);
   if (isNaN(d.getTime())) return raw;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 const TEAM_COLORS: Record<string, { primary: string; secondary: string }> = {
-  LAL:{ primary:"#552583", secondary:"#FDB927" },
-  GSW:{ primary:"#1D428A", secondary:"#FFC72C" },
-  BOS:{ primary:"#007A33", secondary:"#BA9653" },
-  CHI:{ primary:"#CE1141", secondary:"#FFFFFF" },
-  MIA:{ primary:"#98002E", secondary:"#F9A01B" },
-  NYK:{ primary:"#006BB6", secondary:"#F58426" },
-  LAC:{ primary:"#C8102E", secondary:"#1D428A" },
-  PHX:{ primary:"#1D1160", secondary:"#E56020" },
-  DEN:{ primary:"#0E2240", secondary:"#FEC524" },
-  MIL:{ primary:"#00471B", secondary:"#EEE1C6" },
-  DAL:{ primary:"#00538C", secondary:"#002B5E" },
-  PHI:{ primary:"#006BB6", secondary:"#ED174C" },
-  BKN:{ primary:"#444444", secondary:"#AAAAAA" },
-  TOR:{ primary:"#CE1141", secondary:"#FF6B35" },
-  ATL:{ primary:"#E03A3E", secondary:"#C1D32F" },
-  CLE:{ primary:"#860038", secondary:"#FDBB30" },
-  IND:{ primary:"#002D62", secondary:"#FDBB30" },
-  CHA:{ primary:"#1D1160", secondary:"#00788C" },
-  ORL:{ primary:"#0077C0", secondary:"#C4CED4" },
-  WAS:{ primary:"#002B5C", secondary:"#E31837" },
-  MEM:{ primary:"#5D76A9", secondary:"#12173F"  },
-  NOP:{ primary:"#0C2340", secondary:"#C8A956" },
-  SAS:{ primary:"#444444", secondary:"#C4CED4" },
-  OKC:{ primary:"#007AC1", secondary:"#EF3B24" },
-  UTA:{ primary:"#002B5C", secondary:"#00471B" },
-  POR:{ primary:"#E03A3E", secondary:"#000000" },
-  SAC:{ primary:"#5A2D81", secondary:"#63727A" },
-  MIN:{ primary:"#0C2340", secondary:"#236192" },
-  HOU:{ primary:"#CE1141", secondary:"#C4CED4" },
-  DET:{ primary:"#C8102E", secondary:"#1D428A" },
+  LAL: { primary: '#552583', secondary: '#FDB927' },
+  GSW: { primary: '#1D428A', secondary: '#FFC72C' },
+  BOS: { primary: '#007A33', secondary: '#BA9653' },
+  CHI: { primary: '#CE1141', secondary: '#FFFFFF' },
+  MIA: { primary: '#98002E', secondary: '#F9A01B' },
+  NYK: { primary: '#006BB6', secondary: '#F58426' },
+  LAC: { primary: '#C8102E', secondary: '#1D428A' },
+  PHX: { primary: '#1D1160', secondary: '#E56020' },
+  DEN: { primary: '#0E2240', secondary: '#FEC524' },
+  MIL: { primary: '#00471B', secondary: '#EEE1C6' },
+  DAL: { primary: '#00538C', secondary: '#002B5E' },
+  PHI: { primary: '#006BB6', secondary: '#ED174C' },
+  BKN: { primary: '#444444', secondary: '#AAAAAA' },
+  TOR: { primary: '#CE1141', secondary: '#FF6B35' },
+  ATL: { primary: '#E03A3E', secondary: '#C1D32F' },
+  CLE: { primary: '#860038', secondary: '#FDBB30' },
+  IND: { primary: '#002D62', secondary: '#FDBB30' },
+  CHA: { primary: '#1D1160', secondary: '#00788C' },
+  ORL: { primary: '#0077C0', secondary: '#C4CED4' },
+  WAS: { primary: '#002B5C', secondary: '#E31837' },
+  MEM: { primary: '#5D76A9', secondary: '#12173F' },
+  NOP: { primary: '#0C2340', secondary: '#C8A956' },
+  SAS: { primary: '#444444', secondary: '#C4CED4' },
+  OKC: { primary: '#007AC1', secondary: '#EF3B24' },
+  UTA: { primary: '#002B5C', secondary: '#00471B' },
+  POR: { primary: '#E03A3E', secondary: '#000000' },
+  SAC: { primary: '#5A2D81', secondary: '#63727A' },
+  MIN: { primary: '#0C2340', secondary: '#236192' },
+  HOU: { primary: '#CE1141', secondary: '#C4CED4' },
+  DET: { primary: '#C8102E', secondary: '#1D428A' },
 };
 
 const getColors = (abbr: string) =>
-  TEAM_COLORS[abbr] ?? { primary: "#333333", secondary: "#888888" };
+  TEAM_COLORS[abbr] ?? { primary: '#333333', secondary: '#888888' };
 
 // Build a minimal Team object from just an abbreviation (for the picker)
 function teamFromAbbr(abbr: string): Team {
-  return { _id: abbr, abbreviation: abbr, name: "", city: "" };
+  return { _id: abbr, abbreviation: abbr, name: '', city: '' };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SchedulePage() {
-
   // ── Favorite teams sidebar ─────────────────────────────────────────────────
   const [favoriteTeams, setFavoriteTeams] = useState<Team[]>([]);
-  const [loadingFavs, setLoadingFavs]     = useState(true);
+  const [loadingFavs, setLoadingFavs] = useState(true);
   const [favoritesAvail, setFavoritesAvail] = useState(true);
 
   // ── Today's games ──────────────────────────────────────────────────────────
-  const [todaysGames, setTodaysGames]     = useState<TodayGame[]>([]);
-  const [loadingToday, setLoadingToday]   = useState(true);
-  const [errorToday, setErrorToday]       = useState<string | null>(null);
-  const [selectedGame, setSelectedGame]   = useState<TodayGame | null>(null);
+  const [todaysGames, setTodaysGames] = useState<TodayGame[]>([]);
+  const [loadingToday, setLoadingToday] = useState(true);
+  const [errorToday, setErrorToday] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<TodayGame | null>(null);
 
   // ── Team schedule ──────────────────────────────────────────────────────────
   // selectedTeam can come from the favorites sidebar OR the fallback picker
-  const [selectedTeam, setSelectedTeam]         = useState<Team | null>(null);
-  const [teamSchedule, setTeamSchedule]         = useState<TeamGame[]>([]);
-  const [loadingSchedule, setLoadingSchedule]   = useState(false);
-  const [errorSchedule, setErrorSchedule]       = useState<string | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [teamSchedule, setTeamSchedule] = useState<TeamGame[]>([]);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const [errorSchedule, setErrorSchedule] = useState<string | null>(null);
 
   // ── 1. Fetch favorite teams ────────────────────────────────────────────────
   // GET /api/users/me/favorites/teams
@@ -195,7 +243,7 @@ export default function SchedulePage() {
       setTeamSchedule([]);
       try {
         const params = new URLSearchParams({
-          team:   selectedTeam.abbreviation,
+          team: selectedTeam.abbreviation,
           season: CURRENT_SEASON,
         });
         const res = await fetch(`${API_BASE}/schedule?${params}`);
@@ -203,7 +251,7 @@ export default function SchedulePage() {
         const data: TeamGame[] = await res.json();
         setTeamSchedule(data);
       } catch (err) {
-        setErrorSchedule("Could not load team schedule.");
+        setErrorSchedule('Could not load team schedule.');
         console.error(err);
       } finally {
         setLoadingSchedule(false);
@@ -215,20 +263,19 @@ export default function SchedulePage() {
   // ── Derived ────────────────────────────────────────────────────────────────
   const colors = selectedTeam ? getColors(selectedTeam.abbreviation) : null;
 
-  const favTeamIds = new Set(favoriteTeams.map(t => t._id));
+  const favTeamIds = new Set(favoriteTeams.map((t) => t._id));
 
   // Record counts for the schedule table summary
-  const wins   = teamSchedule.filter(g => g.wl === "W").length;
-  const losses = teamSchedule.filter(g => g.wl === "L").length;
+  const wins = teamSchedule.filter((g) => g.wl === 'W').length;
+  const losses = teamSchedule.filter((g) => g.wl === 'L').length;
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="sched-page">
-
       {/* ── Sidebar ── */}
       <aside className="sched-sidebar">
         <h2 className="sched-sidebar-title">
-          {favoritesAvail ? "Favorite Teams" : "Select Team"}
+          {favoritesAvail ? 'Favorite Teams' : 'Select Team'}
         </h2>
 
         {/* Favorites list */}
@@ -238,21 +285,25 @@ export default function SchedulePage() {
 
             <div className="sched-team-list">
               {favoriteTeams.map((team) => {
-                const c        = getColors(team.abbreviation);
-                const isActive = selectedTeam?.abbreviation === team.abbreviation;
+                const c = getColors(team.abbreviation);
+                const isActive =
+                  selectedTeam?.abbreviation === team.abbreviation;
                 return (
                   <button
                     key={team._id}
-                    className={`sched-team-item ${isActive ? "active" : ""}`}
+                    className={`sched-team-item ${isActive ? 'active' : ''}`}
                     style={
                       isActive
                         ? {
-                            background:  `linear-gradient(135deg, ${c.primary}55, #1a1a1a)`,
+                            background: `linear-gradient(135deg, ${c.primary}55, #1a1a1a)`,
                             borderColor: c.secondary,
                           }
                         : {}
                     }
-                    onClick={() => { setSelectedTeam(team); setSelectedGame(null); }}
+                    onClick={() => {
+                      setSelectedTeam(team);
+                      setSelectedGame(null);
+                    }}
                   >
                     <div
                       className="sched-team-logo-wrap"
@@ -267,7 +318,9 @@ export default function SchedulePage() {
                       />
                     </div>
                     <div className="sched-team-text">
-                      <span className="sched-team-abbr">{team.abbreviation}</span>
+                      <span className="sched-team-abbr">
+                        {team.abbreviation}
+                      </span>
                       <span className="sched-team-next">
                         {team.city} {team.name}
                       </span>
@@ -277,7 +330,9 @@ export default function SchedulePage() {
               })}
 
               {!loadingFavs && favoriteTeams.length === 0 && (
-                <p className="sched-placeholder">No favorite teams added yet.</p>
+                <p className="sched-placeholder">
+                  No favorite teams added yet.
+                </p>
               )}
             </div>
           </>
@@ -291,15 +346,17 @@ export default function SchedulePage() {
             </label>
             <select
               className="sched-team-picker"
-              value={selectedTeam?.abbreviation ?? ""}
+              value={selectedTeam?.abbreviation ?? ''}
               onChange={(e) => {
                 const abbr = e.target.value;
                 if (abbr) setSelectedTeam(teamFromAbbr(abbr));
               }}
             >
               <option value="">— pick a team —</option>
-              {ALL_TEAMS.map(abbr => (
-                <option key={abbr} value={abbr}>{abbr}</option>
+              {ALL_TEAMS.map((abbr) => (
+                <option key={abbr} value={abbr}>
+                  {abbr}
+                </option>
               ))}
             </select>
           </div>
@@ -309,13 +366,12 @@ export default function SchedulePage() {
       {/* ── Main Panel ── */}
       <main className="sched-main">
         <div className="sched-panel">
-
           {/* ── Today's Games strip ── */}
           <section className="sched-today-section">
             <h3 className="sched-section-title">Today's Games</h3>
 
             {loadingToday && <p className="sched-loading">Loading…</p>}
-            {errorToday   && <p className="sched-error">{errorToday}</p>}
+            {errorToday && <p className="sched-error">{errorToday}</p>}
 
             {!loadingToday && !errorToday && todaysGames.length === 0 && (
               <p className="sched-placeholder">No games scheduled for today.</p>
@@ -323,13 +379,14 @@ export default function SchedulePage() {
 
             <div className="sched-today-list">
               {todaysGames.map((game) => {
-                const isFav  = favTeamIds.has(game.homeTeam._id) ||
-                               favTeamIds.has(game.awayTeam._id);
+                const isFav =
+                  favTeamIds.has(game.homeTeam._id) ||
+                  favTeamIds.has(game.awayTeam._id);
                 const isActive = selectedGame?._id === game._id;
 
                 // Score display for live / final games
                 const scoreLabel =
-                  game.status !== "Upcoming" &&
+                  game.status !== 'Upcoming' &&
                   game.homeScore !== null &&
                   game.awayScore !== null
                     ? `${game.awayScore}–${game.homeScore}`
@@ -339,10 +396,10 @@ export default function SchedulePage() {
                   <button
                     key={game._id}
                     className={[
-                      "sched-today-card",
-                      isFav    ? "fav-game" : "",
-                      isActive ? "active"   : "",
-                    ].join(" ")}
+                      'sched-today-card',
+                      isFav ? 'fav-game' : '',
+                      isActive ? 'active' : '',
+                    ].join(' ')}
                     onClick={() => setSelectedGame(isActive ? null : game)}
                   >
                     <span className="sched-today-time">
@@ -357,8 +414,10 @@ export default function SchedulePage() {
                     {scoreLabel ? (
                       <span className="sched-score">{scoreLabel}</span>
                     ) : (
-                      <span className={`sched-status ${game.status === "Live" ? "live" : ""}`}>
-                        {game.status === "Live" ? "● LIVE" : game.status}
+                      <span
+                        className={`sched-status ${game.status === 'Live' ? 'live' : ''}`}
+                      >
+                        {game.status === 'Live' ? '● LIVE' : game.status}
                       </span>
                     )}
                   </button>
@@ -371,10 +430,10 @@ export default function SchedulePage() {
 
           {/* ── Full team schedule ── */}
           <section className="sched-full-section">
-
             {!selectedTeam && (
               <p className="sched-placeholder">
-                Select a team from the left to view their {CURRENT_SEASON} schedule.
+                Select a team from the left to view their {CURRENT_SEASON}{' '}
+                schedule.
               </p>
             )}
 
@@ -403,11 +462,13 @@ export default function SchedulePage() {
                     >
                       {selectedTeam.city
                         ? `${selectedTeam.city} ${selectedTeam.name}`
-                        : selectedTeam.abbreviation}{" "}
+                        : selectedTeam.abbreviation}{' '}
                       — {CURRENT_SEASON}
                     </h3>
                     {teamSchedule.length > 0 && (
-                      <p style={{ margin: 0, fontSize: "0.8rem", color: "#666" }}>
+                      <p
+                        style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}
+                      >
                         {wins}–{losses} ({teamSchedule.length} games)
                       </p>
                     )}
@@ -421,9 +482,13 @@ export default function SchedulePage() {
                   <p className="sched-error">{errorSchedule}</p>
                 )}
 
-                {!loadingSchedule && teamSchedule.length === 0 && !errorSchedule && (
-                  <p className="sched-placeholder">No games found for this season.</p>
-                )}
+                {!loadingSchedule &&
+                  teamSchedule.length === 0 &&
+                  !errorSchedule && (
+                    <p className="sched-placeholder">
+                      No games found for this season.
+                    </p>
+                  )}
 
                 {teamSchedule.length > 0 && (
                   <div className="sched-table-wrap">
@@ -444,7 +509,7 @@ export default function SchedulePage() {
                       <tbody>
                         {teamSchedule.map((game) => {
                           const opp = game.opponentTeamId;
-                          const won = game.wl === "W";
+                          const won = game.wl === 'W';
                           return (
                             <tr key={game._id}>
                               <td className="sched-date-col">
@@ -453,14 +518,16 @@ export default function SchedulePage() {
                               <td>
                                 <div className="sched-opp-cell">
                                   <span className="sched-ha-badge">
-                                    {game.isHome ? "vs" : "@"}
+                                    {game.isHome ? 'vs' : '@'}
                                   </span>
                                   <img
                                     src={getLogoUrl(opp)}
                                     alt={opp.abbreviation}
                                     className="sched-opp-logo"
                                     onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display = "none";
+                                      (
+                                        e.target as HTMLImageElement
+                                      ).style.display = 'none';
                                     }}
                                   />
                                   <span className="sched-opp-abbr">
@@ -469,15 +536,22 @@ export default function SchedulePage() {
                                 </div>
                               </td>
                               <td>
-                                <span className={`sched-result ${won ? "win" : "loss"}`}>
+                                <span
+                                  className={`sched-result ${won ? 'win' : 'loss'}`}
+                                >
                                   {game.wl}
                                 </span>
                               </td>
                               <td className="sched-score">
-                                <span style={{ color: won ? "#4ade80" : "#f87171", fontWeight: 700 }}>
+                                <span
+                                  style={{
+                                    color: won ? '#4ade80' : '#f87171',
+                                    fontWeight: 700,
+                                  }}
+                                >
                                   {game.points}
                                 </span>
-                                <span style={{ color: "#444" }}> – </span>
+                                <span style={{ color: '#444' }}> – </span>
                                 <span>{game.oppPoints}</span>
                               </td>
                               <td>{game.rebounds}</td>
@@ -486,13 +560,18 @@ export default function SchedulePage() {
                               <td>{game.blocks}</td>
                               <td
                                 style={{
-                                  color:      game.plusMinus > 0 ? "#4ade80"
-                                            : game.plusMinus < 0 ? "#f87171"
-                                            : "#666",
+                                  color:
+                                    game.plusMinus > 0
+                                      ? '#4ade80'
+                                      : game.plusMinus < 0
+                                        ? '#f87171'
+                                        : '#666',
                                   fontWeight: 600,
                                 }}
                               >
-                                {game.plusMinus > 0 ? `+${game.plusMinus}` : game.plusMinus}
+                                {game.plusMinus > 0
+                                  ? `+${game.plusMinus}`
+                                  : game.plusMinus}
                               </td>
                             </tr>
                           );

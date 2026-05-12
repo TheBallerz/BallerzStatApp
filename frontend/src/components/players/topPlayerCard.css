@@ -3,14 +3,16 @@
 .tpc-card {
   position: relative;
   display: flex;
-  align-items: flex-end;      /* anchor info text to bottom-left */
+  align-items: flex-end; /* anchor info text to bottom-left */
   height: 70px;
   border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: border-color 0.15s ease, filter 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    filter 0.15s ease;
 }
 
 .tpc-card:hover {

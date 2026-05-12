@@ -2,12 +2,12 @@ import './favoritePlayerCard.css';
 import { getTeamAsset } from '../../assets/teamAssets';
 
 export interface FavoritePlayer {
-  _id:       string;
+  _id: string;
   firstName: string;
-  lastName:  string;
-  nbaId:     number | null;
-  imageUrl:  string | null;
-  teamId:    { abbreviation: string } | null;
+  lastName: string;
+  nbaId: number | null;
+  imageUrl: string | null;
+  teamId: { abbreviation: string } | null;
 }
 
 interface FavoritePlayerCardProps {
@@ -18,8 +18,10 @@ interface FavoritePlayerCardProps {
  * Favorite player card — same gradient + headshot design as TopPlayerCard
  * but scaled up to 150px to fit the favorites section boxes.
  */
-export default function FavoritePlayerCard({ player }: FavoritePlayerCardProps) {
-  const abbr  = player.teamId?.abbreviation ?? '';
+export default function FavoritePlayerCard({
+  player,
+}: FavoritePlayerCardProps) {
+  const abbr = player.teamId?.abbreviation ?? '';
   const asset = getTeamAsset(abbr);
 
   // Use the NBA CDN headshot if nbaId is available, fall back to imageUrl

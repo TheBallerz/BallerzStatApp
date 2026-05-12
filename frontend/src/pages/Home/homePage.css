@@ -84,7 +84,9 @@
   border-radius: 14px;
   height: 70px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .game-card:hover {
@@ -148,7 +150,9 @@
   border-radius: 14px;
   height: 150px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .favorite-card:hover {

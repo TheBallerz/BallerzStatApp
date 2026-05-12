@@ -2,20 +2,25 @@ import { useState, useEffect } from 'react';
 import { type SelectedItem } from './GetStartedStep2';
 
 interface TeamResult {
-  _id:   string;
-  name:  string;
+  _id: string;
+  name: string;
   nbaId: number | null;
 }
 
 interface Props {
   selectedTeams: SelectedItem[];
-  onAdd:    (team: SelectedItem) => void;
+  onAdd: (team: SelectedItem) => void;
   onRemove: (id: string) => void;
-  onSkip:   () => void;
+  onSkip: () => void;
 }
 
-export default function GetStartedStep3({ selectedTeams, onAdd, onRemove, onSkip }: Props) {
-  const [query,   setQuery]   = useState('');
+export default function GetStartedStep3({
+  selectedTeams,
+  onAdd,
+  onRemove,
+  onSkip,
+}: Props) {
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<TeamResult[]>([]);
 
   // Debounced search — fires 300 ms after the user stops typing
@@ -23,10 +28,13 @@ export default function GetStartedStep3({ selectedTeams, onAdd, onRemove, onSkip
     const trimmed = query.trim();
 
     const timer = setTimeout(async () => {
-      if (!trimmed) { setResults([]); return; }
+      if (!trimmed) {
+        setResults([]);
+        return;
+      }
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE}/teams/search?q=${encodeURIComponent(trimmed)}`
+          `${import.meta.env.VITE_API_BASE}/teams/search?q=${encodeURIComponent(trimmed)}`,
         );
         if (res.ok) setResults(await res.json());
       } catch {
@@ -66,7 +74,9 @@ export default function GetStartedStep3({ selectedTeams, onAdd, onRemove, onSkip
           placeholder=""
           aria-label="Search teams"
         />
-        <span className="gs-search-icon" aria-hidden="true">🔍</span>
+        <span className="gs-search-icon" aria-hidden="true">
+          🔍
+        </span>
       </div>
 
       {/* ── Search results ─────────────────────────────────── */}
@@ -80,7 +90,7 @@ export default function GetStartedStep3({ selectedTeams, onAdd, onRemove, onSkip
                 type="button"
                 onClick={() =>
                   onAdd({
-                    id:   team.nbaId != null ? String(team.nbaId) : team._id,
+                    id: team.nbaId != null ? String(team.nbaId) : team._id,
                     name: team.name,
                   })
                 }

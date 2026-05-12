@@ -1,26 +1,31 @@
 import { useState, useEffect } from 'react';
 
 export interface SelectedItem {
-  id:   string;
+  id: string;
   name: string;
 }
 
 interface PlayerResult {
-  _id:       string;
+  _id: string;
   firstName: string;
-  lastName:  string;
-  nbaId:     number | null;
+  lastName: string;
+  nbaId: number | null;
 }
 
 interface Props {
   selectedPlayers: SelectedItem[];
-  onAdd:    (player: SelectedItem) => void;
+  onAdd: (player: SelectedItem) => void;
   onRemove: (id: string) => void;
-  onSkip:   () => void;
+  onSkip: () => void;
 }
 
-export default function GetStartedStep2({ selectedPlayers, onAdd, onRemove, onSkip }: Props) {
-  const [query,   setQuery]   = useState('');
+export default function GetStartedStep2({
+  selectedPlayers,
+  onAdd,
+  onRemove,
+  onSkip,
+}: Props) {
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<PlayerResult[]>([]);
 
   // Debounced search — fires 300 ms after the user stops typing
@@ -28,10 +33,13 @@ export default function GetStartedStep2({ selectedPlayers, onAdd, onRemove, onSk
     const trimmed = query.trim();
 
     const timer = setTimeout(async () => {
-      if (!trimmed) { setResults([]); return; }
+      if (!trimmed) {
+        setResults([]);
+        return;
+      }
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE}/players/search?q=${encodeURIComponent(trimmed)}`
+          `${import.meta.env.VITE_API_BASE}/players/search?q=${encodeURIComponent(trimmed)}`,
         );
         if (res.ok) setResults(await res.json());
       } catch {
@@ -71,7 +79,9 @@ export default function GetStartedStep2({ selectedPlayers, onAdd, onRemove, onSk
           placeholder=""
           aria-label="Search players"
         />
-        <span className="gs-search-icon" aria-hidden="true">🔍</span>
+        <span className="gs-search-icon" aria-hidden="true">
+          🔍
+        </span>
       </div>
 
       {/* ── Search results ─────────────────────────────────── */}
@@ -87,7 +97,8 @@ export default function GetStartedStep2({ selectedPlayers, onAdd, onRemove, onSk
                 type="button"
                 onClick={() =>
                   onAdd({
-                    id:   player.nbaId != null ? String(player.nbaId) : player._id,
+                    id:
+                      player.nbaId != null ? String(player.nbaId) : player._id,
                     name: `${player.firstName} ${player.lastName}`,
                   })
                 }
