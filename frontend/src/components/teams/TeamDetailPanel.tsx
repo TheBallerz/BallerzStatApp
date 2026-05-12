@@ -7,6 +7,8 @@ type SelectedTeam = {
   name: string;
   division: string;
   teamId: number;
+  primaryColor?: string;
+  secondaryColor?: string;
 };
 
 type TeamDetail = {
@@ -56,7 +58,15 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
   }, [team.teamId]);
 
   return (
-    <div className="team-detail-panel">
+    <div
+        className="team-detail-panel"
+        style={
+          {
+            "--team-primary": team.primaryColor,
+            "--team-secondary": team.secondaryColor,
+          } as React.CSSProperties
+        }
+      >
       <div className="team-detail-header">
         <div className="team-detail-identity">
           {logoSrc ? (

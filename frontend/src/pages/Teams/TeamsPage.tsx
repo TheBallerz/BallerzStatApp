@@ -8,6 +8,9 @@ type SelectedTeam = {
   name: string;
   division: string;
   teamId: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  logoUrl?: string;
 };
 
 type Team = {
@@ -21,6 +24,9 @@ type Team = {
   rpg?: number;
   apg?: number;
   fgPct?: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  logoUrl?: string;
 };
 
 type Division = {
@@ -46,6 +52,9 @@ function groupTeamsByDivision(teams: Team[]): Division[] {
         name: team.teamName,
         division: divisionName,
         teamId: team.teamId,
+        primaryColor: team.primaryColor,
+        secondaryColor: team.secondaryColor,
+        logoUrl: team.logoUrl,
       })),
   }));
 }
@@ -77,6 +86,10 @@ export default function TeamsPage() {
           rpg: team.rpg,
           apg: team.apg,
           fgPct: team.fgPct,
+        
+          primaryColor: team.primaryColor,
+          secondaryColor: team.secondaryColor,
+          logoUrl: team.logoUrl,
         }));
 
         console.log("MAPPED TEAMS:", mappedTeams);
@@ -127,6 +140,30 @@ export default function TeamsPage() {
 
   return (
     <div className={`teams-page ${hasPanel ? "has-panel" : ""}`}>
+      {!hasPanel && (
+        <div className="teams-hero">
+          <div>
+            <h1>Teams</h1>
+            <p>Explore NBA teams by division, view stats, and compare matchups.</p>
+          </div>
+  
+          <div className="teams-summary">
+            <div>
+              <strong>30</strong>
+              <span>Teams</span>
+            </div>
+            <div>
+              <strong>6</strong>
+              <span>Divisions</span>
+            </div>
+            <div>
+              <strong>2</strong>
+              <span>Conferences</span>
+            </div>
+          </div>
+        </div>
+      )}
+  
       <div className={hasPanel ? "teams-list" : "division-grid"}>
         {divisions.map((division) => (
           <DivisionCard
@@ -137,7 +174,7 @@ export default function TeamsPage() {
           />
         ))}
       </div>
-
+  
       {hasPanel && (
         <div className={`team-panels-container panels-${selectedTeams.length}`}>
           {selectedTeams.map((team) => (

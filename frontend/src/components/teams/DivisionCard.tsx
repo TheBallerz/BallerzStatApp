@@ -5,6 +5,9 @@ type SelectedTeam = {
   name: string;
   division: string;
   teamId: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  logoUrl?: string;
 };
 
 type Division = {
@@ -38,13 +41,13 @@ export default function DivisionCard({
             <li
               key={team.name}
               className={`team-row ${isSelected ? "selected" : ""}`}
-              onClick={() =>
-                onTeamClick?.({
-                  name: team.name,
-                  division: division.name,
-                  teamId: team.teamId,
-                })
+              style={
+                {
+                  "--team-primary": team.primaryColor,
+                  "--team-secondary": team.secondaryColor,
+                } as React.CSSProperties
               }
+              onClick={() => onTeamClick?.(team)}
             >
               {logoSrc ? (
                 <img

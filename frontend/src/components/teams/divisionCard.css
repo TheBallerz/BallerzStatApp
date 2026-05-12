@@ -20,6 +20,17 @@
   margin-bottom: 14px;
   cursor: pointer;
   user-select: none;
+
+  border-radius: 12px;
+  padding: 6px 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease,
+    filter 0.25s ease;
 }
 
 .team-row input[type="checkbox"] {
@@ -46,11 +57,14 @@
 }
 
 .team-row:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 6px 8px;
-  margin-left: -8px;
-  margin-right: -8px;
+  background: linear-gradient(
+    135deg,
+    var(--team-primary),
+    var(--team-secondary)
+  );
+  box-shadow: 0 0 18px var(--team-primary);
+  transform: translateY(-2px);
+  filter: saturate(1.2);
 }
 
 .team-row:active {
@@ -58,9 +72,10 @@
 }
 
 .team-row.selected {
-  background: rgba(255, 255, 255, 0.10);
-  border-radius: 12px;
-  padding: 6px 8px;
-  margin-left: -8px;
-  margin-right: -8px;
+  background: linear-gradient(
+    135deg,
+    var(--team-primary),
+    var(--team-secondary)
+  );
+  box-shadow: 0 0 18px var(--team-primary);
 }
