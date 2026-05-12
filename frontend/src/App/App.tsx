@@ -12,6 +12,7 @@ import AccountPage from "../pages/AccountPage";
 import './App.css';
 import { Routes, Route} from 'react-router-dom';
 import Layout from "../components/layout/Layout";
+import Fantasy from '../pages/Fantasy/Fantasy';
 
 
 
@@ -36,6 +37,7 @@ function App() {
                     <Route path="/standings" element={<StandingsPage />} />
                     <Route path="/schedule"  element={<SchedulePage />}  />
                     <Route path="/account"   element={<AccountPage />}   />
+                    <Route path="/fantasy" element={<Fantasy />} />
                   </Routes>
                 </Layout>
               }

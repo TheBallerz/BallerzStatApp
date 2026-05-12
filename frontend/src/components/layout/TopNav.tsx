@@ -10,6 +10,7 @@ const navItems: NavItem[] = [
   { label: "Home",       path: "/"          },
   { label: "Teams",      path: "/teams"     },
   { label: "Players",    path: "/players"   },
+  { label: "Fantasy",    path: "/fantasy"   },
   { label: "Favorites",  path: "/favorites" },
   { label: "Standings",  path: "/standings" },
   { label: "Schedule",   path: "/schedule"  },
