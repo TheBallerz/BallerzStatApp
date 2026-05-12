@@ -35,7 +35,7 @@ router.get('/players/search', async (req, res) => {
     const players = await Player.find({
       $or: [{ firstName: regex }, { lastName: regex }],
     })
-      .select('_id firstName lastName')
+      .select('_id firstName lastName nbaId')
       .limit(10)
       .lean();
 

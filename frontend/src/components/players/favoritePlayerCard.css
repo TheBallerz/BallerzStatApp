@@ -1,0 +1,64 @@
+/* ── FavoritePlayerCard — 150px tall variant of TopPlayerCard ── */
+
+.fpc-card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;      /* anchor info text to bottom-left */
+  height: 150px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: border-color 0.15s ease, filter 0.15s ease;
+}
+
+.fpc-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  filter: brightness(1.08);
+}
+
+/* ── Player headshot ──────────────────────────────────────── */
+
+.fpc-headshot {
+  position: absolute;
+  left: -20px;
+  bottom: 0;
+  height: 98%;
+  width: auto;
+  object-fit: cover;
+  object-position: top;
+  pointer-events: none;
+}
+
+/* ── Name + team abbreviation ─────────────────────────────── */
+
+.fpc-info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 0 12px 70px 140px;
+  /* flex: 1 + min-width: 0 constrains the container so ellipsis fires */
+  flex: 1;
+  min-width: 0;
+}
+
+.fpc-name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fpc-team {
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

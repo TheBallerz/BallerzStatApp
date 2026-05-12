@@ -21,12 +21,17 @@ const NBA_URL = 'https://stats.nba.com/stats';
 //                       common bot-detection signal.
 const NBA_HEADERS = {
   'User-Agent':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36',
   'x-nba-stats-origin': 'stats',
   'x-nba-stats-token':  'true',
-  Referer:         'https://www.nba.com/',
-  Origin:          'https://www.nba.com',
-  'Accept-Language': 'en-US,en;q=0.9',
+  Referer:              'https://www.nba.com/',
+  Origin:               'https://www.nba.com',
+  'Accept':             'application/json, text/plain, */*',
+  'Accept-Language':    'en-US,en;q=0.9',
+  'Accept-Encoding':    'gzip, deflate, br',
+  'Connection':         'keep-alive',
+  'Cache-Control':      'no-cache',
+  'Pragma':             'no-cache',
 };
 
 // Insead of hard coding "current season" we have this function to get current season
@@ -70,11 +75,26 @@ const CURRENT_SEASON = getCurrentSeason();
 // Core HTTP helper — sends a GET request to the NBA Stats API.
 // All other functions in this module call nbaGet() rather than axios directly,
 // keeping the header spoofing and base URL in one place.
-async function nbaGet(path, params = {}) {
-   const response = await axios.get(`${NBA_URL}/${path}`, {
-    params, headers: NBA_HEADERS,
-   });
-   return response.data;
+// Retries up to 3 times with exponential backoff (2s, 4s, 8s) before throwing.
+// The NBA API frequently returns 429/500 on the first attempt but succeeds on retry.
+async function nbaGet(path, params = {}, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(`${NBA_URL}/${path}`, {
+        params,
+        headers: NBA_HEADERS,
+        timeout: 30000, // 30 s — the API can be slow
+      });
+      return response.data;
+    } catch (err) {
+      const status = err.response?.status;
+      const isRetryable = !status || status === 429 || status >= 500;
+      if (!isRetryable || attempt === retries) throw err;
+      const wait = 2000 * Math.pow(2, attempt - 1); // 2s, 4s, 8s
+      console.warn(`[nbaApi] ${path} attempt ${attempt} failed (${status ?? 'network'}), retrying in ${wait / 1000}s...`);
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+  }
 }
 
 // ── Level 1: Static / roster data ───────────────────────────────────────────
@@ -150,12 +170,20 @@ async function getPlayerInfo(nbaPlayerId) {
  * @returns {Object} Synthetic API response: { resultSets: [mergedResultSet] }
  */
 async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = null) {
-  // Fire both season type requests in parallel; use allSettled so one failure
-  // doesn't prevent the other from completing.
-  const [regularResult, playoffResult] = await Promise.allSettled([
-    nbaGet(endpoint, { ...paramsBase, SeasonType: 'Regular Season' }),
-    nbaGet(endpoint, { ...paramsBase, SeasonType: 'Playoffs' }),
-  ]);
+  // Fire requests sequentially with a short delay between them.
+  // The NBA API rate limiter treats simultaneous requests from the same IP as
+  // suspicious — sequential requests with a pause look far more like a real browser.
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const regularResult = await nbaGet(endpoint, { ...paramsBase, SeasonType: 'Regular Season' })
+    .then((v) => ({ status: 'fulfilled', value: v }))
+    .catch((e) => ({ status: 'rejected', reason: e }));
+
+  await delay(1200); // 1.2 s between the two requests
+
+  const playoffResult = await nbaGet(endpoint, { ...paramsBase, SeasonType: 'Playoffs' })
+    .then((v) => ({ status: 'fulfilled', value: v }))
+    .catch((e) => ({ status: 'rejected', reason: e }));
 
   // Extract the target result set from each successful response.
   const resultSets = [regularResult, playoffResult]

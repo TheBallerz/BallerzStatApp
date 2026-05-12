@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Player = require('../models/Player');
+const Team = require('../models/Team');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -81,10 +83,11 @@ router.post('/login', async (req, res) => {
 router.patch('/favorites', requireAuth, async (req, res) => {
   const { favoritePlayers, favoriteTeams } = req.body;
 
-  // Build the update object from only the fields that were supplied
+  // Build the update object from only the fields that were supplied.
+  // Coerce each id to Number so they are stored as nbaIds (not strings).
   const update = {};
-  if (Array.isArray(favoritePlayers)) update.favoritePlayers = favoritePlayers;
-  if (Array.isArray(favoriteTeams))   update.favoriteTeams   = favoriteTeams;
+  if (Array.isArray(favoritePlayers)) update.favoritePlayers = favoritePlayers.map(Number);
+  if (Array.isArray(favoriteTeams))   update.favoriteTeams   = favoriteTeams.map(Number);
 
   if (Object.keys(update).length === 0) {
     return res.status(400).json({ message: 'No favorites provided.' });
@@ -113,31 +116,37 @@ router.patch('/favorites', requireAuth, async (req, res) => {
 });
 
 // GET /api/auth/me
-// Returns the authenticated user with deeply populated favoritePlayers and favoriteTeams.
-// favoritePlayers: each Player doc has its teamId populated (abbreviation only).
-// favoriteTeams: each Team doc is returned in full (name, abbreviation, logoUrl).
+// Returns the authenticated user with expanded favoritePlayers and favoriteTeams.
+// favoritePlayers and favoriteTeams are stored as nbaId numbers. This route
+// resolves those numbers into full Player/Team documents before returning them,
+// so the response shape is the same as before (arrays of objects, not numbers).
 router.get('/me', requireAuth, async (req, res) => {
   const user = await User.findById(req.userId)
     .select('-passwordHash')
-    .populate({
-      path: 'favoritePlayers',
-      select: 'firstName lastName nbaId imageUrl teamId',
-      populate: {
-        path: 'teamId',
-        select: 'abbreviation',
-      },
-    })
-    .populate({
-      path: 'favoriteTeams',
-      select: 'name abbreviation logoUrl',
-    })
     .lean();
 
   if (!user) {
     return res.status(404).json({ message: 'User not found.' });
   }
 
-  res.json({ user });
+  // Resolve nbaId arrays into full documents in parallel.
+  const [players, teams] = await Promise.all([
+    Player.find({ nbaId: { $in: user.favoritePlayers || [] } })
+      .select('firstName lastName nbaId imageUrl teamId')
+      .populate({ path: 'teamId', select: 'abbreviation' })
+      .lean(),
+    Team.find({ nbaId: { $in: user.favoriteTeams || [] } })
+      .select('name abbreviation logoUrl')
+      .lean(),
+  ]);
+
+  res.json({
+    user: {
+      ...user,
+      favoritePlayers: players,
+      favoriteTeams:   teams,
+    },
+  });
 });
 
 module.exports = router;

@@ -1,0 +1,63 @@
+/* ── FavoriteTeamCard — 150px team card for favorites section ── */
+
+.ftc-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 150px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: border-color 0.15s ease, filter 0.15s ease;
+}
+
+.ftc-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  filter: brightness(1.08);
+}
+
+/* ── Team logo ───────────────────────────────────────────── */
+
+.ftc-logo {
+  position: absolute;
+  left: 12px;
+  height: 110px;
+  width: 110px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+}
+
+/* ── Team name + abbreviation ────────────────────────────── */
+
+.ftc-info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 0 12px 70px 140px;
+  /* flex: 1 + min-width: 0 constrains the container so ellipsis fires */
+  flex: 1;
+  min-width: 0;
+}
+
+.ftc-name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ftc-abbr {
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
