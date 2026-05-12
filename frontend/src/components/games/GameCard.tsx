@@ -23,7 +23,6 @@ interface GameCardProps {
  * fades to dark in the center — creating two distinct colored halves.
  */
 export default function GameCard({
-  gameId: _gameId,
   homeTeam,
   awayTeam,
   isActive,

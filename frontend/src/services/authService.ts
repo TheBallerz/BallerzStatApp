@@ -3,7 +3,7 @@
 // After a successful login or registration, a JWT and a user object are persisted so
 // other parts of the app can read them without making additional network requests.
 
-const API_BASE = "http://localhost:3000/api/auth";
+const API_BASE = `${import.meta.env.VITE_API_BASE}/auth`;
 const TOKEN_KEY = "ballerz_token"; // localStorage key for the JWT
 const USER_KEY = "ballerz_user";   // localStorage key for the serialized user object
 
@@ -13,6 +13,7 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   email: string;
+  isAdmin: boolean;
 }
 
 // Shape of every successful auth response from the backend

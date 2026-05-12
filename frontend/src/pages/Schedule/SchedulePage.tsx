@@ -42,7 +42,7 @@ interface TeamGame {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE       = "http://localhost:3000/api";
+const API_BASE       = import.meta.env.VITE_API_BASE;
 const CURRENT_SEASON = "2024-25";
 
 // All 30 teams for the fallback picker when favorites aren't set up yet

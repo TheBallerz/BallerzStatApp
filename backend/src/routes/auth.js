@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
   const token = signToken(user._id);
   res.status(201).json({
     token,
-    user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email },
+    user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email, isAdmin: user.isAdmin },
   });
 });
 
@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
   const token = signToken(user._id);
   res.status(200).json({
     token,
-    user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email },
+    user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email, isAdmin: user.isAdmin },
   });
 });
 
