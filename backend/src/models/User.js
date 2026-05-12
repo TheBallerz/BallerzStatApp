@@ -32,6 +32,13 @@ const userSchema = new mongoose.Schema(
     // the players/teams collections are cleared and re-inserted.
     favoritePlayers: [{ type: Number }],
     favoriteTeams:   [{ type: Number }],
+    // Grants access to the admin panel on the Account page.
+    // Set to true manually in MongoDB for the first admin; afterwards admins can
+    // promote/demote other users via the admin panel UI.
+    isAdmin: {
+      type:    Boolean,
+      default: false,
+    },
   },
   { timestamps: true }, // automatically adds createdAt and updatedAt fields
 );

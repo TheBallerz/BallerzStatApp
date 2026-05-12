@@ -51,7 +51,7 @@ interface PlayerSeasonStats {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 // Update this if your Express server runs on a different port
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 // Current NBA season — update each year
 const CURRENT_SEASON = "2024-25";

@@ -66,7 +66,7 @@ export default function TeamsPage() {
 
         console.log("RAW TEAMS API:", data);
 
-        const mappedTeams: Team[] = data.map((team: any) => ({
+        const mappedTeams: Team[] = data.map((team: Team) => ({
           teamId: team.teamId,
           teamName: team.teamName,
           teamAbbreviation: team.teamAbbreviation,

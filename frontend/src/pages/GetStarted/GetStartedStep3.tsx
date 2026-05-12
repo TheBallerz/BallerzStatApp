@@ -21,12 +21,12 @@ export default function GetStartedStep3({ selectedTeams, onAdd, onRemove, onSkip
   // Debounced search — fires 300 ms after the user stops typing
   useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) { setResults([]); return; }
 
     const timer = setTimeout(async () => {
+      if (!trimmed) { setResults([]); return; }
       try {
         const res = await fetch(
-          `http://localhost:3000/api/teams/search?q=${encodeURIComponent(trimmed)}`
+          `${import.meta.env.VITE_API_BASE}/teams/search?q=${encodeURIComponent(trimmed)}`
         );
         if (res.ok) setResults(await res.json());
       } catch {
