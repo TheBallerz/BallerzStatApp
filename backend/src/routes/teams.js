@@ -21,7 +21,7 @@ router.get('/teams/search', async (req, res) => {
 
     const regex = new RegExp(q, 'i');
     const teams = await Team.find({ name: regex })
-      .select('_id name')
+      .select('_id name nbaId')
       .lean();
 
     res.json(teams);

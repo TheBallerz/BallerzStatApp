@@ -10,6 +10,7 @@
     "sync:team-ids": "node src/scripts/syncTeamNbaIds.js",
     "sync:players": "node src/scripts/enrichPlayers.js",
     "sync": "node src/scripts/manualSync.js",
+    "fix:player-stats": "node src/scripts/fixPlayerStats.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint .",

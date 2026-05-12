@@ -27,18 +27,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    favoritePlayers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Player',
-      },
-    ],
-    favoriteTeams: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Team',
-      },
-    ],
+    // Stored as NBA API numeric IDs (Player.nbaId / Team.nbaId), not MongoDB ObjectIds.
+    // Using nbaId is stable across re-seeds — MongoDB ObjectIds change every time
+    // the players/teams collections are cleared and re-inserted.
+    favoritePlayers: [{ type: Number }],
+    favoriteTeams:   [{ type: Number }],
   },
   { timestamps: true }, // automatically adds createdAt and updatedAt fields
 );
