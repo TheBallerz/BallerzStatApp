@@ -2,14 +2,19 @@ jest.mock('../nbaApi', () => ({
     getTeams: jest.fn(),
     getTeamInfo: jest.fn(),
   }));
-  
+
   jest.mock('../utils/nbaUtils', () => ({
     rowsToObjects: jest.fn(),
   }));
-  
+
+  jest.mock('../models/Team', () => ({
+    find: jest.fn(),
+  }));
+
   const router = require('../routes/teams');
   const { getTeams, getTeamInfo } = require('../nbaApi');
   const { rowsToObjects } = require('../utils/nbaUtils');
+  const Team = require('../models/Team');
   
   function getHandler(path) {
     const layer = router.stack.find(
@@ -207,11 +212,13 @@ jest.mock('../nbaApi', () => ({
 
   describe('GET /teams', () => {
     const handler = getHandler('/teams');
-  
+
     beforeEach(() => {
       jest.clearAllMocks();
       jest.spyOn(console, 'log').mockImplementation(() => {});
       jest.spyOn(console, 'error').mockImplementation(() => {});
+      // The route calls Team.find() to enrich results with DB data; default to empty.
+      Team.find.mockResolvedValue([]);
     });
   
     afterEach(() => {

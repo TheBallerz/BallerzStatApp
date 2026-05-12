@@ -168,7 +168,8 @@ describe('Player Model', () => {
 describe('User Model', () => {
   function validUser() {
     return {
-      username: 'baller42',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'Baller@Example.COM',
       passwordHash: 'hashedpassword123',
     };
@@ -193,24 +194,24 @@ describe('User Model', () => {
     await expect(User.create(data)).rejects.toThrow(mongoose.Error.ValidationError);
   });
 
-  it('rejects a duplicate username (unique index)', async () => {
+  it('rejects a duplicate email (unique index)', async () => {
     await User.create(validUser());
-    // Different email but same username
-    await expect(User.create({ ...validUser(), email: 'other@example.com' })).rejects.toMatchObject({ code: 11000 });
+    // Same email but different name should fail on the unique email constraint
+    await expect(User.create({ ...validUser(), firstName: 'Other' })).rejects.toMatchObject({ code: 11000 });
   });
 
   it('finds a user by _id', async () => {
     const created = await User.create(validUser());
     const found = await User.findById(created._id);
     expect(found).not.toBeNull();
-    expect(found.username).toBe('baller42');
+    expect(found.email).toBe('baller@example.com');
   });
 
   it('updates a user field', async () => {
     const user = await User.create(validUser());
-    await User.findByIdAndUpdate(user._id, { username: 'newhandle' });
+    await User.findByIdAndUpdate(user._id, { firstName: 'Updated' });
     const updated = await User.findById(user._id);
-    expect(updated.username).toBe('newhandle');
+    expect(updated.firstName).toBe('Updated');
   });
 
   it('deletes a user', async () => {
@@ -226,6 +227,9 @@ describe('User Model', () => {
 describe('TeamGameStats Model', () => {
   function validTeamGameStats() {
     return {
+      nbaGameId: 22401234,
+      season: '2024-25',
+      result: 'W',
       teamId: new mongoose.Types.ObjectId(),
       opponentTeamId: new mongoose.Types.ObjectId(),
       gameDate: new Date('2025-01-15'),
@@ -278,6 +282,8 @@ describe('TeamGameStats Model', () => {
 describe('PlayerGameStats Model', () => {
   function validPlayerGameStats() {
     return {
+      nbaGameId: 22401234,
+      season: '2024-25',
       playerId: new mongoose.Types.ObjectId(),
       teamId: new mongoose.Types.ObjectId(),
       opponentTeamId: new mongoose.Types.ObjectId(),
@@ -335,12 +341,12 @@ describe('TeamSeasonStats Model', () => {
     };
   }
 
-  it('creates a valid record and defaults wins, losses, and totals to 0', async () => {
+  it('creates a valid record and defaults wins, losses, and averages to 0', async () => {
     const record = await TeamSeasonStats.create(validTeamSeasonStats());
     expect(record._id).toBeDefined();
     expect(record.wins).toBe(0);
     expect(record.losses).toBe(0);
-    expect(record.totalPoints).toBe(0);
+    expect(record.avgPoints).toBe(0);
   });
 
   it('initialises gameStats as an empty array', async () => {
@@ -395,10 +401,10 @@ describe('PlayerSeasonStats Model', () => {
     };
   }
 
-  it('creates a valid record and defaults all totals to 0', async () => {
+  it('creates a valid record and defaults all averages to 0', async () => {
     const record = await PlayerSeasonStats.create(validPlayerSeasonStats());
     expect(record._id).toBeDefined();
-    expect(record.totalPoints).toBe(0);
+    expect(record.avgPoints).toBe(0);
     expect(record.gamesPlayed).toBe(0);
   });
 
@@ -429,11 +435,11 @@ describe('PlayerSeasonStats Model', () => {
     expect(found).not.toBeNull();
   });
 
-  it('updates totalPoints', async () => {
+  it('updates avgPoints', async () => {
     const record = await PlayerSeasonStats.create(validPlayerSeasonStats());
-    await PlayerSeasonStats.findByIdAndUpdate(record._id, { totalPoints: 1500 });
+    await PlayerSeasonStats.findByIdAndUpdate(record._id, { avgPoints: 28.5 });
     const updated = await PlayerSeasonStats.findById(record._id);
-    expect(updated.totalPoints).toBe(1500);
+    expect(updated.avgPoints).toBe(28.5);
   });
 
   it('deletes a record', async () => {
