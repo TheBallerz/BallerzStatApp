@@ -2,42 +2,15 @@
 
 /**
  * nightlySync.js
- *
  * Scheduled job that runs automatically at 2:00 AM every night using node-cron.
  * Also exports runSync() so it can be triggered manually via a script or admin route.
- *
- * OVERVIEW
- * --------
  * The sync job keeps our MongoDB game stats collections in sync with the NBA Stats
- * API. It handles two scenarios automatically:
- *
- *   First run (no TeamSeasonStats documents exist for the current season):
- *     → Calls seasonStatsService to pull full season totals from the NBA API
- *       and populate TeamSeasonStats and PlayerSeasonStats with baseline data.
- *       This ensures we have accurate stats for all games played before the
- *       pipeline was turned on.
- *
- *   Subsequent runs (season stats already exist):
- *     → Fetches the full game log for the current season from the NBA API.
- *       For each row, checks whether a TeamGameStats or PlayerGameStats doc
- *       already exists with that nbaGameId. Existing records are skipped;
- *       new ones are inserted and the corresponding season stats are updated
- *       incrementally via seasonStatsService.
- *
- * DEDUPLICATION
- * -------------
+ * API. 
  * The nbaGameId field on TeamGameStats / PlayerGameStats, combined with the
  * compound unique index on (teamId, nbaGameId) and (playerId, nbaGameId),
  * ensures each game is stored at most once per team/player. The pre-insert
  * .exists() check is an additional guard that avoids hitting the unique
  * constraint error on every row that was already imported.
- *
- * OPPONENT RESOLUTION
- * -------------------
- * The leaguegamelog API returns a MATCHUP field (e.g., "BOS vs. MIA" or
- * "BOS @ MIA"). parseOpponentAbbr() extracts the opponent's abbreviation
- * from this string, which is then used to look up the opponent's MongoDB
- * Team document from the pre-loaded teamByAbbr map.
  */
 
 const cron = require('node-cron');
@@ -285,7 +258,6 @@ async function syncPlayerGames(playerByNbaId, teamByNbaId, teamByAbbr, shouldUpd
 }
 
 // ── Main sync entry point ─────────────────────────────────────────────────────
-
 /**
  * Runs the full sync pipeline. Called automatically by the cron schedule,
  * and also exported so it can be triggered manually (e.g., via a script or
@@ -293,35 +265,19 @@ async function syncPlayerGames(playerByNbaId, teamByNbaId, teamByAbbr, shouldUpd
  */
 async function runSync() {
   console.log(`\n[nightlySync] ── Starting sync at ${new Date().toISOString()} ──`);
-
-  // Build in-memory lookup maps from MongoDB so game log rows can be resolved
-  // to MongoDB documents without issuing a DB query per row.
   const allTeams = await Team.find({});
-  // teamByNbaId: used to match the primary team in each game log row (TEAM_ID).
   const teamByNbaId = new Map(
     allTeams.filter((t) => t.nbaId).map((t) => [t.nbaId, t]),
   );
-  // teamByAbbr: used to resolve the opponent team from the MATCHUP string.
   const teamByAbbr = new Map(allTeams.map((t) => [t.abbreviation, t]));
-
-  // playerByNbaId: used to match each player game log row (PLAYER_ID).
   const allPlayers  = await Player.find({ nbaId: { $exists: true } });
   const playerByNbaId = new Map(allPlayers.map((p) => [p.nbaId, p]));
-
-  // ── First-run detection ───────────────────────────────────────────────────
-  // If no TeamSeasonStats documents exist for this season, this is the first
-  // sync. Attempt the baseline ingestion first to populate complete season-to-date
-  // totals from the NBA API before the incremental game sync runs.
-  // On all subsequent syncs this check passes and baseline is skipped entirely.
   const seasonStatsCount = await TeamSeasonStats.countDocuments({
     season: CURRENT_SEASON,
   });
 
   // Capture first-run status BEFORE the baseline writes any documents.
   const isFirstRun = seasonStatsCount === 0;
-
-  // Track whether the baseline succeeded so we can decide how to handle
-  // season stats updates in the incremental sync below.
   let baselineSucceeded = false;
 
   if (isFirstRun) {
@@ -332,12 +288,6 @@ async function runSync() {
       baselineSucceeded = true;
       console.log('[nightlySync] Baseline ingestion complete.');
     } catch (err) {
-      // The NBA Stats API occasionally fails on season aggregate endpoints —
-      // this is common when the regular season has just ended or the API is
-      // temporarily degraded. Rather than crashing the whole sync, we fall back
-      // to building season stats incrementally from the game logs below.
-      // The resulting stats will reflect only the past 14 days of games on this
-      // first run, but every subsequent nightly sync will keep them current.
       console.warn(
         '[nightlySync] Baseline ingestion failed — season stats will be built ' +
         'incrementally from game logs instead. Stats may be incomplete until ' +
@@ -351,23 +301,6 @@ async function runSync() {
   // Fetch and insert any new team and player game records.
   // Both functions skip rows that are already in the database, so this is
   // safe to run repeatedly without creating duplicate records.
-  //
-  // shouldUpdateSeasonStats controls whether each new game insert also triggers
-  // an incremental season stats update. The logic has three cases:
-  //
-  //   Subsequent run (not first run):
-  //     → true. Only genuinely new games reach the insert path, so each
-  //       increments the season totals exactly once.
-  //
-  //   First run, baseline succeeded:
-  //     → false. The baseline already wrote accurate full-season totals via a
-  //       single API call. Calling the incremental updater on top of those
-  //       would double-count every historical game.
-  //
-  //   First run, baseline failed:
-  //     → true. There are no season stats docs yet, so the incremental updater
-  //       must run to build them from the game logs. Stats will be partial
-  //       (only the past 14 days) but accurate for what's inserted.
   const shouldUpdateSeasonStats = !isFirstRun || !baselineSucceeded;
   await syncTeamGames(teamByNbaId, teamByAbbr, shouldUpdateSeasonStats);
   await syncPlayerGames(playerByNbaId, teamByNbaId, teamByAbbr, shouldUpdateSeasonStats);
@@ -375,16 +308,7 @@ async function runSync() {
   console.log(`[nightlySync] ── Sync complete at ${new Date().toISOString()} ──\n`);
 }
 
-// ── Cron schedule ─────────────────────────────────────────────────────────────
-
-/**
- * Registers the nightly sync job with node-cron and starts it.
- * Called once from server.js after the MongoDB connection is established.
- *
- * Cron expression '0 2 * * *' means: at minute 0 of hour 2, every day.
- * 2:00 AM is chosen because all West Coast games (latest time zone) are
- * reliably finished by then, so the game log will include complete results.
- */
+// ── Cron scheduling ─────────────────────────────────────────────────────────
 function startNightlySync() {
   cron.schedule('0 2 * * *', () => {
     // Errors are caught here so a single sync failure doesn't crash the server.

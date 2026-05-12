@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const { getPlayers, getPlayerCareerStats } = require('../nbaApi');
 const { rowsToObjects } = require('../utils/nbaUtils');
+const PlayerSeasonStats = require('../models/PlayerSeasonStats');
+const Player = require('../models/Player');
 
 // for names that have accents
 function normalizeText(text) {
@@ -13,6 +15,130 @@ function normalizeText(text) {
     .trim()
     .replace(/['"]/g, '');
 }
+
+/**
+ * GET /api/players/search?q=<query>
+ *
+ * Searches the Player collection in MongoDB (not the NBA API) for players
+ * whose first or last name matches the query string.
+ * Returns up to 10 results: [{ _id, firstName, lastName }]
+ * Returns [] if the query is empty or no players match.
+ */
+router.get('/players/search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+
+    if (!q) return res.json([]);
+
+    // Case-insensitive regex match on either first or last name
+    const regex = new RegExp(q, 'i');
+    const players = await Player.find({
+      $or: [{ firstName: regex }, { lastName: regex }],
+    })
+      .select('_id firstName lastName')
+      .limit(10)
+      .lean();
+
+    res.json(players);
+  } catch (error) {
+    console.error('Error searching players:', error.message);
+    res.status(500).json({ error: 'Failed to search players', details: error.message });
+  }
+});
+
+/**
+ * GET /api/players/top
+ *
+ * Returns the top 5 players in four stat categories:
+ *   points   → avgPoints  (PPG)
+ *   threes   → avgFg3m    (3PM)
+ *   assists  → avgAssists (APG)
+ *   rebounds → avgRebounds(RPG)
+ *
+ * Only players with gamesPlayed >= 10 qualify.
+ * If a player appears in multiple season documents, their best season is used.
+ * All stat values are per-game averages stored directly in PlayerSeasonStats.
+ */
+router.get('/players/top', async (req, res) => {
+  try {
+    const MIN_GAMES = 10;
+
+    /**
+     * Builds a MongoDB aggregation pipeline that:
+     *  1. Filters to documents where gamesPlayed >= MIN_GAMES and nbaPlayerId exists
+     *  2. Sorts by the target stat descending (so $first picks the best season)
+     *  3. Groups by nbaPlayerId — deduplicates players across multiple seasons
+     *  4. Re-sorts the deduplicated results by stat descending
+     *  5. Limits to top 5
+     *  6. Joins Player + Team documents for name and abbreviation
+     */
+    function topPipeline(statField) {
+      return PlayerSeasonStats.aggregate([
+        // Step 1: only qualified documents
+        { $match: { gamesPlayed: { $gte: MIN_GAMES }, nbaPlayerId: { $ne: null } } },
+        // Step 2: best season first for each player
+        { $sort: { [statField]: -1 } },
+        // Step 3: one doc per player (keeps the best-season row via $first)
+        {
+          $group: {
+            _id:         '$nbaPlayerId',
+            nbaPlayerId: { $first: '$nbaPlayerId' },
+            statValue:   { $first: `$${statField}` },
+            teamId:      { $first: '$teamId' },
+            playerId:    { $first: '$playerId' },
+          },
+        },
+        // Step 4: re-rank the deduplicated set
+        { $sort: { statValue: -1 } },
+        // Step 5: top 5 only
+        { $limit: 5 },
+        // Step 6a: join Player document for name
+        {
+          $lookup: {
+            from:         'players',
+            localField:   'playerId',
+            foreignField: '_id',
+            as:           'player',
+          },
+        },
+        { $unwind: '$player' },
+        // Step 6b: join Team document for abbreviation and color key
+        {
+          $lookup: {
+            from:         'teams',
+            localField:   'teamId',
+            foreignField: '_id',
+            as:           'team',
+          },
+        },
+        { $unwind: '$team' },
+        // Step 7: shape the output
+        {
+          $project: {
+            _id:        0,
+            nbaPlayerId: 1,
+            statValue:   1,
+            playerName: { $concat: ['$player.firstName', ' ', '$player.lastName'] },
+            teamAbbr:   '$team.abbreviation',
+          },
+        },
+      ]);
+    }
+
+    // Run all four queries in parallel
+    const [points, threes, assists, rebounds] = await Promise.all([
+      topPipeline('avgPoints'),
+      topPipeline('avgFg3m'),
+      topPipeline('avgAssists'),
+      topPipeline('avgRebounds'),
+    ]);
+
+    res.json({ points, threes, assists, rebounds });
+  } catch (error) {
+    console.error('Error fetching top players:', error.message);
+    res.status(500).json({ error: 'Failed to fetch top players', details: error.message });
+  }
+});
 
 // Player route
 router.get('/players', async (req, res) => {
