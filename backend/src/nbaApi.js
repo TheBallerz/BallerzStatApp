@@ -52,24 +52,6 @@ function getCurrentSeason() {
   }
 }
 
-// Insead of hard coding "current season" we have this function to get current season
-function getCurrentSeason() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0 = Jan, 9 = Oct
-
-  if (month >= 9) {
-    // October–December → new season
-    const nextYear = (year + 1).toString().slice(-2);
-    return `${year}-${nextYear}`;
-  } else {
-    // January–September → still previous season
-    const prevYear = year - 1;
-    const nextYear = year.toString().slice(-2);
-    return `${prevYear}-${nextYear}`;
-  }
-}
-
 const CURRENT_SEASON = getCurrentSeason();
 
 // Core HTTP helper — sends a GET request to the NBA Stats API.
@@ -485,7 +467,6 @@ async function getTeamInfo(teamId, season = CURRENT_SEASON) {
 }
 
 module.exports = {
-  CURRENT_SEASON,
   CURRENT_SEASON,      // Exported so other modules use the same season string
   nbaGet,              // Low-level helper (available if routes need custom calls)
   // Level 1 — static/roster data

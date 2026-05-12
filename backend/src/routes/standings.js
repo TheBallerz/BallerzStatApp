@@ -7,8 +7,6 @@ router.get("/standings", async (req, res) => {
   try {
     const season = req.query.season || "2025-26";
 
-    const seasons = await TeamSeasonStats.distinct("season");
-
     const standings = await TeamSeasonStats.find({ season }).lean();
 
     const teams = await Team.find().lean();
