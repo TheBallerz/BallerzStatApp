@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import DivisionCard from '../../components/teams/DivisionCard';
 import TeamDetailPanel from '../../components/teams/TeamDetailPanel';
 import { fetchTeams } from '../../services/nbaApi';
-import './teamsPage.css';
+import './TeamsPage.css';
 
 type SelectedTeam = {
   name: string;
