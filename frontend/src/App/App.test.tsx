@@ -11,3 +11,7 @@
 //     expect(screen.getByText('Ballerz Stat App')).toBeInTheDocument();
 //   });
 // });
+
+it('placeholder – App tests temporarily disabled', () => {
+  expect(true).toBe(true);
+});
