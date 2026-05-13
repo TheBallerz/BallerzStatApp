@@ -179,7 +179,9 @@ router.get('/schedule', async (req, res) => {
       const opponentAbbr = (parts[1] ?? '').trim();
 
       // Opponent score = our points minus our point differential (exact math).
-      const oppPoints = Math.round(row.PTS - row.PLUS_MINUS);
+      // Number() is needed because the NBA API returns PTS and PLUS_MINUS as
+      // strings (e.g. "112", "+7"), so bare subtraction would produce NaN.
+      const oppPoints = Math.round(Number(row.PTS) - Number(row.PLUS_MINUS));
 
       return {
         _id:            String(row.GAME_ID),
