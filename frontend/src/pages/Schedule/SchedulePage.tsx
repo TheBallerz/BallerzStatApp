@@ -73,21 +73,14 @@ function formatDate(raw: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-/**
- * Derive the current NBA season label from today's date.
- * NBA seasons start in October:
- *   Oct 2025 – Jun 2026  →  "2025-26"
- *   Jul – Sep 2025       →  "2024-25"  (off-season, use previous)
- */
 function deriveCurrentSeason(): string {
   const now       = new Date();
   const year      = now.getFullYear();
-  const month     = now.getMonth() + 1; // 1-based
+  const month     = now.getMonth() + 1;
   const startYear = month >= 10 ? year : year - 1;
   return `${startYear}-${String(startYear + 1).slice(2)}`;
 }
 
-/** Normalize any season string the API returns to short form "YYYY-YY". */
 function normalizeSeason(raw: string): string {
   if (/^\d{4}-\d{2}$/.test(raw)) return raw;
   const m = raw.match(/^(\d{4})-(\d{4})$/);
@@ -139,37 +132,40 @@ function teamFromAbbr(abbr: string): Team {
 
 export default function SchedulePage() {
 
-  // ── Current season: start from derived value, overwrite from API ───────────
   const [currentSeason, setCurrentSeason] = useState<string>(deriveCurrentSeason);
 
-  // ── Favorite teams sidebar ─────────────────────────────────────────────────
   const [favoriteTeams, setFavoriteTeams] = useState<Team[]>([]);
   const [loadingFavs, setLoadingFavs]     = useState(true);
   const [favoritesAvail, setFavoritesAvail] = useState(true);
 
-  // ── Today's games ──────────────────────────────────────────────────────────
   const [todaysGames, setTodaysGames]   = useState<TodayGame[]>([]);
   const [loadingToday, setLoadingToday] = useState(true);
   const [errorToday, setErrorToday]     = useState<string | null>(null);
   const [selectedGame, setSelectedGame] = useState<TodayGame | null>(null);
 
-  // ── Team schedule ──────────────────────────────────────────────────────────
   const [selectedTeam, setSelectedTeam]       = useState<Team | null>(null);
   const [teamSchedule, setTeamSchedule]       = useState<TeamGame[]>([]);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
   const [errorSchedule, setErrorSchedule]     = useState<string | null>(null);
 
-  // ── 0. Fetch current season from API ──────────────────────────────────────
+  // NEW
+  const [selectedScheduleGame, setSelectedScheduleGame] =
+    useState<TeamGame | null>(null);
+
   useEffect(() => {
     fetch(`${API_BASE}/schedule/season/current`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(data => { if (data?.season) setCurrentSeason(normalizeSeason(String(data.season))); })
-      .catch(() => { /* keep derived value */ });
+      .then(data => {
+        if (data?.season) {
+          setCurrentSeason(normalizeSeason(String(data.season)));
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  // ── 1. Fetch favorite teams ────────────────────────────────────────────────
   useEffect(() => {
     setLoadingFavs(true);
+
     fetch(`${API_BASE}/users/me/favorites/teams`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data: Team[]) => setFavoriteTeams(data))
@@ -177,10 +173,10 @@ export default function SchedulePage() {
       .finally(() => setLoadingFavs(false));
   }, []);
 
-  // ── 2. Fetch today's games ─────────────────────────────────────────────────
   useEffect(() => {
     setLoadingToday(true);
     setErrorToday(null);
+
     fetch(`${API_BASE}/schedule/today`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data: TodayGame[]) => setTodaysGames(data))
@@ -188,16 +184,18 @@ export default function SchedulePage() {
       .finally(() => setLoadingToday(false));
   }, []);
 
-  // ── 3. Fetch team schedule when a team is selected ─────────────────────────
   useEffect(() => {
     if (!selectedTeam) return;
+
     setLoadingSchedule(true);
     setErrorSchedule(null);
     setTeamSchedule([]);
+
     const params = new URLSearchParams({
-      team:   selectedTeam.abbreviation,
+      team: selectedTeam.abbreviation,
       season: currentSeason,
     });
+
     fetch(`${API_BASE}/schedule?${params}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data: TeamGame[]) => setTeamSchedule(data))
@@ -205,48 +203,206 @@ export default function SchedulePage() {
       .finally(() => setLoadingSchedule(false));
   }, [selectedTeam, currentSeason]);
 
-  // ── Derived ────────────────────────────────────────────────────────────────
   const colors     = selectedTeam ? getColors(selectedTeam.abbreviation) : null;
   const favTeamIds = new Set(favoriteTeams.map(t => t._id));
   const wins       = teamSchedule.filter(g => g.wl === 'W').length;
   const losses     = teamSchedule.filter(g => g.wl === 'L').length;
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="sched-page">
 
       {/* ── Sidebar ── */}
       <aside className="sched-sidebar">
+
         <h2 className="sched-sidebar-title">
           {favoritesAvail ? 'Favorite Teams' : 'Select Team'}
         </h2>
 
+        {/* NEW GAME DETAILS PANEL */}
+        {selectedScheduleGame && (
+          <div
+            style={{
+              background: '#151515',
+              border: '1px solid #2a2a2a',
+              borderRadius: '16px',
+              padding: '1rem',
+              marginBottom: '1rem',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                marginBottom: '0.9rem',
+              }}
+            >
+              <img
+                src={getLogoUrl(selectedScheduleGame.opponentTeamId)}
+                alt={selectedScheduleGame.opponentTeamId.abbreviation}
+                style={{
+                  width: 28,
+                  height: 28,
+                  objectFit: 'contain',
+                }}
+              />
+
+              <div>
+                <div
+                  style={{
+                    fontWeight: 800,
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {selectedScheduleGame.isHome ? 'vs' : '@'}{' '}
+                  {selectedScheduleGame.opponentTeamId.abbreviation}
+                </div>
+
+                <div
+                  style={{
+                    color: '#666',
+                    fontSize: '0.72rem',
+                  }}
+                >
+                  {formatDate(selectedScheduleGame.gameDate)}
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.55rem',
+                fontSize: '0.8rem',
+              }}
+            >
+              <div>
+                <span style={{ color: '#666' }}>Result:</span>{' '}
+                <span
+                  className={`sched-result ${
+                    selectedScheduleGame.wl === 'W'
+                      ? 'win'
+                      : 'loss'
+                  }`}
+                >
+                  {selectedScheduleGame.wl}
+                </span>
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>Score:</span>{' '}
+                <span>
+                  {selectedScheduleGame.points ?? '—'} -{' '}
+                  {selectedScheduleGame.oppPoints ?? '—'}
+                </span>
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>REB:</span>{' '}
+                {selectedScheduleGame.rebounds}
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>AST:</span>{' '}
+                {selectedScheduleGame.assists}
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>STL:</span>{' '}
+                {selectedScheduleGame.steals}
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>BLK:</span>{' '}
+                {selectedScheduleGame.blocks}
+              </div>
+
+              <div>
+                <span style={{ color: '#666' }}>+/-:</span>{' '}
+                <span
+                  style={{
+                    color:
+                      (selectedScheduleGame.plusMinus ?? 0) > 0
+                        ? '#4ade80'
+                        : (selectedScheduleGame.plusMinus ?? 0) < 0
+                        ? '#f87171'
+                        : '#aaa',
+                    fontWeight: 700,
+                  }}
+                >
+                  {selectedScheduleGame.plusMinus != null
+                    ? selectedScheduleGame.plusMinus > 0
+                      ? `+${selectedScheduleGame.plusMinus}`
+                      : selectedScheduleGame.plusMinus
+                    : '—'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {favoritesAvail && (
           <>
             {loadingFavs && <p className="sched-loading">Loading…</p>}
+
             <div className="sched-team-list">
               {favoriteTeams.map((team) => {
                 const c        = getColors(team.abbreviation);
-                const isActive = selectedTeam?.abbreviation === team.abbreviation;
+                const isActive =
+                  selectedTeam?.abbreviation === team.abbreviation;
+
                 return (
                   <button
                     key={team._id}
-                    className={`sched-team-item ${isActive ? 'active' : ''}`}
-                    style={isActive ? { background: `linear-gradient(135deg, ${c.primary}55, #1a1a1a)`, borderColor: c.secondary } : {}}
-                    onClick={() => { setSelectedTeam(team); setSelectedGame(null); }}
+                    className={`sched-team-item ${
+                      isActive ? 'active' : ''
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            background: `linear-gradient(135deg, ${c.primary}55, #1a1a1a)`,
+                            borderColor: c.secondary,
+                          }
+                        : {}
+                    }
+                    onClick={() => {
+                      setSelectedTeam(team);
+                      setSelectedGame(null);
+                      setSelectedScheduleGame(null);
+                    }}
                   >
-                    <div className="sched-team-logo-wrap" style={{ background: `radial-gradient(circle at center, ${c.primary}88, transparent)` }}>
-                      <img src={getLogoUrl(team)} alt={team.abbreviation} className="sched-team-logo" />
+                    <div
+                      className="sched-team-logo-wrap"
+                      style={{
+                        background: `radial-gradient(circle at center, ${c.primary}88, transparent)`,
+                      }}
+                    >
+                      <img
+                        src={getLogoUrl(team)}
+                        alt={team.abbreviation}
+                        className="sched-team-logo"
+                      />
                     </div>
+
                     <div className="sched-team-text">
-                      <span className="sched-team-abbr">{team.abbreviation}</span>
-                      <span className="sched-team-next">{team.city} {team.name}</span>
+                      <span className="sched-team-abbr">
+                        {team.abbreviation}
+                      </span>
+
+                      <span className="sched-team-next">
+                        {team.city} {team.name}
+                      </span>
                     </div>
                   </button>
                 );
               })}
+
               {!loadingFavs && favoriteTeams.length === 0 && (
-                <p className="sched-placeholder">No favorite teams added yet.</p>
+                <p className="sched-placeholder">
+                  No favorite teams added yet.
+                </p>
               )}
             </div>
           </>
@@ -254,16 +410,30 @@ export default function SchedulePage() {
 
         {!favoritesAvail && (
           <div className="sched-team-picker-wrap">
+
             <label className="sched-team-picker-label">
               Choose any team to view their schedule
             </label>
+
             <select
               className="sched-team-picker"
               value={selectedTeam?.abbreviation ?? ''}
-              onChange={(e) => { const a = e.target.value; if (a) setSelectedTeam(teamFromAbbr(a)); }}
+              onChange={(e) => {
+                const a = e.target.value;
+
+                if (a) {
+                  setSelectedTeam(teamFromAbbr(a));
+                  setSelectedScheduleGame(null);
+                }
+              }}
             >
               <option value="">— pick a team —</option>
-              {ALL_TEAMS.map(a => <option key={a} value={a}>{a}</option>)}
+
+              {ALL_TEAMS.map(a => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
             </select>
           </div>
         )}
@@ -271,44 +441,93 @@ export default function SchedulePage() {
 
       {/* ── Main Panel ── */}
       <main className="sched-main">
+
         <div className="sched-panel">
 
           {/* ── Today's Games strip ── */}
           <section className="sched-today-section">
-            <h3 className="sched-section-title">Today's Games</h3>
 
-            {loadingToday && <p className="sched-loading">Loading…</p>}
-            {errorToday   && <p className="sched-error">{errorToday}</p>}
-            {!loadingToday && !errorToday && todaysGames.length === 0 && (
-              <p className="sched-placeholder">No games scheduled for today.</p>
+            <h3 className="sched-section-title">
+              Today's Games
+            </h3>
+
+            {loadingToday && (
+              <p className="sched-loading">
+                Loading…
+              </p>
             )}
 
+            {errorToday && (
+              <p className="sched-error">
+                {errorToday}
+              </p>
+            )}
+
+            {!loadingToday &&
+              !errorToday &&
+              todaysGames.length === 0 && (
+                <p className="sched-placeholder">
+                  No games scheduled for today.
+                </p>
+              )}
+
             <div className="sched-today-list">
+
               {todaysGames.map((game) => {
-                const isFav    = favTeamIds.has(game.homeTeam._id) || favTeamIds.has(game.awayTeam._id);
-                const isActive = selectedGame?._id === game._id;
+
+                const isFav =
+                  favTeamIds.has(game.homeTeam._id) ||
+                  favTeamIds.has(game.awayTeam._id);
+
+                const isActive =
+                  selectedGame?._id === game._id;
+
                 const scoreLabel =
-                  game.status !== 'Upcoming' && game.homeScore !== null && game.awayScore !== null
-                    ? `${game.awayScore}–${game.homeScore}` : null;
+                  game.status !== 'Upcoming' &&
+                  game.homeScore !== null &&
+                  game.awayScore !== null
+                    ? `${game.awayScore}–${game.homeScore}`
+                    : null;
 
                 return (
                   <button
                     key={game._id}
-                    className={['sched-today-card', isFav ? 'fav-game' : '', isActive ? 'active' : ''].join(' ')}
-                    onClick={() => setSelectedGame(isActive ? null : game)}
+                    className={[
+                      'sched-today-card',
+                      isFav ? 'fav-game' : '',
+                      isActive ? 'active' : '',
+                    ].join(' ')}
+                    onClick={() =>
+                      setSelectedGame(isActive ? null : game)
+                    }
                   >
-                    <span className="sched-today-time">{game.startTime}</span>
+                    <span className="sched-today-time">
+                      {game.startTime}
+                    </span>
+
                     <div className="sched-today-matchup">
                       <span>{game.awayTeam.abbreviation}</span>
                       <span className="sched-at">@</span>
                       <span>{game.homeTeam.abbreviation}</span>
                     </div>
-                    {scoreLabel
-                      ? <span className="sched-score">{scoreLabel}</span>
-                      : <span className={`sched-status ${game.status === 'Live' ? 'live' : ''}`}>
-                          {game.status === 'Live' ? '● LIVE' : game.status}
-                        </span>
-                    }
+
+                    {scoreLabel ? (
+                      <span className="sched-score">
+                        {scoreLabel}
+                      </span>
+                    ) : (
+                      <span
+                        className={`sched-status ${
+                          game.status === 'Live'
+                            ? 'live'
+                            : ''
+                        }`}
+                      >
+                        {game.status === 'Live'
+                          ? '● LIVE'
+                          : game.status}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -319,41 +538,85 @@ export default function SchedulePage() {
 
           {/* ── Full team schedule ── */}
           <section className="sched-full-section">
+
             {!selectedTeam && (
               <p className="sched-placeholder">
-                Select a team from the left to view their {currentSeason} schedule.
+                Select a team from the left to view their{' '}
+                {currentSeason} schedule.
               </p>
             )}
 
             {selectedTeam && colors && (
               <>
                 <div className="sched-full-header">
-                  <div className="sched-logo-sm-wrap" style={{ background: `radial-gradient(circle at center, ${colors.primary}88, transparent)` }}>
+
+                  <div
+                    className="sched-logo-sm-wrap"
+                    style={{
+                      background: `radial-gradient(circle at center, ${colors.primary}88, transparent)`,
+                    }}
+                  >
                     {NBA_CDN_IDS[selectedTeam.abbreviation] && (
-                      <img src={getLogoUrl(selectedTeam)} alt={selectedTeam.abbreviation} className="sched-logo-sm" />
+                      <img
+                        src={getLogoUrl(selectedTeam)}
+                        alt={selectedTeam.abbreviation}
+                        className="sched-logo-sm"
+                      />
                     )}
                   </div>
+
                   <div>
-                    <h3 className="sched-full-title" style={{ color: colors.secondary }}>
-                      {selectedTeam.city ? `${selectedTeam.city} ${selectedTeam.name}` : selectedTeam.abbreviation} — {currentSeason}
+                    <h3
+                      className="sched-full-title"
+                      style={{
+                        color: colors.secondary,
+                      }}
+                    >
+                      {selectedTeam.city
+                        ? `${selectedTeam.city} ${selectedTeam.name}`
+                        : selectedTeam.abbreviation}{' '}
+                      — {currentSeason}
                     </h3>
+
                     {teamSchedule.length > 0 && (
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: '0.8rem',
+                          color: '#666',
+                        }}
+                      >
                         {wins}–{losses} ({teamSchedule.length} games)
                       </p>
                     )}
                   </div>
                 </div>
 
-                {loadingSchedule && <p className="sched-loading">Loading schedule…</p>}
-                {errorSchedule   && <p className="sched-error">{errorSchedule}</p>}
-                {!loadingSchedule && teamSchedule.length === 0 && !errorSchedule && (
-                  <p className="sched-placeholder">No games found for this season.</p>
+                {loadingSchedule && (
+                  <p className="sched-loading">
+                    Loading schedule…
+                  </p>
                 )}
+
+                {errorSchedule && (
+                  <p className="sched-error">
+                    {errorSchedule}
+                  </p>
+                )}
+
+                {!loadingSchedule &&
+                  teamSchedule.length === 0 &&
+                  !errorSchedule && (
+                    <p className="sched-placeholder">
+                      No games found for this season.
+                    </p>
+                  )}
 
                 {teamSchedule.length > 0 && (
                   <div className="sched-table-wrap">
+
                     <table className="sched-table">
+
                       <thead>
                         <tr>
                           <th>Date</th>
@@ -367,49 +630,108 @@ export default function SchedulePage() {
                           <th>+/-</th>
                         </tr>
                       </thead>
+
                       <tbody>
                         {teamSchedule.map((game) => {
+
                           const opp = game.opponentTeamId;
                           const won = game.wl === 'W';
+
                           return (
-                            <tr key={game._id}>
-                              <td className="sched-date-col">{formatDate(game.gameDate)}</td>
+                            <tr
+                              key={game._id}
+                              onClick={() =>
+                                setSelectedScheduleGame(game)
+                              }
+                              style={{
+                                cursor: 'pointer',
+                                background:
+                                  selectedScheduleGame?._id === game._id
+                                    ? '#1e1e2e'
+                                    : undefined,
+                              }}
+                            >
+                              <td className="sched-date-col">
+                                {formatDate(game.gameDate)}
+                              </td>
+
                               <td>
                                 <div className="sched-opp-cell">
-                                  <span className="sched-ha-badge">{game.isHome ? 'vs' : '@'}</span>
+
+                                  <span className="sched-ha-badge">
+                                    {game.isHome ? 'vs' : '@'}
+                                  </span>
+
                                   <img
                                     src={getLogoUrl(opp)}
                                     alt={opp.abbreviation}
                                     className="sched-opp-logo"
-                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    onError={(e) => {
+                                      (
+                                        e.target as HTMLImageElement
+                                      ).style.display = 'none';
+                                    }}
                                   />
-                                  <span className="sched-opp-abbr">{opp.abbreviation}</span>
+
+                                  <span className="sched-opp-abbr">
+                                    {opp.abbreviation}
+                                  </span>
                                 </div>
                               </td>
+
                               <td>
-                                <span className={`sched-result ${won ? 'win' : 'loss'}`}>{game.wl}</span>
+                                <span
+                                  className={`sched-result ${
+                                    won ? 'win' : 'loss'
+                                  }`}
+                                >
+                                  {game.wl}
+                                </span>
                               </td>
+
                               <td className="sched-score">
-                                <span style={{ color: won ? '#4ade80' : '#f87171', fontWeight: 700 }}>
+                                <span
+                                  style={{
+                                    color: won
+                                      ? '#4ade80'
+                                      : '#f87171',
+                                    fontWeight: 700,
+                                  }}
+                                >
                                   {game.points ?? '—'}
                                 </span>
-                                <span style={{ color: '#444' }}> – </span>
-                                {/* oppPoints is safely computed on the backend as PTS - PLUS_MINUS.
-                                    Render a dash if the value didn't come through. */}
+
+                                <span style={{ color: '#444' }}>
+                                  {' '}–{' '}
+                                </span>
+
                                 <span>
-                                  {game.oppPoints != null ? game.oppPoints : '—'}
+                                  {game.oppPoints != null
+                                    ? game.oppPoints
+                                    : '—'}
                                 </span>
                               </td>
+
                               <td>{game.rebounds}</td>
                               <td>{game.assists}</td>
                               <td>{game.steals}</td>
                               <td>{game.blocks}</td>
-                              <td style={{
-                                color: (game.plusMinus ?? 0) > 0 ? '#4ade80' : (game.plusMinus ?? 0) < 0 ? '#f87171' : '#666',
-                                fontWeight: 600,
-                              }}>
+
+                              <td
+                                style={{
+                                  color:
+                                    (game.plusMinus ?? 0) > 0
+                                      ? '#4ade80'
+                                      : (game.plusMinus ?? 0) < 0
+                                      ? '#f87171'
+                                      : '#666',
+                                  fontWeight: 600,
+                                }}
+                              >
                                 {game.plusMinus != null
-                                  ? (game.plusMinus > 0 ? `+${game.plusMinus}` : game.plusMinus)
+                                  ? game.plusMinus > 0
+                                    ? `+${game.plusMinus}`
+                                    : game.plusMinus
                                   : '—'}
                               </td>
                             </tr>
@@ -422,7 +744,6 @@ export default function SchedulePage() {
               </>
             )}
           </section>
-
         </div>
       </main>
     </div>
