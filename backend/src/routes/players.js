@@ -5,6 +5,7 @@ const router            = express.Router();
 const Player            = require('../models/Player');
 const PlayerSeasonStats = require('../models/PlayerSeasonStats');
 const PlayerCareerStats = require('../models/PlayerCareerStats');
+const PlayerGameStats   = require('../models/PlayerGameStats');
 
 // Strips accents and lowercases a string for consistent search matching.
 // Handles names like "Nikola Jokić" → "nikola jokic" so searches work
@@ -218,6 +219,60 @@ router.get('/players/:playerId/career', async (req, res) => {
   } catch (error) {
     console.error('Error fetching player career stats:', error.message);
     res.status(500).json({ error: 'Failed to fetch player career stats', details: error.message });
+  }
+});
+
+/**
+ * GET /api/players/:nbaPlayerId/stats
+ *
+ * Returns season averages and last-game stats for a single player.
+ * :nbaPlayerId is the NBA numeric player ID (nbaId on the Player document).
+ *
+ * Response:
+ *   seasonAvg  — per-game season averages (pts, reb, ast, fg3m)
+ *   lastGame   — stats from the player's most recent game in PlayerGameStats,
+ *                or null if no game records exist (TTL expired / off-season)
+ */
+router.get('/players/:nbaPlayerId/stats', async (req, res) => {
+  try {
+    const nbaPlayerId = Number(req.params.nbaPlayerId);
+    if (isNaN(nbaPlayerId)) {
+      return res.status(400).json({ error: 'nbaPlayerId must be a numeric NBA player ID' });
+    }
+
+    const seasonStats = await PlayerSeasonStats.findOne({ nbaPlayerId }).lean();
+    if (!seasonStats) {
+      return res.status(404).json({ error: 'No season stats found for this player' });
+    }
+
+    const player = await Player.findOne({ nbaId: nbaPlayerId }).select('_id').lean();
+    let lastGame = null;
+    if (player) {
+      const gameDoc = await PlayerGameStats.findOne({ playerId: player._id })
+        .sort({ gameDate: -1 })
+        .lean();
+      if (gameDoc) {
+        lastGame = {
+          pts:  gameDoc.points,
+          reb:  gameDoc.rebounds,
+          ast:  gameDoc.assists,
+          fg3m: gameDoc.threePointersMade,
+        };
+      }
+    }
+
+    res.json({
+      seasonAvg: {
+        pts:  seasonStats.avgPoints,
+        reb:  seasonStats.avgRebounds,
+        ast:  seasonStats.avgAssists,
+        fg3m: seasonStats.avgFg3m,
+      },
+      lastGame,
+    });
+  } catch (error) {
+    console.error('Error fetching player stats:', error.message);
+    res.status(500).json({ error: 'Failed to fetch player stats', details: error.message });
   }
 });
 

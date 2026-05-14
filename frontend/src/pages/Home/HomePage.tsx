@@ -10,14 +10,31 @@ import FavoritePlayerCard, {
 import FavoriteTeamCard, {
   type FavoriteTeam,
 } from '../../components/teams/FavoriteTeamCard';
+import PlayerDetailPanel from '../../components/players/PlayerDetailPanel';
+import HomeTeamPanel from '../../components/teams/HomeTeamPanel';
 import { getToken } from '../../services/authService';
+import { saveFavorites } from '../../services/favoritesService';
+import { getTeamNbaId } from '../../assets/teamAssets';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type SelectedCard = {
+type SelectedTeamCard = {
+  type: 'team';
   id: string;
   label: string;
+  nbaTeamId: number;
 };
+
+type SelectedPlayerCard = {
+  type: 'player';
+  id: string;
+  label: string;
+  nbaPlayerId: number;
+  playerName: string;
+  teamAbbr: string;
+};
+
+type SelectedCard = SelectedTeamCard | SelectedPlayerCard;
 
 interface TeamInfo {
   abbr: string;
@@ -160,6 +177,62 @@ export default function HomePage() {
     return () => controller.abort();
   }, []);
 
+  // ── Favorite toggle helpers ──────────────────────────────────────────────────
+
+  async function refetchFavorites() {
+    const token = getToken();
+    if (!token) return;
+    const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    setFavoritePlayers(data.user.favoritePlayers ?? []);
+    setFavoriteTeams(data.user.favoriteTeams ?? []);
+  }
+
+  async function togglePlayerFavorite(nbaPlayerId: number) {
+    const isFav = favoritePlayers.some((p) => p.nbaId === nbaPlayerId);
+    if (isFav) {
+      // Optimistic remove
+      setFavoritePlayers((prev) => prev.filter((p) => p.nbaId !== nbaPlayerId));
+      const newIds = favoritePlayers
+        .filter((p) => p.nbaId !== nbaPlayerId)
+        .map((p) => p.nbaId)
+        .filter((id): id is number => id != null);
+      await saveFavorites({ favoritePlayers: newIds });
+    } else {
+      // Add then re-fetch for the full populated document
+      const newIds = [
+        ...favoritePlayers.map((p) => p.nbaId).filter((id): id is number => id != null),
+        nbaPlayerId,
+      ];
+      await saveFavorites({ favoritePlayers: newIds });
+      await refetchFavorites();
+    }
+  }
+
+  async function toggleTeamFavorite(nbaTeamId: number) {
+    const isFav = favoriteTeams.some((t) => t.nbaId === nbaTeamId);
+    if (isFav) {
+      // Optimistic remove
+      setFavoriteTeams((prev) => prev.filter((t) => t.nbaId !== nbaTeamId));
+      const newIds = favoriteTeams
+        .filter((t) => t.nbaId !== nbaTeamId)
+        .map((t) => t.nbaId)
+        .filter((id): id is number => id != null);
+      await saveFavorites({ favoriteTeams: newIds });
+    } else {
+      // Add then re-fetch for the full populated document
+      const newIds = [
+        ...favoriteTeams.map((t) => t.nbaId).filter((id): id is number => id != null),
+        nbaTeamId,
+      ];
+      await saveFavorites({ favoriteTeams: newIds });
+      await refetchFavorites();
+    }
+  }
+
   // ── Card selection helpers ───────────────────────────────────────────────────
 
   const handleCardClick = (card: SelectedCard) => {
@@ -179,6 +252,16 @@ export default function HomePage() {
   };
 
   const isActive = (id: string) => selected.some((s) => s.id === id);
+
+  // ── Grey-filter logic ────────────────────────────────────────────────────────
+  // Based on the most recently opened panel's type, grey out cards of the
+  // opposite type so the user knows what they can compare against.
+
+  const activePanelType =
+    selected.length > 0 ? selected[selected.length - 1].type : null;
+
+  const isPlayerGreyed = activePanelType === 'team';   // grey players when team panel open
+  const isTeamGreyed   = activePanelType === 'player'; // grey teams/games when player panel open
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -228,13 +311,31 @@ export default function HomePage() {
                           gameId={game.gameId}
                           homeTeam={game.homeTeam}
                           awayTeam={game.awayTeam}
-                          isActive={isActive(game.gameId)}
-                          onClick={() =>
-                            handleCardClick({
-                              id: game.gameId,
-                              label: `${game.awayTeam.abbr} @ ${game.homeTeam.abbr}`,
-                            })
+                          activeHalf={
+                            isActive(`team-away-${game.gameId}`) ? 'away' :
+                            isActive(`team-home-${game.gameId}`) ? 'home' : null
                           }
+                          isGreyed={isTeamGreyed}
+                          onAwayClick={() => {
+                            const nbaTeamId = getTeamNbaId(game.awayTeam.abbr);
+                            if (!nbaTeamId) return;
+                            handleCardClick({
+                              type: 'team',
+                              id: `team-away-${game.gameId}`,
+                              label: game.awayTeam.abbr,
+                              nbaTeamId,
+                            });
+                          }}
+                          onHomeClick={() => {
+                            const nbaTeamId = getTeamNbaId(game.homeTeam.abbr);
+                            if (!nbaTeamId) return;
+                            handleCardClick({
+                              type: 'team',
+                              id: `team-home-${game.gameId}`,
+                              label: game.homeTeam.abbr,
+                              nbaTeamId,
+                            });
+                          }}
                         />
                       ))}
                     </div>
@@ -289,6 +390,17 @@ export default function HomePage() {
                           key={player.nbaPlayerId}
                           player={player}
                           statLabel={suffix}
+                          isGreyed={isPlayerGreyed}
+                          onClick={() =>
+                            handleCardClick({
+                              type: 'player',
+                              id: `player-${player.nbaPlayerId}`,
+                              label: player.playerName,
+                              nbaPlayerId: player.nbaPlayerId,
+                              playerName: player.playerName,
+                              teamAbbr: player.teamAbbr,
+                            })
+                          }
                         />
                       ))}
                     </div>
@@ -306,7 +418,22 @@ export default function HomePage() {
             <div className="favorites-scroll-container">
               {favoritePlayers.length > 0
                 ? favoritePlayers.map((player) => (
-                    <FavoritePlayerCard key={player._id} player={player} />
+                    <FavoritePlayerCard
+                      key={player._id}
+                      player={player}
+                      isGreyed={isPlayerGreyed}
+                      onClick={() => {
+                        if (!player.nbaId) return;
+                        handleCardClick({
+                          type: 'player',
+                          id: `player-${player._id}`,
+                          label: `${player.firstName} ${player.lastName}`,
+                          nbaPlayerId: player.nbaId,
+                          playerName: `${player.firstName} ${player.lastName}`,
+                          teamAbbr: player.teamId?.abbreviation ?? '',
+                        });
+                      }}
+                    />
                   ))
                 : Array.from({ length: EMPTY_FAVORITE_COUNT }).map((_, i) => (
                     <div key={i} className="favorite-card" />
@@ -319,7 +446,20 @@ export default function HomePage() {
             <div className="favorites-scroll-container">
               {favoriteTeams.length > 0
                 ? favoriteTeams.map((team) => (
-                    <FavoriteTeamCard key={team._id} team={team} />
+                    <FavoriteTeamCard
+                      key={team._id}
+                      team={team}
+                      isGreyed={isTeamGreyed}
+                      onClick={() => {
+                        if (!team.nbaId) return;
+                        handleCardClick({
+                          type: 'team',
+                          id: `team-${team._id}`,
+                          label: team.name,
+                          nbaTeamId: team.nbaId,
+                        });
+                      }}
+                    />
                   ))
                 : Array.from({ length: EMPTY_FAVORITE_COUNT }).map((_, i) => (
                     <div key={i} className="favorite-card" />
@@ -329,15 +469,29 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Stats panels ───────────────────────────────────── */}
+      {/* ── Stats panels (fixed overlay, floats over content) ── */}
       {selected.length > 0 && (
         <div className={`stats-panels-container panels-${selected.length}`}>
           {selected.map((item) => (
             <div key={item.id} className="stats-panel">
-              <div className="stats-panel-header">
-                <h2 className="stats-panel-title">{item.label}</h2>
-              </div>
-              <div className="stats-panel-divider" />
+              {item.type === 'team' ? (
+                <HomeTeamPanel
+                  nbaTeamId={item.nbaTeamId}
+                  label={item.label}
+                  onClose={() => handleCardClick(item)}
+                  isFavorited={favoriteTeams.some((t) => t.nbaId === item.nbaTeamId)}
+                  onToggleFavorite={() => toggleTeamFavorite(item.nbaTeamId)}
+                />
+              ) : (
+                <PlayerDetailPanel
+                  nbaPlayerId={item.nbaPlayerId}
+                  playerName={item.playerName}
+                  teamAbbr={item.teamAbbr}
+                  onClose={() => handleCardClick(item)}
+                  isFavorited={favoritePlayers.some((p) => p.nbaId === item.nbaPlayerId)}
+                  onToggleFavorite={() => togglePlayerFavorite(item.nbaPlayerId)}
+                />
+              )}
             </div>
           ))}
         </div>

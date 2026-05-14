@@ -4,7 +4,38 @@ const express         = require('express');
 const router          = express.Router();
 const Team            = require('../models/Team');
 const TeamSeasonStats = require('../models/TeamSeasonStats');
+const TeamGameStats   = require('../models/TeamGameStats');
+const GameSchedule    = require('../models/GameSchedule');
 const { CURRENT_SEASON } = require('../nbaApi');
+
+// Returns the ordinal suffix for a positive integer (1→'st', 2→'nd', etc.).
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// Reformats "7:30 pm ET" → "7:30 PM", leaving other strings unchanged.
+function formatStartTime(raw) {
+  if (!raw) return '';
+  return raw.replace(/(\d+:\d+)\s*(am|pm)\s*(ET)?/i, (_, time, ampm) =>
+    `${time} ${ampm.toUpperCase()}`
+  ).trim();
+}
+
+// Returns 'Today', 'Tomorrow', or a short date string (e.g. 'Mon May 18').
+// Comparison is done in local time so midnight boundaries are intuitive.
+function formatGameDate(gameDate) {
+  const game   = new Date(gameDate);
+  const now    = new Date();
+  const today  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tmrw   = new Date(today.getTime() + 86_400_000);
+  const gamDay = new Date(game.getFullYear(), game.getMonth(), game.getDate());
+
+  if (gamDay.getTime() === today.getTime()) return 'Today';
+  if (gamDay.getTime() === tmrw.getTime())  return 'Tomorrow';
+  return game.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
 
 /**
  * GET /api/teams/search?q=<query>
@@ -117,6 +148,110 @@ router.get('/teams/:teamId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching team detail:', error.message);
     res.status(500).json({ error: 'Failed to fetch team detail', details: error.message });
+  }
+});
+
+/**
+ * GET /api/teams/:nbaTeamId/summary
+ *
+ * Returns a compact summary card payload for a single team:
+ *   record   — { wins, losses } from TeamSeasonStats
+ *   rank     — e.g. "4th in West", derived by sorting all teams in the same
+ *              conference by win% and finding this team's position
+ *   lastGame — most recent TeamGameStats doc: result, scores, opponent abbr
+ *   nextGame — next GameSchedule doc: opponent abbr, formatted date + time
+ *              (null if no upcoming game is found)
+ *
+ * All data is read exclusively from MongoDB — no live NBA API calls.
+ */
+router.get('/teams/:nbaTeamId/summary', async (req, res) => {
+  try {
+    const nbaTeamId = Number(req.params.nbaTeamId);
+    if (isNaN(nbaTeamId)) {
+      return res.status(400).json({ error: 'nbaTeamId must be a numeric NBA team ID' });
+    }
+
+    // ── 1. Resolve the team document ──────────────────────────────────────────
+    const team = await Team.findOne({ nbaId: nbaTeamId }).lean();
+    if (!team) {
+      return res.status(404).json({ error: `No team found for nbaId ${nbaTeamId}` });
+    }
+
+    // ── 2. Season record ──────────────────────────────────────────────────────
+    const seasonStats = await TeamSeasonStats.findOne({
+      teamId: team._id,
+      season: CURRENT_SEASON,
+    }).lean();
+
+    const wins   = seasonStats?.wins   ?? 0;
+    const losses = seasonStats?.losses ?? 0;
+
+    // ── 3. Conference rank ────────────────────────────────────────────────────
+    // Pull all season stats, populate team conference, filter to this conference,
+    // sort by win%, and find the 1-based position of this team.
+    const allSeasonStats = await TeamSeasonStats.find({ season: CURRENT_SEASON })
+      .populate({ path: 'teamId', select: 'conference _id' })
+      .lean();
+
+    const confStats = allSeasonStats.filter(
+      (s) => s.teamId?.conference === team.conference
+    );
+    confStats.sort((a, b) => {
+      const aWinPct = (a.wins + a.losses) > 0 ? a.wins / (a.wins + a.losses) : 0;
+      const bWinPct = (b.wins + b.losses) > 0 ? b.wins / (b.wins + b.losses) : 0;
+      return bWinPct - aWinPct;
+    });
+
+    const rankPos  = confStats.findIndex((s) => String(s.teamId?._id) === String(team._id)) + 1;
+    const confShort = team.conference === 'Eastern' ? 'East' : 'West';
+    const rank     = rankPos > 0 ? `${ordinal(rankPos)} in ${confShort}` : '--';
+
+    // ── 4. Last game ──────────────────────────────────────────────────────────
+    const lastGameDoc = await TeamGameStats.findOne({ teamId: team._id })
+      .sort({ gameDate: -1 })
+      .populate({ path: 'opponentTeamId', select: 'abbreviation' })
+      .lean();
+
+    const lastGame = lastGameDoc
+      ? {
+          result:    lastGameDoc.result,       // 'W' or 'L'
+          teamScore: lastGameDoc.points,
+          oppScore:  lastGameDoc.oppPoints,
+          oppAbbr:   lastGameDoc.opponentTeamId?.abbreviation ?? '???',
+        }
+      : null;
+
+    // ── 5. Next game ──────────────────────────────────────────────────────────
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const nextGameDoc = await GameSchedule.findOne({
+      $or:    [{ homeTeamId: team._id }, { awayTeamId: team._id }],
+      gameDate: { $gte: todayStart },
+      status: { $ne: 'Final' },
+    })
+      .sort({ gameDate: 1 })
+      .populate('homeTeamId', 'abbreviation _id')
+      .populate('awayTeamId', 'abbreviation _id')
+      .lean();
+
+    let nextGame = null;
+    if (nextGameDoc) {
+      const isHome = String(nextGameDoc.homeTeamId?._id) === String(team._id);
+      const oppAbbr = isHome
+        ? nextGameDoc.awayTeamId?.abbreviation
+        : nextGameDoc.homeTeamId?.abbreviation;
+      nextGame = {
+        oppAbbr:   oppAbbr ?? '???',
+        gameDate:  formatGameDate(nextGameDoc.gameDate),
+        startTime: formatStartTime(nextGameDoc.startTime),
+      };
+    }
+
+    res.json({ record: { wins, losses }, rank, lastGame, nextGame });
+  } catch (error) {
+    console.error('Error fetching team summary:', error.message);
+    res.status(500).json({ error: 'Failed to fetch team summary', details: error.message });
   }
 });
 

@@ -10,23 +10,28 @@ interface GameCardProps {
   gameId: string;
   homeTeam: TeamInfo;
   awayTeam: TeamInfo;
-  isActive: boolean;
-  onClick: () => void;
+  /** Which half (if any) has an open detail panel */
+  activeHalf?: 'away' | 'home' | null;
+  /** When true the whole card is dimmed and non-interactive */
+  isGreyed?: boolean;
+  onAwayClick: () => void;
+  onHomeClick: () => void;
 }
 
 /**
  * Pill-shaped game card matching the design:
  *   [LOGO · score/abbr]   VS   [score/abbr · LOGO]
  *
- * The background is a linear-gradient: away team's color fills the left half
- * and fades to dark in the center; home team's color fills the right half and
- * fades to dark in the center — creating two distinct colored halves.
+ * Each half is independently clickable: clicking the left half triggers
+ * onAwayClick; clicking the right half triggers onHomeClick.
  */
 export default function GameCard({
   homeTeam,
   awayTeam,
-  isActive,
-  onClick,
+  activeHalf,
+  isGreyed,
+  onAwayClick,
+  onHomeClick,
 }: GameCardProps) {
   const homeAsset = getTeamAsset(homeTeam.abbr);
   const awayAsset = getTeamAsset(awayTeam.abbr);
@@ -34,14 +39,19 @@ export default function GameCard({
   // Each team's color fills its half and fades toward the dark center.
   const gradient = `linear-gradient(to right, ${awayAsset.color} 0%, #1c1c1c 45%, #1c1c1c 55%, ${homeAsset.color} 100%)`;
 
+  const isActive = activeHalf !== null && activeHalf !== undefined;
+
   return (
     <div
       className={`game-card${isActive ? ' card-active' : ''}`}
-      onClick={onClick}
+      style={isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : undefined}
     >
       <div className="game-card-inner" style={{ background: gradient }}>
         {/* ── Away team: logo on far left, score+abbr to its right ── */}
-        <div className="gc-half gc-half--away">
+        <div
+          className={`gc-half gc-half--away${activeHalf === 'away' ? ' gc-half--active' : ''}`}
+          onClick={onAwayClick}
+        >
           {awayAsset.logoUrl ? (
             <img
               className="gc-logo"
@@ -61,7 +71,10 @@ export default function GameCard({
         <span className="gc-vs">VS</span>
 
         {/* ── Home team: score+abbr on left, logo on far right ───── */}
-        <div className="gc-half gc-half--home">
+        <div
+          className={`gc-half gc-half--home${activeHalf === 'home' ? ' gc-half--active' : ''}`}
+          onClick={onHomeClick}
+        >
           {homeAsset.logoUrl ? (
             <img
               className="gc-logo"

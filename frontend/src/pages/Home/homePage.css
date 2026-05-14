@@ -15,7 +15,7 @@
   min-width: 0; /* allow flex child to shrink below content size */
   padding: 16px 28px;
   overflow-y: auto;
-  overflow-x: hidden; /* prevent any horizontal overflow from escaping to page level */
+  overflow-x: hidden;
 }
 
 /* ── Section layout ─────────────────────────────────────── */
@@ -134,7 +134,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: calc(2 * 150px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  height: calc(2 * 190px + 10px + 4px); /* 2 cards + 1 gap + card borders */
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
 }
@@ -148,7 +148,7 @@
   background-color: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  height: 150px;
+  height: 190px;
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -165,14 +165,20 @@
   background-color: #252525;
 }
 
-/* ── Stats panels container ─────────────────────────────── */
+/* ── Stats panels container — floats over page content ──── */
 
 .stats-panels-container {
+  position: fixed;
+  right: 0;
+  top: 61px;   /* below the fixed nav */
+  bottom: 0;
   display: flex;
   flex-direction: row;
+  align-items: stretch;
   gap: 8px;
-  padding: 12px 12px 12px 0;
-  flex-shrink: 0;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none; /* clicks pass through the gap between panels */
 }
 
 /* Single panel */
@@ -195,6 +201,7 @@
   flex-direction: column;
   overflow: hidden;
   animation: panel-slide-in 0.22s ease-out;
+  pointer-events: all; /* re-enable clicks on the panel itself */
 }
 
 @keyframes panel-slide-in {
@@ -206,22 +213,4 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-.stats-panel-header {
-  padding: 22px 22px 18px;
-}
-
-.stats-panel-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  line-height: 1.15;
-}
-
-.stats-panel-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
 }
