@@ -10,7 +10,7 @@ The application is fully deployed using Azure with CI/CD via GitHub Actions.
 
 ### Live URLs
 
-- **Frontend:** https://nice-wave-0b1190a0f.z.azurestaticapps.net  
+- **Frontend:** https://nice-wave-0b1190a0f.7.azurestaticapps.net  
 - **Backend:** https://ballerz-backend.azurewebsites.net  
 
 ---
