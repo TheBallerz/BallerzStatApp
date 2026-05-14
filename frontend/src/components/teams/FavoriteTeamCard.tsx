@@ -35,7 +35,7 @@ export default function FavoriteTeamCard({ team, onClick, isGreyed }: FavoriteTe
   useEffect(() => {
     if (!team.nbaId) return;
     setLoading(true);
-    fetch(`/api/teams/${team.nbaId}/summary`)
+    fetch(`${import.meta.env.VITE_API_BASE}/teams/${team.nbaId}/summary`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         setSummary(data);

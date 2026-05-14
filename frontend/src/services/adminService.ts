@@ -1,6 +1,6 @@
 import { getToken } from './authService';
 
-const API_BASE = 'https://ballerz-backend.azurewebsites.net/api/admin';
+const API_BASE = `${import.meta.env.VITE_API_BASE}/admin`;
 
 /** Shape of a user record returned by the admin endpoints */
 export interface AdminUser {

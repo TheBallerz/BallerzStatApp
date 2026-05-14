@@ -75,7 +75,7 @@ export default function FavoritePlayerCard({ player, onClick, isGreyed }: Favori
   useEffect(() => {
     if (!player.nbaId) return;
     setLoading(true);
-    fetch(`/api/players/${player.nbaId}/stats`)
+    fetch(`${import.meta.env.VITE_API_BASE}/players/${player.nbaId}/stats`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         setStats(data);

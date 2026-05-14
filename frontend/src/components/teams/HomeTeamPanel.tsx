@@ -35,7 +35,7 @@ export default function HomeTeamPanel({ nbaTeamId, label, onClose, isFavorited, 
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetch(`/api/teams/${nbaTeamId}`)
+    fetch(`${import.meta.env.VITE_API_BASE}/teams/${nbaTeamId}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`)))
       .then((data: TeamData) => {
         setTeam(data);

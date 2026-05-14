@@ -38,7 +38,7 @@ export default function PlayerDetailPanel({
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetch(`/api/players/${nbaPlayerId}/stats`)
+    fetch(`${import.meta.env.VITE_API_BASE}/players/${nbaPlayerId}/stats`)
       .then((r) => (r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`)))
       .then((data: PlayerStats) => {
         setStats(data);
