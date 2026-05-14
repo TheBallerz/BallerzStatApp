@@ -38,7 +38,11 @@ JWT_EXPIRES_IN=7d        # optional, defaults to 7d
 PORT=3000                # optional, defaults to 3000
 ```
 
-The frontend requires no environment configuration for local development — it proxies API requests to `http://localhost:3000`.
+The frontend uses an environment variable for API requests.
+
+Create a `.env` file in `frontend/`: VITE_API_BASE=http://localhost:3000/api
+
+For production (Azure deployment), the app uses: VITE_API_BASE=https://ballerz-backend.azurewebsites.net/api
 
 ---
 
@@ -331,3 +335,58 @@ npm run lint:fix       # auto-fix linting errors
 npm run format         # format all files with Prettier
 npm run format:check   # check formatting without making changes
 ```
+---
+
+## Deployment (Azure)
+
+The application is fully deployed using Azure with CI/CD via GitHub Actions.
+
+### Live URLs
+
+- **Frontend:** https://nice-wave-0b1190a0f.z.azurestaticapps.net  
+- **Backend:** https://ballerz-backend.azurewebsites.net  
+
+---
+
+### Architecture
+
+- Frontend: Azure Static Web Apps (Vite build → `dist/`)
+- Backend: Azure App Service (Node.js + Express)
+- CI/CD: GitHub Actions (auto deploy on push to `main`)
+
+---
+
+### CI/CD Pipelines
+
+#### Backend
+- Installs dependencies
+- Runs tests and lint checks
+- Deploys to Azure App Service
+
+#### Frontend
+- Builds React app (`npm run build`)
+- Outputs static files to `dist/`
+- Deploys to Azure Static Web Apps
+
+---
+
+### Important Notes
+
+- The frontend does NOT use `localhost` in production
+- All API calls go through: https://ballerz-backend.azurewebsites.net/api
+- Controlled via: VITE_API_BASE
+
+---
+
+### Troubleshooting
+
+If the frontend loads but no data appears:
+
+- Open DevTools → Network tab
+- Ensure requests go to the Azure backend (not localhost)
+
+If CI/CD fails due to formatting:
+
+```bash
+cd frontend
+npx prettier --write .
