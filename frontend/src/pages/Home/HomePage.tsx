@@ -73,9 +73,12 @@ export default function HomePage() {
 
     async function fetchRecentGames() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE}/games/recent`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE}/games/recent`,
+          {
+            signal: controller.signal,
+          },
+        );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: RecentGameDay[] = await res.json();
         setRecentDays(data);
@@ -103,9 +106,12 @@ export default function HomePage() {
 
     async function fetchTopPlayers() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE}/players/top`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE}/players/top`,
+          {
+            signal: controller.signal,
+          },
+        );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: TopPlayersData = await res.json();
         setTopPlayers(data);
