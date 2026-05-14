@@ -14,7 +14,7 @@ interface FantasyPlayer {
   turnovers: number;
 }
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://ballerz-backend.azurewebsites.net/api';
 
 function fantasyScore(p: FantasyPlayer): number {
   return (

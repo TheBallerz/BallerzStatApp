@@ -73,7 +73,7 @@ export default function HomePage() {
 
     async function fetchRecentGames() {
       try {
-        const res = await fetch('/api/games/recent', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE}/games/recent`, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -103,7 +103,7 @@ export default function HomePage() {
 
     async function fetchTopPlayers() {
       try {
-        const res = await fetch('/api/players/top', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE}/players/top`, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -193,7 +193,7 @@ export default function AccountPage() {
 
     async function fetchMe() {
       try {
-        const res = await fetch('http://localhost:3000/api/auth/me', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) return;

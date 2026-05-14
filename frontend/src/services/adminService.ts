@@ -1,6 +1,6 @@
 import { getToken } from './authService';
 
-const API_BASE = 'http://localhost:3000/api/admin';
+const API_BASE = 'https://ballerz-backend.azurewebsites.net/api/admin';
 
 /** Shape of a user record returned by the admin endpoints */
 export interface AdminUser {
