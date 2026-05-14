@@ -3,66 +3,51 @@ const router  = express.Router();
 const { nbaGet, CURRENT_SEASON } = require('../nbaApi');
 const { rowsToObjects }          = require('../utils/nbaUtils');
 
-// ── Team metadata (abbreviation → NBA numeric ID + name) ─────────────────────
-// Used to build Team-shaped objects without hitting MongoDB.
+// ── Team metadata ─────────────────────────────────────────────────────────────
+
 const NBA_TEAMS = {
-  ATL: { id: 1610612737, name: 'Hawks',         city: 'Atlanta'        },
-  BOS: { id: 1610612738, name: 'Celtics',        city: 'Boston'         },
-  BKN: { id: 1610612751, name: 'Nets',           city: 'Brooklyn'       },
-  CHA: { id: 1610612766, name: 'Hornets',        city: 'Charlotte'      },
-  CHI: { id: 1610612741, name: 'Bulls',          city: 'Chicago'        },
-  CLE: { id: 1610612739, name: 'Cavaliers',      city: 'Cleveland'      },
-  DAL: { id: 1610612742, name: 'Mavericks',      city: 'Dallas'         },
-  DEN: { id: 1610612743, name: 'Nuggets',        city: 'Denver'         },
-  DET: { id: 1610612765, name: 'Pistons',        city: 'Detroit'        },
-  GSW: { id: 1610612744, name: 'Warriors',       city: 'Golden State'   },
-  HOU: { id: 1610612745, name: 'Rockets',        city: 'Houston'        },
-  IND: { id: 1610612754, name: 'Pacers',         city: 'Indiana'        },
-  LAC: { id: 1610612746, name: 'Clippers',       city: 'Los Angeles'    },
-  LAL: { id: 1610612747, name: 'Lakers',         city: 'Los Angeles'    },
-  MEM: { id: 1610612763, name: 'Grizzlies',      city: 'Memphis'        },
-  MIA: { id: 1610612748, name: 'Heat',           city: 'Miami'          },
-  MIL: { id: 1610612749, name: 'Bucks',          city: 'Milwaukee'      },
-  MIN: { id: 1610612750, name: 'Timberwolves',   city: 'Minnesota'      },
-  NOP: { id: 1610612740, name: 'Pelicans',       city: 'New Orleans'    },
-  NYK: { id: 1610612752, name: 'Knicks',         city: 'New York'       },
-  OKC: { id: 1610612760, name: 'Thunder',        city: 'Oklahoma City'  },
-  ORL: { id: 1610612753, name: 'Magic',          city: 'Orlando'        },
-  PHI: { id: 1610612755, name: '76ers',          city: 'Philadelphia'   },
-  PHX: { id: 1610612756, name: 'Suns',           city: 'Phoenix'        },
-  POR: { id: 1610612757, name: 'Trail Blazers',  city: 'Portland'       },
-  SAC: { id: 1610612758, name: 'Kings',          city: 'Sacramento'     },
-  SAS: { id: 1610612759, name: 'Spurs',          city: 'San Antonio'    },
-  TOR: { id: 1610612761, name: 'Raptors',        city: 'Toronto'        },
-  UTA: { id: 1610612762, name: 'Jazz',           city: 'Utah'           },
-  WAS: { id: 1610612764, name: 'Wizards',        city: 'Washington'     },
+  ATL: { id: 1610612737, name: 'Hawks',        city: 'Atlanta'       },
+  BOS: { id: 1610612738, name: 'Celtics',       city: 'Boston'        },
+  BKN: { id: 1610612751, name: 'Nets',          city: 'Brooklyn'      },
+  CHA: { id: 1610612766, name: 'Hornets',       city: 'Charlotte'     },
+  CHI: { id: 1610612741, name: 'Bulls',         city: 'Chicago'       },
+  CLE: { id: 1610612739, name: 'Cavaliers',     city: 'Cleveland'     },
+  DAL: { id: 1610612742, name: 'Mavericks',     city: 'Dallas'        },
+  DEN: { id: 1610612743, name: 'Nuggets',       city: 'Denver'        },
+  DET: { id: 1610612765, name: 'Pistons',       city: 'Detroit'       },
+  GSW: { id: 1610612744, name: 'Warriors',      city: 'Golden State'  },
+  HOU: { id: 1610612745, name: 'Rockets',       city: 'Houston'       },
+  IND: { id: 1610612754, name: 'Pacers',        city: 'Indiana'       },
+  LAC: { id: 1610612746, name: 'Clippers',      city: 'Los Angeles'   },
+  LAL: { id: 1610612747, name: 'Lakers',        city: 'Los Angeles'   },
+  MEM: { id: 1610612763, name: 'Grizzlies',     city: 'Memphis'       },
+  MIA: { id: 1610612748, name: 'Heat',          city: 'Miami'         },
+  MIL: { id: 1610612749, name: 'Bucks',         city: 'Milwaukee'     },
+  MIN: { id: 1610612750, name: 'Timberwolves',  city: 'Minnesota'     },
+  NOP: { id: 1610612740, name: 'Pelicans',      city: 'New Orleans'   },
+  NYK: { id: 1610612752, name: 'Knicks',        city: 'New York'      },
+  OKC: { id: 1610612760, name: 'Thunder',       city: 'Oklahoma City' },
+  ORL: { id: 1610612753, name: 'Magic',         city: 'Orlando'       },
+  PHI: { id: 1610612755, name: '76ers',         city: 'Philadelphia'  },
+  PHX: { id: 1610612756, name: 'Suns',          city: 'Phoenix'       },
+  POR: { id: 1610612757, name: 'Trail Blazers', city: 'Portland'      },
+  SAC: { id: 1610612758, name: 'Kings',         city: 'Sacramento'    },
+  SAS: { id: 1610612759, name: 'Spurs',         city: 'San Antonio'   },
+  TOR: { id: 1610612761, name: 'Raptors',       city: 'Toronto'       },
+  UTA: { id: 1610612762, name: 'Jazz',          city: 'Utah'          },
+  WAS: { id: 1610612764, name: 'Wizards',       city: 'Washington'    },
 };
 
-// Reverse lookup: numeric NBA team ID → abbreviation string
 const ID_TO_ABBR = Object.fromEntries(
-  Object.entries(NBA_TEAMS).map(([abbr, info]) => [info.id, abbr])
+  Object.entries(NBA_TEAMS).map(([abbr, info]) => [String(info.id), abbr])
 );
 
-// Builds a frontend-compatible Team object from an abbreviation.
-// _id is the numeric NBA team ID cast to a string so the frontend
-// can use it as a React key and for logo CDN lookups.
 function buildTeam(abbr) {
   const info = NBA_TEAMS[abbr?.toUpperCase()];
-  if (!info) {
-    // Unknown abbreviation — return a minimal placeholder so the UI
-    // doesn't crash if a game involves a team not in the table.
-    return { _id: abbr ?? 'UNK', abbreviation: abbr ?? '?', name: '', city: '' };
-  }
-  return {
-    _id:          String(info.id),
-    abbreviation: abbr.toUpperCase(),
-    name:         info.name,
-    city:         info.city,
-  };
+  if (!info) return { _id: abbr ?? 'UNK', abbreviation: abbr ?? '?', name: '', city: '' };
+  return { _id: String(info.id), abbreviation: abbr.toUpperCase(), name: info.name, city: info.city };
 }
 
-// Formats a JavaScript Date as "MM/DD/YYYY" — the format stats.nba.com
-// GameDate parameters require.
 function formatNbaDate(date) {
   const mm   = String(date.getMonth() + 1).padStart(2, '0');
   const dd   = String(date.getDate()).padStart(2, '0');
@@ -70,17 +55,14 @@ function formatNbaDate(date) {
   return `${mm}/${dd}/${yyyy}`;
 }
 
+// ── GET /api/schedule/season/current ─────────────────────────────────────────
+
+router.get('/schedule/season/current', (_req, res) => {
+  res.json({ season: CURRENT_SEASON });
+});
+
 // ── GET /api/schedule/today ───────────────────────────────────────────────────
-// Returns every NBA game scheduled for today's date using the scoreboardv2
-// endpoint. Each game includes both teams, current scores (if in progress or
-// final), and a human-readable status string.
-//
-// scoreboardv2 result sets used:
-//   GameHeader  — one row per game: GAME_ID, GAME_DATE_EST, GAME_STATUS_ID,
-//                 GAME_STATUS_TEXT, HOME_TEAM_ID, VISITOR_TEAM_ID
-//   LineScore   — one row per (game, team): GAME_ID, TEAM_ID, PTS
-//
-// GAME_STATUS_ID values: 1 = Upcoming, 2 = Live, 3 = Final
+
 router.get('/schedule/today', async (req, res) => {
   try {
     const today = formatNbaDate(new Date());
@@ -93,13 +75,12 @@ router.get('/schedule/today', async (req, res) => {
 
     const gameHeaderRS = data.resultSets?.find(rs => rs.name === 'GameHeader');
     const lineScoreRS  = data.resultSets?.find(rs => rs.name === 'LineScore');
-
     if (!gameHeaderRS) return res.json([]);
 
     const gameHeaders = rowsToObjects(gameHeaderRS);
     const lineScores  = lineScoreRS ? rowsToObjects(lineScoreRS) : [];
 
-    // Map GAME_ID → { [TEAM_ID]: PTS } for O(1) score lookups below.
+    // Map GAME_ID → { TEAM_ID: PTS }
     const scoreMap = {};
     for (const ls of lineScores) {
       if (!scoreMap[ls.GAME_ID]) scoreMap[ls.GAME_ID] = {};
@@ -109,14 +90,12 @@ router.get('/schedule/today', async (req, res) => {
     const STATUS = { 1: 'Upcoming', 2: 'Live', 3: 'Final' };
 
     const games = gameHeaders.map(g => {
-      const homeAbbr = ID_TO_ABBR[g.HOME_TEAM_ID]    ?? String(g.HOME_TEAM_ID);
-      const awayAbbr = ID_TO_ABBR[g.VISITOR_TEAM_ID] ?? String(g.VISITOR_TEAM_ID);
+      const homeAbbr = ID_TO_ABBR[String(g.HOME_TEAM_ID)]    ?? String(g.HOME_TEAM_ID);
+      const awayAbbr = ID_TO_ABBR[String(g.VISITOR_TEAM_ID)] ?? String(g.VISITOR_TEAM_ID);
       const scores   = scoreMap[g.GAME_ID] ?? {};
-
       return {
         _id:       g.GAME_ID,
         gameDate:  g.GAME_DATE_EST,
-        // GAME_STATUS_TEXT is "7:30 pm ET" when upcoming, "Q3 4:22" live, "Final" when done
         startTime: g.GAME_STATUS_TEXT,
         homeTeam:  buildTeam(homeAbbr),
         awayTeam:  buildTeam(awayAbbr),
@@ -133,18 +112,21 @@ router.get('/schedule/today', async (req, res) => {
   }
 });
 
-// ── GET /api/schedule?team=LAL&season=2024-25 ────────────────────────────────
-// Returns the full regular-season game log for a single team using the
-// teamgamelog endpoint. Each row represents one game result with opponent,
-// score, and basic box-score totals.
+// ── GET /api/schedule?team=LAL&season=2025-26 ─────────────────────────────────
 //
-// Query params:
-//   team   (required) — team abbreviation, e.g. "LAL"
-//   season (optional) — defaults to CURRENT_SEASON
+// Strategy: use leaguegamelog (PlayerOrTeam=T) which returns ONE ROW PER TEAM
+// PER GAME across the whole league. Every game therefore appears TWICE — once
+// for each team — so we can cross-reference the opponent's row to get their
+// exact PTS rather than trying to derive it from PLUS_MINUS.
 //
-// Opponent score is derived as: pts - plus_minus, which is exact.
-// Games are returned sorted ascending by date so the frontend can render
-// them in chronological order without additional sorting.
+// Steps:
+//   1. Fetch leaguegamelog for the full season (no date filter needed here
+//      because we want the entire history, not just the rolling 14-day window
+//      used by the nightly sync).
+//   2. Filter to rows for the requested team → "our" rows.
+//   3. Build a lookup: GAME_ID → PTS for ALL rows (both teams).
+//   4. For each of our rows, find the opponent's PTS from the lookup.
+
 router.get('/schedule', async (req, res) => {
   try {
     const abbr   = (req.query.team ?? '').toUpperCase();
@@ -159,49 +141,68 @@ router.get('/schedule', async (req, res) => {
       return res.status(404).json({ error: `Unknown team abbreviation: ${abbr}` });
     }
 
-    const data = await nbaGet('teamgamelog', {
-      TeamID:     teamInfo.id,
-      Season:     season,
-      SeasonType: 'Regular Season',
-      LeagueID:   '00',
+    // leaguegamelog returns every (team, game) row for the whole league.
+    // We fetch the full season without a DateFrom so we get all completed games.
+    const data = await nbaGet('leaguegamelog', {
+      PlayerOrTeam: 'T',           // T = team-level rows
+      Season:       season,
+      SeasonType:   'Regular Season',
+      LeagueID:     '00',
+      Sorter:       'DATE',
+      Direction:    'ASC',         // oldest first → no need to sort later
+      Counter:      '0',
+      DateFrom:     '',            // no start limit — full season
+      DateTo:       '',            // no end limit   — through today
     });
 
-    const resultSet = data.resultSets?.find(rs => rs.name === 'TeamGameLog');
+    const resultSet = data.resultSets?.find(rs => rs.name === 'LeagueGameLog');
     if (!resultSet) return res.json([]);
 
-    const rows = rowsToObjects(resultSet);
+    const allRows = rowsToObjects(resultSet);
 
-    const games = rows.map(row => {
-      // MATCHUP is "LAL vs. GSW" (home) or "LAL @ GSW" (away).
-      // Split on " vs. " or " @ " to extract the opponent abbreviation.
-      const isHome      = row.MATCHUP.includes('vs.');
-      const parts       = row.MATCHUP.split(/\s+(?:vs\.|@)\s+/);
-      const opponentAbbr = (parts[1] ?? '').trim();
+    // Build a map: "GAME_ID:TEAM_ID" → PTS so we can look up the opponent score.
+    // TEAM_ID in leaguegamelog is the numeric NBA team ID (matches teamInfo.id).
+    const ptsByGameTeam = {};
+    for (const row of allRows) {
+      ptsByGameTeam[`${row.GAME_ID}:${row.TEAM_ID}`] = Number(row.PTS);
+    }
 
-      // Opponent score = our points minus our point differential (exact math).
-      // Number() is needed because the NBA API returns PTS and PLUS_MINUS as
-      // strings (e.g. "112", "+7"), so bare subtraction would produce NaN.
-      const oppPoints = Math.round(Number(row.PTS) - Number(row.PLUS_MINUS));
+    // Filter to only the rows for our selected team.
+    const ourRows = allRows.filter(row => Number(row.TEAM_ID) === teamInfo.id);
+
+    const games = ourRows.map(row => {
+      // MATCHUP format: "LAC vs. GSW" (home) or "LAC @ GSW" (away)
+      const isHome       = row.MATCHUP.includes('vs.');
+      const parts        = row.MATCHUP.split(/\s+(?:vs\.|@)\s+/);
+      const opponentAbbr = (parts[1] ?? '').trim().toUpperCase();
+
+      const ourPts = Number(row.PTS);
+
+      // Look up the opponent's team ID from the abbr map, then find their PTS
+      // in the same game from our pre-built lookup.
+      const oppTeamInfo = NBA_TEAMS[opponentAbbr];
+      const oppPts = oppTeamInfo
+        ? (ptsByGameTeam[`${row.GAME_ID}:${oppTeamInfo.id}`] ?? null)
+        : null;
+
+      const pm = Number(row.PLUS_MINUS);
 
       return {
         _id:            String(row.GAME_ID),
         gameDate:       row.GAME_DATE,
         opponentTeamId: buildTeam(opponentAbbr),
         isHome,
-        wl:             row.WL,        // "W" or "L"
-        points:         row.PTS,
-        oppPoints,
+        wl:             row.WL,
+        points:         Number.isFinite(ourPts) ? ourPts : null,
+        oppPoints:      oppPts,          // exact score from the opponent's own row
         rebounds:       row.REB,
         assists:        row.AST,
         steals:         row.STL,
         blocks:         row.BLK,
         turnovers:      row.TOV,
-        plusMinus:      row.PLUS_MINUS,
+        plusMinus:      Number.isFinite(pm) ? pm : null,
       };
     });
-
-    // Sort chronologically (NBA API returns newest-first by default).
-    games.sort((a, b) => new Date(a.gameDate) - new Date(b.gameDate));
 
     res.json(games);
   } catch (err) {
