@@ -347,21 +347,23 @@ function rollingWindowStart(days = 14) {
   return formatNbaDate(date);
 }
 
-// Returns a row for every (team, game) combination within the past 14 days,
+// Returns a row for every (team, game) combination for the given season,
 // combining both Regular Season and Playoffs games into one result set.
 // PlayerOrTeam='T' selects the team-level game log.
 // Key fields: GAME_ID, TEAM_ID, MATCHUP, GAME_DATE, WL, PTS, REB, AST,
 // STL, BLK, TOV, FGM, FGA, FG3M, FG3A, FTM, FTA, PLUS_MINUS.
 // MATCHUP format is "ABBR vs. ABBR" (home) or "ABBR @ ABBR" (away).
 //
-// The 14-day window matches the 2-week TTL on TeamGameStats documents —
-// we never need box scores older than what MongoDB will auto-delete anyway.
-async function getTeamGameLog(season = CURRENT_SEASON) {
+// daysBack controls the DateFrom filter:
+//   number — fetch only games in the past N days (e.g. 14 for nightly incremental syncs)
+//   null   — no DateFrom filter; returns the full season (used on first-run syncs so
+//             TeamGameStats is populated with the complete season history)
+async function getTeamGameLog(season = CURRENT_SEASON, daysBack = 14) {
   const params = {
     Counter: '0',
-    DateFrom: rollingWindowStart(14), // only fetch the past 14 days
-    DateTo:   '',                     // empty = through today
-    Direction: 'DESC',                // most recent games first
+    DateFrom: daysBack !== null ? rollingWindowStart(daysBack) : '', // null = full season
+    DateTo:   '',                                                     // empty = through today
+    Direction: 'DESC',                                                // most recent games first
     LeagueID: '00',
     PlayerOrTeam: 'T',               // T = team-level rows
     Season: season,
@@ -372,18 +374,21 @@ async function getTeamGameLog(season = CURRENT_SEASON) {
   return fetchBothSeasonTypes('leaguegamelog', params, 'LeagueGameLog');
 }
 
-// Returns a row for every (player, game) combination within the past 14 days,
+// Returns a row for every (player, game) combination for the given season,
 // combining both Regular Season and Playoffs games into one result set.
 // PlayerOrTeam='P' selects the player-level game log.
 // Same key fields as getTeamGameLog, plus PLAYER_ID and PLAYER_NAME.
 // Minutes are returned in "MM:SS" format and converted to decimal by
 // nightlySync.js before being stored.
-async function getPlayerGameLog(season = CURRENT_SEASON) {
+//
+// daysBack follows the same semantics as getTeamGameLog — pass null for the
+// full season on a first-run sync, or a number for an incremental window.
+async function getPlayerGameLog(season = CURRENT_SEASON, daysBack = 14) {
   const params = {
     Counter: '0',
-    DateFrom: rollingWindowStart(14), // only fetch the past 14 days
-    DateTo:   '',                     // empty = through today
-    Direction: 'DESC',                // most recent games first
+    DateFrom: daysBack !== null ? rollingWindowStart(daysBack) : '', // null = full season
+    DateTo:   '',                                                     // empty = through today
+    Direction: 'DESC',                                                // most recent games first
     LeagueID: '00',
     PlayerOrTeam: 'P',               // P = player-level rows
     Season: season,
