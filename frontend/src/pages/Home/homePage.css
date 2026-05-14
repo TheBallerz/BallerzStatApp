@@ -170,7 +170,7 @@
 .stats-panels-container {
   position: fixed;
   right: 0;
-  top: 61px;   /* below the fixed nav */
+  top: 61px; /* below the fixed nav */
   bottom: 0;
   display: flex;
   flex-direction: row;

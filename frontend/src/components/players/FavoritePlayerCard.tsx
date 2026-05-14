@@ -28,14 +28,15 @@ function fmt(val: number, decimals = 1): string {
 
 function StatRow({ label, avg, last }: StatRowProps) {
   const diff = last !== null ? last - avg : null;
-  const diffStr =
-    diff === null
-      ? '--'
-      : diff > 0
-        ? `+${fmt(diff)}`
-        : fmt(diff);
+  const diffStr = diff === null ? '--' : diff > 0 ? `+${fmt(diff)}` : fmt(diff);
   const diffClass =
-    diff === null ? '' : diff > 0 ? 'fpc-diff-pos' : diff < 0 ? 'fpc-diff-neg' : '';
+    diff === null
+      ? ''
+      : diff > 0
+        ? 'fpc-diff-pos'
+        : diff < 0
+          ? 'fpc-diff-neg'
+          : '';
 
   return (
     <tr className="fpc-stat-row">
@@ -54,7 +55,11 @@ interface FavoritePlayerCardProps {
   isGreyed?: boolean;
 }
 
-export default function FavoritePlayerCard({ player, onClick, isGreyed }: FavoritePlayerCardProps) {
+export default function FavoritePlayerCard({
+  player,
+  onClick,
+  isGreyed,
+}: FavoritePlayerCardProps) {
   const abbr = player.teamId?.abbreviation ?? '';
   const asset = getTeamAsset(abbr);
 
@@ -74,16 +79,20 @@ export default function FavoritePlayerCard({ player, onClick, isGreyed }: Favori
 
   useEffect(() => {
     if (!player.nbaId) return;
-    setLoading(true);
-    fetch(`${import.meta.env.VITE_API_BASE}/players/${player.nbaId}/stats`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        setStats(data);
+    async function load() {
+      setLoading(true);
+      try {
+        const r = await fetch(
+          `${import.meta.env.VITE_API_BASE}/players/${player.nbaId}/stats`,
+        );
+        setStats(r.ok ? await r.json() : null);
+      } catch {
+        // leave stats null
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+      }
+    }
+    load();
   }, [player.nbaId]);
 
   return (
@@ -91,7 +100,9 @@ export default function FavoritePlayerCard({ player, onClick, isGreyed }: Favori
       className="fpc-card"
       style={{
         background: gradient,
-        ...(isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : {}),
+        ...(isGreyed
+          ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' }
+          : {}),
       }}
       onClick={onClick}
     >
@@ -128,10 +139,26 @@ export default function FavoritePlayerCard({ player, onClick, isGreyed }: Favori
               </tr>
             </thead>
             <tbody>
-              <StatRow label="PTS" avg={stats.seasonAvg.pts}  last={stats.lastGame?.pts  ?? null} />
-              <StatRow label="3PM" avg={stats.seasonAvg.fg3m} last={stats.lastGame?.fg3m ?? null} />
-              <StatRow label="AST" avg={stats.seasonAvg.ast}  last={stats.lastGame?.ast  ?? null} />
-              <StatRow label="REB" avg={stats.seasonAvg.reb}  last={stats.lastGame?.reb  ?? null} />
+              <StatRow
+                label="PTS"
+                avg={stats.seasonAvg.pts}
+                last={stats.lastGame?.pts ?? null}
+              />
+              <StatRow
+                label="3PM"
+                avg={stats.seasonAvg.fg3m}
+                last={stats.lastGame?.fg3m ?? null}
+              />
+              <StatRow
+                label="AST"
+                avg={stats.seasonAvg.ast}
+                last={stats.lastGame?.ast ?? null}
+              />
+              <StatRow
+                label="REB"
+                avg={stats.seasonAvg.reb}
+                last={stats.lastGame?.reb ?? null}
+              />
             </tbody>
           </table>
         ) : null}

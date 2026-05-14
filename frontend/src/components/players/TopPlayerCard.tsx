@@ -41,7 +41,9 @@ export default function TopPlayerCard({
       className="tpc-card"
       style={{
         background: gradient,
-        ...(isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : {}),
+        ...(isGreyed
+          ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' }
+          : {}),
       }}
       onClick={onClick}
     >

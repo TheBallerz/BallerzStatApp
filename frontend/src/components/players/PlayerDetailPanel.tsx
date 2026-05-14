@@ -36,25 +36,29 @@ export default function PlayerDetailPanel({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    fetch(`${import.meta.env.VITE_API_BASE}/players/${nbaPlayerId}/stats`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`)))
-      .then((data: PlayerStats) => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    async function load() {
+      setLoading(true);
+      setError('');
+      try {
+        const r = await fetch(
+          `${import.meta.env.VITE_API_BASE}/players/${nbaPlayerId}/stats`,
+        );
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        setStats(await r.json());
+      } catch (err) {
         setError(String(err));
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+    load();
   }, [nbaPlayerId]);
 
   // Stat definitions in display order
   const statDefs: { key: keyof PlayerStats['seasonAvg']; label: string }[] = [
-    { key: 'pts',  label: 'PTS' },
-    { key: 'reb',  label: 'REB' },
-    { key: 'ast',  label: 'AST' },
+    { key: 'pts', label: 'PTS' },
+    { key: 'reb', label: 'REB' },
+    { key: 'ast', label: 'AST' },
     { key: 'fg3m', label: '3PM' },
   ];
 
@@ -78,11 +82,15 @@ export default function PlayerDetailPanel({
           </div>
         </div>
         <div className="pdp-actions">
-          <button className="pdp-close" onClick={onClose}>×</button>
+          <button className="pdp-close" onClick={onClose}>
+            ×
+          </button>
           {onToggleFavorite && (
             <button
               className={`pdp-heart${isFavorited ? ' pdp-heart--filled' : ''}`}
-              aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={
+                isFavorited ? 'Remove from favorites' : 'Add to favorites'
+              }
               onClick={onToggleFavorite}
             >
               {isFavorited ? '♥' : '♡'}
@@ -105,7 +113,9 @@ export default function PlayerDetailPanel({
             {statDefs.map(({ key, label }) => (
               <div key={key} className="pdp-stat-row">
                 <span className="pdp-stat-label">{label}</span>
-                <span className="pdp-stat-value">{fmt(stats.seasonAvg[key])}</span>
+                <span className="pdp-stat-value">
+                  {fmt(stats.seasonAvg[key])}
+                </span>
               </div>
             ))}
 
@@ -118,7 +128,10 @@ export default function PlayerDetailPanel({
                 </div>
               ))
             ) : (
-              <p className="pdp-status" style={{ textAlign: 'left', padding: '6px 0' }}>
+              <p
+                className="pdp-status"
+                style={{ textAlign: 'left', padding: '6px 0' }}
+              >
                 No recent game data
               </p>
             )}

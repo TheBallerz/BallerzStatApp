@@ -67,7 +67,7 @@ async function fetchMe(): Promise<{
   const data = await res.json();
   return {
     favoritePlayers: data.user.favoritePlayers ?? [],
-    favoriteTeams:   data.user.favoriteTeams   ?? [],
+    favoriteTeams: data.user.favoriteTeams ?? [],
   };
 }
 
@@ -76,22 +76,22 @@ async function fetchMe(): Promise<{
 export default function FavoritesPage() {
   // ── Favorites state ───────────────────────────────────────────────────────
   const [favoritePlayers, setFavoritePlayers] = useState<FavoritePlayer[]>([]);
-  const [favoriteTeams,   setFavoriteTeams]   = useState<FavoriteTeam[]>([]);
+  const [favoriteTeams, setFavoriteTeams] = useState<FavoriteTeam[]>([]);
 
   // ── Panel selection state ─────────────────────────────────────────────────
   const [selected, setSelected] = useState<SelectedCard[]>([]);
 
   // ── Player search ─────────────────────────────────────────────────────────
-  const [playerQuery,   setPlayerQuery]   = useState('');
+  const [playerQuery, setPlayerQuery] = useState('');
   const [playerResults, setPlayerResults] = useState<PlayerResult[]>([]);
 
   // ── Team search ───────────────────────────────────────────────────────────
-  const [teamQuery,   setTeamQuery]   = useState('');
+  const [teamQuery, setTeamQuery] = useState('');
   const [teamResults, setTeamResults] = useState<TeamResult[]>([]);
 
   // ── Refs for click-outside to close dropdowns ─────────────────────────────
   const playerSearchRef = useRef<HTMLDivElement>(null);
-  const teamSearchRef   = useRef<HTMLDivElement>(null);
+  const teamSearchRef = useRef<HTMLDivElement>(null);
 
   // ── 1. Load favorites on mount ────────────────────────────────────────────
   useEffect(() => {
@@ -104,16 +104,22 @@ export default function FavoritesPage() {
   // ── 2. Debounced player search (300 ms) ───────────────────────────────────
   useEffect(() => {
     const trimmed = playerQuery.trim();
-    if (!trimmed) { setPlayerResults([]); return; }
+    const delay = trimmed ? 300 : 0;
 
     const timer = setTimeout(async () => {
+      if (!trimmed) {
+        setPlayerResults([]);
+        return;
+      }
       try {
         const res = await fetch(
           `${API_BASE}/players/search?q=${encodeURIComponent(trimmed)}`,
         );
         if (res.ok) setPlayerResults(await res.json());
-      } catch { /* ignore */ }
-    }, 300);
+      } catch {
+        /* ignore */
+      }
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [playerQuery]);
@@ -121,16 +127,22 @@ export default function FavoritesPage() {
   // ── 3. Debounced team search (300 ms) ─────────────────────────────────────
   useEffect(() => {
     const trimmed = teamQuery.trim();
-    if (!trimmed) { setTeamResults([]); return; }
+    const delay = trimmed ? 300 : 0;
 
     const timer = setTimeout(async () => {
+      if (!trimmed) {
+        setTeamResults([]);
+        return;
+      }
       try {
         const res = await fetch(
           `${API_BASE}/teams/search?q=${encodeURIComponent(trimmed)}`,
         );
         if (res.ok) setTeamResults(await res.json());
-      } catch { /* ignore */ }
-    }, 300);
+      } catch {
+        /* ignore */
+      }
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [teamQuery]);
@@ -138,10 +150,16 @@ export default function FavoritesPage() {
   // ── 4. Click-outside closes dropdowns ─────────────────────────────────────
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (playerSearchRef.current && !playerSearchRef.current.contains(e.target as Node)) {
+      if (
+        playerSearchRef.current &&
+        !playerSearchRef.current.contains(e.target as Node)
+      ) {
         setPlayerResults([]);
       }
-      if (teamSearchRef.current && !teamSearchRef.current.contains(e.target as Node)) {
+      if (
+        teamSearchRef.current &&
+        !teamSearchRef.current.contains(e.target as Node)
+      ) {
         setTeamResults([]);
       }
     }
@@ -181,7 +199,7 @@ export default function FavoritesPage() {
     selected.length > 0 ? selected[selected.length - 1].type : null;
 
   const isPlayerGreyed = activePanelType === 'team';
-  const isTeamGreyed   = activePanelType === 'player';
+  const isTeamGreyed = activePanelType === 'player';
 
   // ── Add / remove handlers ─────────────────────────────────────────────────
 
@@ -189,7 +207,9 @@ export default function FavoritesPage() {
     setPlayerQuery('');
     setPlayerResults([]);
     const newIds = [
-      ...favoritePlayers.map((p) => p.nbaId).filter((id): id is number => id != null),
+      ...favoritePlayers
+        .map((p) => p.nbaId)
+        .filter((id): id is number => id != null),
       ...(result.nbaId != null ? [result.nbaId] : []),
     ];
     await saveFavorites({ favoritePlayers: newIds });
@@ -212,7 +232,9 @@ export default function FavoritesPage() {
     setTeamQuery('');
     setTeamResults([]);
     const newIds = [
-      ...favoriteTeams.map((t) => t.nbaId).filter((id): id is number => id != null),
+      ...favoriteTeams
+        .map((t) => t.nbaId)
+        .filter((id): id is number => id != null),
       ...(result.nbaId != null ? [result.nbaId] : []),
     ];
     await saveFavorites({ favoriteTeams: newIds });
@@ -236,7 +258,6 @@ export default function FavoritesPage() {
   return (
     <div className="fp-page">
       <div className="fp-columns">
-
         {/* ── Left column: Favorite Players ─────────────────────────────── */}
         <div className="fp-col">
           <h2 className="fp-col-title">Your Favorite Players</h2>
@@ -251,7 +272,9 @@ export default function FavoritesPage() {
                 placeholder="Add Players to Your Favorites"
                 aria-label="Search players"
               />
-              <span className="gs-search-icon" aria-hidden="true">🔍</span>
+              <span className="gs-search-icon" aria-hidden="true">
+                🔍
+              </span>
             </div>
 
             {visiblePlayerResults.length > 0 && (
@@ -296,7 +319,10 @@ export default function FavoritesPage() {
                 <button
                   className="fp-remove-btn"
                   aria-label="Remove from favorites"
-                  onClick={(e) => { e.stopPropagation(); removePlayer(player); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePlayer(player);
+                  }}
                 >
                   ×
                 </button>
@@ -319,7 +345,9 @@ export default function FavoritesPage() {
                 placeholder="Add Teams to Your Favorites"
                 aria-label="Search teams"
               />
-              <span className="gs-search-icon" aria-hidden="true">🔍</span>
+              <span className="gs-search-icon" aria-hidden="true">
+                🔍
+              </span>
             </div>
 
             {visibleTeamResults.length > 0 && (
@@ -360,7 +388,10 @@ export default function FavoritesPage() {
                 <button
                   className="fp-remove-btn"
                   aria-label="Remove from favorites"
-                  onClick={(e) => { e.stopPropagation(); removeTeam(team); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTeam(team);
+                  }}
                 >
                   ×
                 </button>
@@ -368,7 +399,6 @@ export default function FavoritesPage() {
             ))}
           </div>
         </div>
-
       </div>
 
       {/* ── Detail panels (fixed overlay, floats over content) ────────── */}
@@ -376,7 +406,9 @@ export default function FavoritesPage() {
         <div className={`fp-panels-container panels-${selected.length}`}>
           {selected.map((item) => {
             if (item.type === 'team') {
-              const matchingTeam = favoriteTeams.find((t) => `team-${t._id}` === item.id);
+              const matchingTeam = favoriteTeams.find(
+                (t) => `team-${t._id}` === item.id,
+              );
               return (
                 <div key={item.id} className="fp-panel">
                   <HomeTeamPanel
@@ -384,12 +416,16 @@ export default function FavoritesPage() {
                     label={item.label}
                     onClose={() => handleCardClick(item)}
                     isFavorited={true}
-                    onToggleFavorite={matchingTeam ? () => removeTeam(matchingTeam) : undefined}
+                    onToggleFavorite={
+                      matchingTeam ? () => removeTeam(matchingTeam) : undefined
+                    }
                   />
                 </div>
               );
             } else {
-              const matchingPlayer = favoritePlayers.find((p) => `player-${p._id}` === item.id);
+              const matchingPlayer = favoritePlayers.find(
+                (p) => `player-${p._id}` === item.id,
+              );
               return (
                 <div key={item.id} className="fp-panel">
                   <PlayerDetailPanel
@@ -398,7 +434,11 @@ export default function FavoritesPage() {
                     teamAbbr={item.teamAbbr}
                     onClose={() => handleCardClick(item)}
                     isFavorited={true}
-                    onToggleFavorite={matchingPlayer ? () => removePlayer(matchingPlayer) : undefined}
+                    onToggleFavorite={
+                      matchingPlayer
+                        ? () => removePlayer(matchingPlayer)
+                        : undefined
+                    }
                   />
                 </div>
               );

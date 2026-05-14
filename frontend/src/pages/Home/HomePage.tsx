@@ -210,7 +210,9 @@ export default function HomePage() {
     } else {
       // Add then re-fetch for the full populated document
       const newIds = [
-        ...favoritePlayers.map((p) => p.nbaId).filter((id): id is number => id != null),
+        ...favoritePlayers
+          .map((p) => p.nbaId)
+          .filter((id): id is number => id != null),
         nbaPlayerId,
       ];
       await saveFavorites({ favoritePlayers: newIds });
@@ -231,7 +233,9 @@ export default function HomePage() {
     } else {
       // Add then re-fetch for the full populated document
       const newIds = [
-        ...favoriteTeams.map((t) => t.nbaId).filter((id): id is number => id != null),
+        ...favoriteTeams
+          .map((t) => t.nbaId)
+          .filter((id): id is number => id != null),
         nbaTeamId,
       ];
       await saveFavorites({ favoriteTeams: newIds });
@@ -266,8 +270,8 @@ export default function HomePage() {
   const activePanelType =
     selected.length > 0 ? selected[selected.length - 1].type : null;
 
-  const isPlayerGreyed = activePanelType === 'team';   // grey players when team panel open
-  const isTeamGreyed   = activePanelType === 'player'; // grey teams/games when player panel open
+  const isPlayerGreyed = activePanelType === 'team'; // grey players when team panel open
+  const isTeamGreyed = activePanelType === 'player'; // grey teams/games when player panel open
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -318,8 +322,11 @@ export default function HomePage() {
                           homeTeam={game.homeTeam}
                           awayTeam={game.awayTeam}
                           activeHalf={
-                            isActive(`team-away-${game.gameId}`) ? 'away' :
-                            isActive(`team-home-${game.gameId}`) ? 'home' : null
+                            isActive(`team-away-${game.gameId}`)
+                              ? 'away'
+                              : isActive(`team-home-${game.gameId}`)
+                                ? 'home'
+                                : null
                           }
                           isGreyed={isTeamGreyed}
                           onAwayClick={() => {
@@ -485,7 +492,9 @@ export default function HomePage() {
                   nbaTeamId={item.nbaTeamId}
                   label={item.label}
                   onClose={() => handleCardClick(item)}
-                  isFavorited={favoriteTeams.some((t) => t.nbaId === item.nbaTeamId)}
+                  isFavorited={favoriteTeams.some(
+                    (t) => t.nbaId === item.nbaTeamId,
+                  )}
                   onToggleFavorite={() => toggleTeamFavorite(item.nbaTeamId)}
                 />
               ) : (
@@ -494,8 +503,12 @@ export default function HomePage() {
                   playerName={item.playerName}
                   teamAbbr={item.teamAbbr}
                   onClose={() => handleCardClick(item)}
-                  isFavorited={favoritePlayers.some((p) => p.nbaId === item.nbaPlayerId)}
-                  onToggleFavorite={() => togglePlayerFavorite(item.nbaPlayerId)}
+                  isFavorited={favoritePlayers.some(
+                    (p) => p.nbaId === item.nbaPlayerId,
+                  )}
+                  onToggleFavorite={() =>
+                    togglePlayerFavorite(item.nbaPlayerId)
+                  }
                 />
               )}
             </div>

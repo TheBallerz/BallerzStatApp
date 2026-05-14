@@ -44,7 +44,11 @@ export default function GameCard({
   return (
     <div
       className={`game-card${isActive ? ' card-active' : ''}`}
-      style={isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : undefined}
+      style={
+        isGreyed
+          ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' }
+          : undefined
+      }
     >
       <div className="game-card-inner" style={{ background: gradient }}>
         {/* ── Away team: logo on far left, score+abbr to its right ── */}

@@ -11,9 +11,14 @@ export interface FavoriteTeam {
 }
 
 interface TeamSummary {
-  record:   { wins: number; losses: number };
-  rank:     string;
-  lastGame: { result: string; teamScore: number; oppScore: number; oppAbbr: string } | null;
+  record: { wins: number; losses: number };
+  rank: string;
+  lastGame: {
+    result: string;
+    teamScore: number;
+    oppScore: number;
+    oppAbbr: string;
+  } | null;
   nextGame: { oppAbbr: string; gameDate: string; startTime: string } | null;
 }
 
@@ -24,8 +29,12 @@ interface FavoriteTeamCardProps {
   isGreyed?: boolean;
 }
 
-export default function FavoriteTeamCard({ team, onClick, isGreyed }: FavoriteTeamCardProps) {
-  const asset  = getTeamAsset(team.abbreviation);
+export default function FavoriteTeamCard({
+  team,
+  onClick,
+  isGreyed,
+}: FavoriteTeamCardProps) {
+  const asset = getTeamAsset(team.abbreviation);
   const logoUrl = team.logoUrl ?? asset.logoUrl;
   const gradient = `linear-gradient(to right, ${asset.color}cc 0%, #1a1a1a 52%)`;
 
@@ -34,14 +43,20 @@ export default function FavoriteTeamCard({ team, onClick, isGreyed }: FavoriteTe
 
   useEffect(() => {
     if (!team.nbaId) return;
-    setLoading(true);
-    fetch(`${import.meta.env.VITE_API_BASE}/teams/${team.nbaId}/summary`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        setSummary(data);
+    async function load() {
+      setLoading(true);
+      try {
+        const r = await fetch(
+          `${import.meta.env.VITE_API_BASE}/teams/${team.nbaId}/summary`,
+        );
+        setSummary(r.ok ? await r.json() : null);
+      } catch {
+        // leave summary null
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    }
+    load();
   }, [team.nbaId]);
 
   // ── Formatted display strings ───────────────────────────────────────────────
@@ -58,7 +73,9 @@ export default function FavoriteTeamCard({ team, onClick, isGreyed }: FavoriteTe
       className="ftc-card"
       style={{
         background: gradient,
-        ...(isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : {}),
+        ...(isGreyed
+          ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' }
+          : {}),
       }}
       onClick={onClick}
     >
@@ -92,7 +109,9 @@ export default function FavoriteTeamCard({ team, onClick, isGreyed }: FavoriteTe
                 <tbody>
                   <tr className="ftc-row">
                     <td className="ftc-label">Win - Loss</td>
-                    <td className="ftc-value">{summary.record.wins} - {summary.record.losses}</td>
+                    <td className="ftc-value">
+                      {summary.record.wins} - {summary.record.losses}
+                    </td>
                   </tr>
                   <tr className="ftc-row">
                     <td className="ftc-label">Rank</td>

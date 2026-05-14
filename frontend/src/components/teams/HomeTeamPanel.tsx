@@ -27,24 +27,34 @@ interface HomeTeamPanelProps {
   onToggleFavorite?: () => void;
 }
 
-export default function HomeTeamPanel({ nbaTeamId, label, onClose, isFavorited, onToggleFavorite }: HomeTeamPanelProps) {
+export default function HomeTeamPanel({
+  nbaTeamId,
+  label,
+  onClose,
+  isFavorited,
+  onToggleFavorite,
+}: HomeTeamPanelProps) {
   const [team, setTeam] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    fetch(`${import.meta.env.VITE_API_BASE}/teams/${nbaTeamId}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`)))
-      .then((data: TeamData) => {
-        setTeam(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    async function load() {
+      setLoading(true);
+      setError('');
+      try {
+        const r = await fetch(
+          `${import.meta.env.VITE_API_BASE}/teams/${nbaTeamId}`,
+        );
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        setTeam(await r.json());
+      } catch (err) {
         setError(String(err));
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+    load();
   }, [nbaTeamId]);
 
   const abbr = team?.abbreviation ?? label;
@@ -54,18 +64,21 @@ export default function HomeTeamPanel({ nbaTeamId, label, onClose, isFavorited, 
 
   const stats = team
     ? [
-        { label: 'Record',   value: team.record },
-        { label: 'PPG',      value: String(team.ppg) },
-        { label: 'RPG',      value: String(team.rpg) },
-        { label: 'APG',      value: String(team.apg) },
-        { label: 'FG%',      value: `${(team.fgPct * 100).toFixed(1)}%` },
+        { label: 'Record', value: team.record },
+        { label: 'PPG', value: String(team.ppg) },
+        { label: 'RPG', value: String(team.rpg) },
+        { label: 'APG', value: String(team.apg) },
+        { label: 'FG%', value: `${(team.fgPct * 100).toFixed(1)}%` },
       ]
     : [];
 
   return (
     <div className="htp-panel">
       {/* ── Header ── */}
-      <div className="htp-header" style={{ borderTop: `3px solid ${asset.color}` }}>
+      <div
+        className="htp-header"
+        style={{ borderTop: `3px solid ${asset.color}` }}
+      >
         <div className="htp-identity">
           {logoUrl && (
             <img
@@ -73,7 +86,8 @@ export default function HomeTeamPanel({ nbaTeamId, label, onClose, isFavorited, 
               src={logoUrl}
               alt={abbr}
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
+                (e.currentTarget as HTMLImageElement).style.visibility =
+                  'hidden';
               }}
             />
           )}
@@ -85,11 +99,15 @@ export default function HomeTeamPanel({ nbaTeamId, label, onClose, isFavorited, 
           </div>
         </div>
         <div className="htp-actions">
-          <button className="htp-close" onClick={onClose}>×</button>
+          <button className="htp-close" onClick={onClose}>
+            ×
+          </button>
           {onToggleFavorite && (
             <button
               className={`htp-heart${isFavorited ? ' htp-heart--filled' : ''}`}
-              aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={
+                isFavorited ? 'Remove from favorites' : 'Add to favorites'
+              }
               onClick={onToggleFavorite}
             >
               {isFavorited ? '♥' : '♡'}
