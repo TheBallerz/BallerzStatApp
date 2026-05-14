@@ -14,6 +14,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import Fantasy from '../pages/Fantasy/Fantasy';
 
+
 function App() {
   return (
     <Routes>
