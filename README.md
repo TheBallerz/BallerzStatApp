@@ -4,6 +4,17 @@ A full-stack NBA statistics application that lets users create an account, save 
 
 ---
 
+## Deployment (Azure)
+
+The application is fully deployed using Azure with CI/CD via GitHub Actions.
+
+### Live URLs
+
+- **Frontend:** https://nice-wave-0b1190a0f.z.azurestaticapps.net  
+- **Backend:** https://ballerz-backend.azurewebsites.net  
+
+---
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -335,17 +346,6 @@ npm run lint:fix       # auto-fix linting errors
 npm run format         # format all files with Prettier
 npm run format:check   # check formatting without making changes
 ```
----
-
-## Deployment (Azure)
-
-The application is fully deployed using Azure with CI/CD via GitHub Actions.
-
-### Live URLs
-
-- **Frontend:** https://nice-wave-0b1190a0f.z.azurestaticapps.net  
-- **Backend:** https://ballerz-backend.azurewebsites.net  
-
 ---
 
 ### Architecture
