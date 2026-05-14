@@ -1,10 +1,10 @@
-/* ── FavoriteTeamCard — 150px team card for favorites section ── */
+/* ── FavoriteTeamCard — two-column layout with stats + schedule tables ── */
 
 .ftc-card {
   position: relative;
   display: flex;
-  align-items: center;
-  height: 150px;
+  flex-direction: row;
+  height: 160px;
   border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
@@ -20,46 +20,138 @@
   filter: brightness(1.08);
 }
 
-/* ── Team logo ───────────────────────────────────────────── */
+/* ── Left column — name + logo ───────────────────────────── */
 
-.ftc-logo {
-  position: absolute;
-  left: 12px;
-  height: 110px;
-  width: 110px;
-  object-fit: contain;
-  pointer-events: none;
-  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+.ftc-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 30%;
+  flex-shrink: 0;
+  overflow: hidden;
 }
-
-/* ── Team name + abbreviation ────────────────────────────── */
 
 .ftc-info {
   position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-  padding: 0 12px 70px 140px;
-  /* flex: 1 + min-width: 0 constrains the container so ellipsis fires */
-  flex: 1;
-  min-width: 0;
+  z-index: 2;
+  padding: 10px 8px 0 12px;
 }
 
 .ftc-name {
-  font-size: 36px;
+  font-size: 22px;
   font-weight: 700;
   color: #ffffff;
-  line-height: 1.1;
-  white-space: nowrap;
+  line-height: 1.15;
+  /* Allow wrapping for long city+team names */
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-.ftc-abbr {
-  font-size: 20px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.08em;
+.ftc-logo {
+  position: absolute;
+  bottom: 0px;
+  left: 6px;
+  height: 60%;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
+}
+
+/* ── Right column — stats + schedule ────────────────────── */
+
+.ftc-right {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 10px 14px 10px 8px;
+  gap: 20px;
+}
+
+/* ── Individual section (Stats or Schedule) ──────────────── */
+
+.ftc-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.ftc-section-header {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── Vertical divider between sections ───────────────────── */
+
+.ftc-divider {
+  display: none;
+}
+
+/* ── Table rows ───────────────────────────────────────────── */
+
+.ftc-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.ftc-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ftc-row:last-child {
+  border-bottom: none;
+}
+
+.ftc-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: left;
+  padding: 6px 6px 6px 0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ftc-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+  padding: 6px 0;
+  vertical-align: middle;
+}
+
+/* ── Loading skeleton ─────────────────────────────────────── */
+
+.ftc-loading {
+  flex: 1;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: ftc-shimmer 1.4s infinite;
+}
+
+@keyframes ftc-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

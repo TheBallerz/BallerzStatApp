@@ -148,3 +148,15 @@ export const TEAM_ASSETS: Record<string, TeamAsset> = {
 export function getTeamAsset(abbr: string): TeamAsset {
   return TEAM_ASSETS[abbr] ?? { color: '#333333', logoUrl: '' };
 }
+
+/**
+ * Extracts the NBA team ID from the logo URL embedded in TEAM_ASSETS.
+ * Logo URLs follow the pattern: https://cdn.nba.com/logos/nba/{nbaTeamId}/...
+ * Returns null if the abbreviation is unknown or the URL doesn't match.
+ */
+export function getTeamNbaId(abbr: string): number | null {
+  const asset = TEAM_ASSETS[abbr.toUpperCase()];
+  if (!asset) return null;
+  const match = asset.logoUrl.match(/\/nba\/(\d+)\//);
+  return match ? Number(match[1]) : null;
+}

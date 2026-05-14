@@ -1,0 +1,177 @@
+/* ── HomeTeamPanel ───────────────────────────────────────────── */
+
+.htp-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.htp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 14px;
+  flex-shrink: 0;
+}
+
+.htp-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.htp-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.htp-name-wrap {
+  min-width: 0;
+}
+
+.htp-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.htp-division {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Close + heart button stack ─────────────────────────────── */
+
+.htp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.htp-close {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.htp-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.htp-heart {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.45);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.htp-heart:hover {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #f43f5e;
+}
+
+.htp-heart--filled {
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+.htp-heart--filled:hover {
+  background: rgba(244, 63, 94, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Divider ─────────────────────────────────────────────────── */
+
+.htp-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+
+.htp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 18px;
+  scrollbar-width: none;
+}
+
+.htp-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Stat rows ───────────────────────────────────────────────── */
+
+.htp-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.htp-stat-row:last-child {
+  border-bottom: none;
+}
+
+.htp-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.htp-stat-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ── Loading / error states ──────────────────────────────────── */
+
+.htp-status {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 16px 0;
+  text-align: center;
+}

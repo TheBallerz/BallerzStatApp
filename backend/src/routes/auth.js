@@ -136,7 +136,7 @@ router.get('/me', requireAuth, async (req, res) => {
       .populate({ path: 'teamId', select: 'abbreviation' })
       .lean(),
     Team.find({ nbaId: { $in: user.favoriteTeams || [] } })
-      .select('name abbreviation logoUrl')
+      .select('name abbreviation logoUrl nbaId')
       .lean(),
   ]);
 

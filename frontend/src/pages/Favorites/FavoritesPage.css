@@ -1,373 +1,173 @@
-/* ─── Favorites Page ─── */
-.fav-page {
-  display: flex;
-  min-height: 100vh;
-  background: #0d0d0d;
-  color: #fff;
-  font-family: 'Inter', 'Helvetica Neue', sans-serif;
-  padding: 2rem;
-  gap: 1.5rem;
-}
+/* ── Favorites page ──────────────────────────────────────────────────────── */
 
-/* Sidebar */
-.fav-sidebar {
-  width: 200px;
-  flex-shrink: 0;
-}
-
-.fav-sidebar-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #aaa;
-  margin-bottom: 1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.fav-team-list {
+/* Fill the viewport below the fixed nav (61px) without overflowing */
+.fp-page {
+  height: calc(100vh - 61px);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: calc(100vh - 8rem);
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.fav-team-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  background: #1a1a1a;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 16px 28px;
+  box-sizing: border-box;
+  background-color: #111;
   color: #fff;
-  text-align: left;
-}
-
-.fav-team-item:hover {
-  background: #242424;
-  transform: translateX(2px);
-}
-
-.fav-team-logo-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.fav-team-logo {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-
-.fav-team-abbr {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-
-/* Main Panel */
-.fav-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.fav-panel {
-  background: #151515;
-  border: 1px solid #2a2a2a;
-  border-radius: 20px;
-  padding: 2rem;
-  min-height: 80vh;
-}
-
-/* Team Header */
-.fav-team-header {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-}
-
-.fav-team-logo-lg-wrap {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.fav-team-logo-lg {
-  width: 64px;
-  height: 64px;
-  object-fit: contain;
-}
-
-.fav-team-info {
-  flex: 1;
-}
-
-.fav-team-name {
-  font-size: 2rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  margin: 0 0 0.5rem;
-}
-
-.fav-stat-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.75rem;
-}
-
-.fav-stat-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.fav-stat-val {
-  font-size: 1.6rem;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.fav-stat-lbl {
-  font-size: 0.7rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.fav-stat-sep {
-  font-size: 1.4rem;
-  color: #555;
-}
-
-.fav-stat-pill {
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 20px;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ccc;
-}
-
-.fav-next-games {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.fav-next-label {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 600;
-}
-
-.fav-next-game-tag {
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.78rem;
-  color: #bbb;
-}
-
-.fav-divider {
-  height: 2px;
-  border-radius: 2px;
-  margin-bottom: 1.5rem;
-  opacity: 0.6;
-}
-
-/* Roster Grid */
-.fav-roster-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 1rem;
-}
-
-.fav-roster-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.fav-player-card {
-  background: #1e1e1e;
-  border: 1px solid #2a2a2a;
-  border-radius: 14px;
-  padding: 1rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  color: #fff;
-}
-
-.fav-player-card:hover {
-  background: #242424;
-  border-color: var(--team-color, #555);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.fav-player-card-img {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #111;
-  border: 2px solid var(--team-primary, #333);
-  flex-shrink: 0;
-}
-
-.fav-player-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.fav-player-card-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.fav-player-card-meta {
-  font-size: 0.75rem;
-  color: #888;
+/* ── Two-column grid ─────────────────────────────────────────────────────── */
+
+.fp-columns {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-height: 0; /* required for children to shrink below content size */
 }
 
-.fav-player-card-stats {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.72rem;
-  color: #aaa;
-}
+/* ── Individual column ───────────────────────────────────────────────────── */
 
-/* Player Detail */
-.fav-back-btn {
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 0;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  transition: color 0.15s;
-}
-
-.fav-back-btn:hover {
-  color: #fff;
-}
-
-.fav-player-detail-inner {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-.fav-player-detail-img {
-  width: 180px;
-  height: 180px;
-  border-radius: 16px;
-  object-fit: cover;
-  background: #111;
-  border: 2px solid #333;
-}
-
-.fav-player-detail-name {
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0 0 0.25rem;
-}
-
-.fav-player-detail-meta {
-  font-size: 1rem;
-  color: #888;
-  margin: 0 0 1.5rem;
-}
-
-.fav-player-stats-grid {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.fav-player-stat-box {
+.fp-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  min-width: 80px;
+  gap: 12px;
+  min-height: 0;
 }
 
-.fav-player-stat-val {
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1;
+/* Column heading — matches .section-title from homePage.css */
+.fp-col-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  flex-shrink: 0;
+  text-align: center;
 }
 
-.fav-player-stat-lbl {
-  font-size: 0.75rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 0.25rem;
+/* ── Search bar wrapper (positions the dropdown) ─────────────────────────── */
+
+.fp-search-wrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
-/* ─── State helpers ─── */
-.fav-loading {
-  color: #666;
-  font-size: 0.85rem;
-  padding: 0.5rem 0;
+/* Override the GetStarted search bar colour so it stands out from the #111 page bg */
+.fp-search-wrap .gs-search-bar {
+  background: #1e1e1e;
 }
-.fav-error {
-  color: #ef4444;
-  font-size: 0.85rem;
-  padding: 0.5rem 0;
+
+/* Dropdown anchors directly below the search bar */
+.fp-results-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  /* Inherits max-height and overflow-y scroll from .gs-results */
 }
-.fav-placeholder {
-  color: #444;
-  font-size: 0.875rem;
-  padding: 2rem 0;
-}
-.fav-extra-stats {
+
+/* ── Scrollable card list ────────────────────────────────────────────────── */
+
+.fp-scroll {
+  flex: 1;
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.4rem;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: none; /* Firefox */
+  padding-bottom: 8px;
 }
-.fav-player-card-hint {
-  font-size: 0.68rem;
-  color: #555;
-  margin-top: 0.1rem;
+
+.fp-scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+/* ── Card wrapper — provides anchor for the remove button ────────────────── */
+
+.fp-card-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ── Detail panels (fixed overlay) ──────────────────────────────────────── */
+
+.fp-panels-container {
+  position: fixed;
+  right: 0;
+  top: 61px;   /* below the fixed nav */
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none; /* clicks pass through gaps between panels */
+}
+
+/* Single panel */
+.fp-panels-container.panels-1 .fp-panel {
+  width: 360px;
+}
+
+/* Two panels — each narrower */
+.fp-panels-container.panels-2 .fp-panel {
+  width: 268px;
+}
+
+.fp-panel {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: all; /* re-enable clicks on the panel itself */
+  animation: fp-panel-slide-in 0.22s ease-out;
+}
+
+@keyframes fp-panel-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Remove (×) button — visible on card hover ───────────────────────────── */
+
+.fp-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.fp-card-wrap:hover .fp-remove-btn {
+  opacity: 1;
+}
+
+.fp-remove-btn:hover {
+  background: rgba(220, 50, 50, 0.65);
+  border-color: rgba(255, 80, 80, 0.5);
+  color: #fff;
 }

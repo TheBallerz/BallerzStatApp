@@ -11,6 +11,9 @@ export interface TopPlayer {
 interface TopPlayerCardProps {
   player: TopPlayer;
   statLabel: string; // e.g. "PPG", "3PM", "APG", "RPG"
+  onClick?: () => void;
+  /** When true the card is dimmed and non-interactive */
+  isGreyed?: boolean;
 }
 
 /**
@@ -24,6 +27,8 @@ interface TopPlayerCardProps {
 export default function TopPlayerCard({
   player,
   statLabel,
+  onClick,
+  isGreyed,
 }: TopPlayerCardProps) {
   const asset = getTeamAsset(player.teamAbbr);
   const headshotUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`;
@@ -32,7 +37,14 @@ export default function TopPlayerCard({
   const gradient = `linear-gradient(to right, ${asset.color}dd 0%, #1a1a1a 60%)`;
 
   return (
-    <div className="tpc-card" style={{ background: gradient }}>
+    <div
+      className="tpc-card"
+      style={{
+        background: gradient,
+        ...(isGreyed ? { filter: 'grayscale(0.8) opacity(0.4)', pointerEvents: 'none' } : {}),
+      }}
+      onClick={onClick}
+    >
       {/* Player headshot — hidden via visibility if the CDN returns a 404 */}
       <img
         className="tpc-headshot"
