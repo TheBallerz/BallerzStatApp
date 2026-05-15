@@ -3,13 +3,13 @@
 const mongoose = require('mongoose');
 
 // Import all models
-const Team = require('../models/Team');
-const Player = require('../models/Player');
-const User = require('../models/User');
-const TeamGameStats = require('../models/TeamGameStats');
-const PlayerGameStats = require('../models/PlayerGameStats');
-const TeamSeasonStats = require('../models/TeamSeasonStats');
-const PlayerSeasonStats = require('../models/PlayerSeasonStats');
+const Team = require('../../models/Team');
+const Player = require('../../models/Player');
+const User = require('../../models/User');
+const TeamGameStats = require('../../models/TeamGameStats');
+const PlayerGameStats = require('../../models/PlayerGameStats');
+const TeamSeasonStats = require('../../models/TeamSeasonStats');
+const PlayerSeasonStats = require('../../models/PlayerSeasonStats');
 
 // Connect to the in-memory MongoDB instance before all tests run
 beforeAll(async () => {
