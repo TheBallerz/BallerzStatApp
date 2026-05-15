@@ -2,7 +2,7 @@
 // The real NavLink requires a Router context which pulls in TextEncoder — a Node
 // built-in that jsdom does not expose without extra polyfilling. Mocking the
 // module avoids that dependency entirely and lets us control isActive directly.
-jest.mock('react-router-dom', () => ({ NavLink: jest.fn(), }));
+jest.mock('react-router-dom', () => ({ NavLink: jest.fn() }));
 
 import { render, screen } from '@testing-library/react';
 import { NavLink } from 'react-router-dom';
@@ -14,13 +14,22 @@ const mockNavLink = NavLink as unknown as jest.Mock;
 // controllable isActive flag so we can test both active and inactive states.
 function setupNavLink(isActive: boolean) {
   mockNavLink.mockImplementation(
-    ({ to, children, className }: {
+    ({
+      to,
+      children,
+      className,
+    }: {
       to: string;
       children: React.ReactNode;
       className: (opts: { isActive: boolean }) => string;
     }) => {
-      const cls = typeof className === 'function' ? className({ isActive }) : className;
-      return <a href={to} className={cls}>{children}</a>;
+      const cls =
+        typeof className === 'function' ? className({ isActive }) : className;
+      return (
+        <a href={to} className={cls}>
+          {children}
+        </a>
+      );
     },
   );
 }
@@ -34,9 +43,16 @@ describe('TopNav', () => {
   test('renders all eight nav link labels', () => {
     render(<TopNav />);
 
-    ['Home', 'Teams', 'Players', 'Fantasy', 'Favorites', 'Standings', 'Schedule', 'Account'].forEach(
-      (label) => expect(screen.getByText(label)).toBeInTheDocument(),
-    );
+    [
+      'Home',
+      'Teams',
+      'Players',
+      'Fantasy',
+      'Favorites',
+      'Standings',
+      'Schedule',
+      'Account',
+    ].forEach((label) => expect(screen.getByText(label)).toBeInTheDocument());
   });
 
   test('renders the Search button', () => {
@@ -70,8 +86,17 @@ describe('TopNav', () => {
   test('each link has the correct href', () => {
     render(<TopNav />);
 
-    expect(screen.getByRole('link', { name: 'Standings' })).toHaveAttribute('href', '/standings');
-    expect(screen.getByRole('link', { name: 'Teams' })).toHaveAttribute('href', '/teams');
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Standings' })).toHaveAttribute(
+      'href',
+      '/standings',
+    );
+    expect(screen.getByRole('link', { name: 'Teams' })).toHaveAttribute(
+      'href',
+      '/teams',
+    );
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'href',
+      '/',
+    );
   });
 });

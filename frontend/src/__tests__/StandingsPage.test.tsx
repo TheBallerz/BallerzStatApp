@@ -1,5 +1,7 @@
 // Mock Object: replace the real service module so import.meta.env is never evaluated
-jest.mock('../services/standingsService', () => ({ fetchStandings: jest.fn() }));
+jest.mock('../services/standingsService', () => ({
+  fetchStandings: jest.fn(),
+}));
 
 import { render, screen } from '@testing-library/react';
 import { fetchStandings } from '../services/standingsService';
@@ -47,7 +49,7 @@ const MOCK_STANDINGS = {
       avgTurnovers: 12.0,
       fgPct: 0.49,
       fg3Pct: 0.37,
-      ftPct: 0.80,
+      ftPct: 0.8,
     },
   ],
 };
@@ -101,11 +103,15 @@ describe('StandingsPage', () => {
 
   test('shows the error message when the fetch throws', async () => {
     // Stub: canned error simulating a network or server failure
-    mockFetchStandings.mockRejectedValue(new Error('Failed to fetch standings'));
+    mockFetchStandings.mockRejectedValue(
+      new Error('Failed to fetch standings'),
+    );
 
     render(<StandingsPage />);
 
-    expect(await screen.findByText('Error: Failed to fetch standings')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Error: Failed to fetch standings'),
+    ).toBeInTheDocument();
   });
 
   test('shows "Error: Unknown error" when the fetch rejects with a non-Error value', async () => {
