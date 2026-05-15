@@ -40,11 +40,21 @@ function fillStep1({
   password = 'Secret1!',
   confirmPassword = 'Secret1!',
 } = {}) {
-  fireEvent.change(screen.getByLabelText('First Name'), { target: { value: firstName } });
-  fireEvent.change(screen.getByLabelText('Last Name'), { target: { value: lastName } });
-  fireEvent.change(screen.getByLabelText('Email'), { target: { value: email } });
-  fireEvent.change(screen.getByLabelText('Password'), { target: { value: password } });
-  fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: confirmPassword } });
+  fireEvent.change(screen.getByLabelText('First Name'), {
+    target: { value: firstName },
+  });
+  fireEvent.change(screen.getByLabelText('Last Name'), {
+    target: { value: lastName },
+  });
+  fireEvent.change(screen.getByLabelText('Email'), {
+    target: { value: email },
+  });
+  fireEvent.change(screen.getByLabelText('Password'), {
+    target: { value: password },
+  });
+  fireEvent.change(screen.getByLabelText('Confirm Password'), {
+    target: { value: confirmPassword },
+  });
 }
 
 describe('GetStartedPage — Step 1', () => {
@@ -64,7 +74,9 @@ describe('GetStartedPage — Step 1', () => {
     // Dummy: no input provided — all fields stay empty
     fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
-    expect(await screen.findByText('All fields are required.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('All fields are required.'),
+    ).toBeInTheDocument();
     // Mock verification: register must not be called when validation fails
     expect(mockRegister).not.toHaveBeenCalled();
   });
@@ -89,7 +101,9 @@ describe('GetStartedPage — Step 1', () => {
     fillStep1({ password: 'Secret1!', confirmPassword: 'Different1!' });
     fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
-    expect(await screen.findByText('Passwords do not match.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Passwords do not match.'),
+    ).toBeInTheDocument();
     expect(mockRegister).not.toHaveBeenCalled();
   });
 
@@ -104,7 +118,12 @@ describe('GetStartedPage — Step 1', () => {
 
     // Mock verification: the right credentials were forwarded to the service
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith('Ken', 'Suon', 'ken@example.com', 'Secret1!');
+      expect(mockRegister).toHaveBeenCalledWith(
+        'Ken',
+        'Suon',
+        'ken@example.com',
+        'Secret1!',
+      );
     });
   });
 
@@ -124,7 +143,9 @@ describe('GetStartedPage — Step 1', () => {
 
   test('displays the backend error message when register() rejects', async () => {
     // Stub: canned error from the server
-    mockRegister.mockRejectedValue(new Error('An account with this email already exists.'));
+    mockRegister.mockRejectedValue(
+      new Error('An account with this email already exists.'),
+    );
 
     render(<GetStartedPage />);
 
@@ -148,7 +169,9 @@ describe('GetStartedPage — Step 1', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Go to next step' })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Go to next step' }),
+      ).toBeDisabled();
     });
   });
 

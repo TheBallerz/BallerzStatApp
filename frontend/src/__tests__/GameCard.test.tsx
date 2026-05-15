@@ -75,7 +75,9 @@ describe('GameCard', () => {
   });
 
   test('does not apply inline style when isGreyed is false', () => {
-    const { container } = render(<GameCard {...defaultProps} isGreyed={false} />);
+    const { container } = render(
+      <GameCard {...defaultProps} isGreyed={false} />,
+    );
 
     const card = container.querySelector('.game-card') as HTMLElement;
     expect(card.style.filter).toBe('');
@@ -99,21 +101,33 @@ describe('GameCard', () => {
   });
 
   test('adds gc-half--active class to the active half only', () => {
-    const { container } = render(<GameCard {...defaultProps} activeHalf="home" />);
+    const { container } = render(
+      <GameCard {...defaultProps} activeHalf="home" />,
+    );
 
-    expect(container.querySelector('.gc-half--home')).toHaveClass('gc-half--active');
-    expect(container.querySelector('.gc-half--away')).not.toHaveClass('gc-half--active');
+    expect(container.querySelector('.gc-half--home')).toHaveClass(
+      'gc-half--active',
+    );
+    expect(container.querySelector('.gc-half--away')).not.toHaveClass(
+      'gc-half--active',
+    );
   });
 
   test('adds card-active class to the wrapper when any half is active', () => {
-    const { container } = render(<GameCard {...defaultProps} activeHalf="away" />);
+    const { container } = render(
+      <GameCard {...defaultProps} activeHalf="away" />,
+    );
 
     expect(container.querySelector('.game-card')).toHaveClass('card-active');
   });
 
   test('does not add card-active class when activeHalf is null', () => {
-    const { container } = render(<GameCard {...defaultProps} activeHalf={null} />);
+    const { container } = render(
+      <GameCard {...defaultProps} activeHalf={null} />,
+    );
 
-    expect(container.querySelector('.game-card')).not.toHaveClass('card-active');
+    expect(container.querySelector('.game-card')).not.toHaveClass(
+      'card-active',
+    );
   });
 });

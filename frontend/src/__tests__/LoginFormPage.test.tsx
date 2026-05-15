@@ -31,7 +31,9 @@ describe('LoginFormPage', () => {
     // Dummy: no input is provided — fields stay empty
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
-    expect(await screen.findByText('Email and password are required.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Email and password are required.'),
+    ).toBeInTheDocument();
     // Mock verification: login() must not be called when validation fails
     expect(mockLogin).not.toHaveBeenCalled();
   });
@@ -42,8 +44,12 @@ describe('LoginFormPage', () => {
 
     render(<LoginFormPage />);
 
-    fireEvent.change(screen.getByLabelText('Email'),    { target: { value: 'user@test.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'pass123' } });
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: 'user@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'pass123' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     // Mock verification: confirm the right credentials were passed to the service
@@ -58,8 +64,12 @@ describe('LoginFormPage', () => {
 
     render(<LoginFormPage />);
 
-    fireEvent.change(screen.getByLabelText('Email'),    { target: { value: 'user@test.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'pass123' } });
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: 'user@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'pass123' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     // Mock verification: Dummy mockNavigate was called with the right route
@@ -74,11 +84,17 @@ describe('LoginFormPage', () => {
 
     render(<LoginFormPage />);
 
-    fireEvent.change(screen.getByLabelText('Email'),    { target: { value: 'wrong@test.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'badpass' } });
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: 'wrong@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'badpass' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
-    expect(await screen.findByText('Invalid email or password.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Invalid email or password.'),
+    ).toBeInTheDocument();
     // Dummy mockNavigate should never be called on failure
     expect(mockNavigate).not.toHaveBeenCalled();
   });
@@ -98,8 +114,12 @@ describe('LoginFormPage', () => {
 
     render(<LoginFormPage />);
 
-    fireEvent.change(screen.getByLabelText('Email'),    { target: { value: 'user@test.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'pass123' } });
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: 'user@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'pass123' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     // The submit arrow must be disabled while loading is true

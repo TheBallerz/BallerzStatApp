@@ -9,7 +9,13 @@ jest.mock('../components/teams/DivisionCard', () => ({
 }));
 jest.mock('../components/teams/TeamDetailPanel', () => ({
   __esModule: true,
-  default: ({ team, onClose }: { team: { name: string }; onClose: () => void }) => (
+  default: ({
+    team,
+    onClose,
+  }: {
+    team: { name: string };
+    onClose: () => void;
+  }) => (
     <div data-testid="team-detail-panel">
       {team.name}
       <button onClick={onClose}>Close</button>
@@ -70,7 +76,14 @@ describe('TeamsPage', () => {
 
     render(<TeamsPage />);
 
-    for (const name of ['Atlantic', 'Central', 'Southeast', 'Northwest', 'Pacific', 'Southwest']) {
+    for (const name of [
+      'Atlantic',
+      'Central',
+      'Southeast',
+      'Northwest',
+      'Pacific',
+      'Southwest',
+    ]) {
       expect(await screen.findByText(name)).toBeInTheDocument();
     }
   });
@@ -81,7 +94,9 @@ describe('TeamsPage', () => {
 
     render(<TeamsPage />);
 
-    expect(await screen.findByText('Failed to load teams.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Failed to load teams.'),
+    ).toBeInTheDocument();
   });
 
   test('calls fetchTeams exactly once on mount', async () => {
@@ -105,6 +120,10 @@ describe('TeamsPage', () => {
 
     // The hero <h1> is the heading-level "Teams" element (not the summary stat span)
     expect(screen.getByRole('heading', { name: 'Teams' })).toBeInTheDocument();
-    expect(screen.getByText('Explore NBA teams by division, view stats, and compare matchups.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Explore NBA teams by division, view stats, and compare matchups.',
+      ),
+    ).toBeInTheDocument();
   });
 });
