@@ -1,15 +1,15 @@
-jest.mock('../models/TeamSeasonStats', () => ({
+jest.mock('../../models/TeamSeasonStats', () => ({
     find: jest.fn(),
     distinct: jest.fn(),
   }));
 
-  jest.mock('../models/Team', () => ({
+  jest.mock('../../models/Team', () => ({
     find: jest.fn(),
   }));
 
-  const router = require('../routes/standings');
-  const TeamSeasonStats = require('../models/TeamSeasonStats');
-  const Team = require('../models/Team');
+  const router = require('../../routes/standings');
+  const TeamSeasonStats = require('../../models/TeamSeasonStats');
+  const Team = require('../../models/Team');
 
   function getHandler(path) {
     const layer = router.stack.find(

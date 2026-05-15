@@ -1,23 +1,23 @@
 'use strict';
 
-jest.mock('../models/Team', () => ({
+jest.mock('../../models/Team', () => ({
   find:    jest.fn(),
   findOne: jest.fn(),
 }));
 
-jest.mock('../models/TeamSeasonStats', () => ({
+jest.mock('../../models/TeamSeasonStats', () => ({
   find:    jest.fn(),
   findOne: jest.fn(),
 }));
 
 // CURRENT_SEASON is imported by the route for the default season value.
-jest.mock('../nbaApi', () => ({
+jest.mock('../../nbaApi', () => ({
   CURRENT_SEASON: '2024-25',
 }));
 
-const router        = require('../routes/teams');
-const Team          = require('../models/Team');
-const TeamSeasonStats = require('../models/TeamSeasonStats');
+const router        = require('../../routes/teams');
+const Team          = require('../../models/Team');
+const TeamSeasonStats = require('../../models/TeamSeasonStats');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

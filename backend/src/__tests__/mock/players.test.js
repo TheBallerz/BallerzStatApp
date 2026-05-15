@@ -1,20 +1,20 @@
 'use strict';
 
-jest.mock('../models/Player', () => ({
+jest.mock('../../models/Player', () => ({
   find: jest.fn(),
 }));
 
-jest.mock('../models/PlayerSeasonStats', () => ({
+jest.mock('../../models/PlayerSeasonStats', () => ({
   aggregate: jest.fn(),
 }));
 
-jest.mock('../models/PlayerCareerStats', () => ({
+jest.mock('../../models/PlayerCareerStats', () => ({
   find: jest.fn(),
 }));
 
-const router            = require('../routes/players');
-const Player            = require('../models/Player');
-const PlayerCareerStats = require('../models/PlayerCareerStats');
+const router            = require('../../routes/players');
+const Player            = require('../../models/Player');
+const PlayerCareerStats = require('../../models/PlayerCareerStats');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
