@@ -7,11 +7,11 @@ interface Player {
   playerId: number;
   fullName: string;
   teamId: number;
-  team: string;
+  team: string; // abbreviation e.g. "LAL"
   teamName: string;
   fromYear: string;
   toYear: string;
-  rosterStatus: number;
+  rosterStatus: number; // 1 = active
 }
 
 interface CareerSeason {
@@ -114,48 +114,21 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced;
 }
 
-// ─── Sort Icon ─────────────────────────────────────────────────────────────────
+// ─── Component ─────────────────────────────────────────────────────────────────
 
-function SortIcon({
-  direction,
-  active,
-  color,
-}: {
-  direction: SortDirection;
-  active: boolean;
-  color: string;
-}) {
+function SortIcon({ direction, active, color }: { direction: SortDirection; active: boolean; color: string }) {
   const dimColor = 'rgba(255,255,255,0.18)';
-  const upActive = active && direction === 'asc';
-  const downActive = active && direction === 'desc';
-
   return (
-    <span
-      className="sort-icon"
-      aria-hidden="true"
-      style={{ display: 'inline-flex', flexDirection: 'column', gap: '1px', marginLeft: '4px', verticalAlign: 'middle', lineHeight: 1 }}
-    >
-      {/* Up caret */}
+    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: '1px', marginLeft: '4px', verticalAlign: 'middle' }}>
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path
-          d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z"
-          fill={upActive ? color : dimColor}
-          style={{ transition: 'fill 0.15s' }}
-        />
+        <path d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z" fill={active && direction === 'asc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
       </svg>
-      {/* Down caret */}
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path
-          d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z"
-          fill={downActive ? color : dimColor}
-          style={{ transition: 'fill 0.15s' }}
-        />
+        <path d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z" fill={active && direction === 'desc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
       </svg>
     </span>
   );
 }
-
-// ─── Component ─────────────────────────────────────────────────────────────────
 
 export default function Players() {
   // ── Sidebar state ──────────────────────────────────────────────────────────
@@ -170,14 +143,13 @@ export default function Players() {
   const [careerStats, setCareerStats] = useState<CareerStats | null>(null);
   const [loadingCareer, setLoadingCareer] = useState(false);
   const [errorCareer, setErrorCareer] = useState<string | null>(null);
-
-  // ── Sort state ─────────────────────────────────────────────────────────────
   const [sort, setSort] = useState<SortState>({ key: null, direction: null });
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
 
   // ── 1. Fetch player list ───────────────────────────────────────────────────
+  // GET /api/players?search=&currentOnly=0|1
   useEffect(() => {
     const load = async () => {
       setLoadingPlayers(true);
@@ -202,13 +174,13 @@ export default function Players() {
   }, [debouncedSearch, activeOnly]);
 
   // ── 2. Fetch career stats when a player is selected ────────────────────────
+  // GET /api/players/:playerId/career
   useEffect(() => {
     if (!selectedPlayer) return;
     const load = async () => {
       setLoadingCareer(true);
       setErrorCareer(null);
       setCareerStats(null);
-      // Reset sort when switching players
       setSort({ key: null, direction: null });
       try {
         const res = await fetch(
@@ -227,43 +199,10 @@ export default function Players() {
     load();
   }, [selectedPlayer]);
 
-  // ── Sort handler: cycles null → desc → asc → null (chronological) ──────────
-  const handleSort = useCallback((key: SortKey) => {
-    setSort((prev) => {
-      if (prev.key !== key) {
-        // New column: start with desc
-        return { key, direction: 'desc' };
-      }
-      if (prev.direction === 'desc') return { key, direction: 'asc' };
-      // Was asc → reset to chronological
-      return { key: null, direction: null };
-    });
-  }, []);
-
-  // ── Sort the seasons ───────────────────────────────────────────────────────
-  const sortedSeasons = (() => {
-    if (!careerStats?.seasons) return [];
-    const base = [...careerStats.seasons].sort((a, b) =>
-      b.season.localeCompare(a.season),
-    );
-    if (!sort.key || !sort.direction) return base;
-
-    return [...base].sort((a, b) => {
-      const aVal = a[sort.key!] ?? 0;
-      const bVal = b[sort.key!] ?? 0;
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sort.direction === 'asc'
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-      const diff = (aVal as number) - (bVal as number);
-      return sort.direction === 'asc' ? diff : -diff;
-    });
-  })();
-
   // ── Derived values ─────────────────────────────────────────────────────────
   const colors = selectedPlayer ? getColors(selectedPlayer.team) : null;
 
+  // Most recent season for the stat highlights in the header
   const latestSeason = careerStats?.seasons?.length
     ? [...careerStats.seasons].sort((a, b) =>
         b.season.localeCompare(a.season),
@@ -274,37 +213,27 @@ export default function Players() {
     setSelectedPlayer(player);
   }, []);
 
-  // ── Column header helper ───────────────────────────────────────────────────
-  const Th = ({
-    label,
-    sortKey,
-    className,
-  }: {
-    label: string;
-    sortKey: SortKey;
-    className?: string;
-  }) => {
-    const isActive = sort.key === sortKey;
-    const accentColor = colors?.secondary ?? '#ffffff';
+  const handleSort = useCallback((key: SortKey) => {
+    setSort((prev) => {
+      if (prev.key !== key) return { key, direction: 'desc' };
+      if (prev.direction === 'desc') return { key, direction: 'asc' };
+      return { key: null, direction: null }; // reset to chronological
+    });
+  }, []);
 
-    return (
-      <th
-        className={`sortable-th${isActive ? ' sort-active' : ''}${className ? ` ${className}` : ''}`}
-        onClick={() => handleSort(sortKey)}
-        style={isActive ? { color: accentColor } : undefined}
-        title={`Sort by ${label}`}
-      >
-        <span className="th-inner">
-          {label}
-          <SortIcon
-            direction={sort.direction}
-            active={isActive}
-            color={accentColor}
-          />
-        </span>
-      </th>
-    );
-  };
+const sortedSeasons = (() => {
+    if (!careerStats?.seasons) return [];
+    const base = [...careerStats.seasons].sort((a, b) => b.season.localeCompare(a.season));
+    if (!sort.key || !sort.direction) return base;
+    return [...base].sort((a, b) => {
+      const aVal = a[sort.key!] ?? 0;
+      const bVal = b[sort.key!] ?? 0;
+      if (typeof aVal === 'string' && typeof bVal === 'string')
+        return sort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      const diff = (aVal as number) - (bVal as number);
+      return sort.direction === 'asc' ? diff : -diff;
+    });
+  })();
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -313,6 +242,7 @@ export default function Players() {
       <aside className="players-sidebar">
         <h2 className="players-sidebar-title">Players</h2>
 
+        {/* Search */}
         <div className="players-search-wrap">
           <span className="players-search-icon">⌕</span>
           <input
@@ -324,6 +254,7 @@ export default function Players() {
           />
         </div>
 
+        {/* Active-only toggle */}
         <div className="players-toggle-row">
           <input
             id="active-toggle"
@@ -337,15 +268,18 @@ export default function Players() {
           </label>
         </div>
 
+        {/* Status */}
         {loadingPlayers && <p className="players-loading">Loading…</p>}
         {errorPlayers && <p className="players-error">{errorPlayers}</p>}
 
+        {/* Count */}
         {!loadingPlayers && players.length > 0 && (
           <p className="players-count-badge">
             {players.length} player{players.length !== 1 ? 's' : ''}
           </p>
         )}
 
+        {/* List */}
         <div className="players-list" ref={listRef}>
           {players.map((player) => {
             const c = getColors(player.team);
@@ -392,6 +326,7 @@ export default function Players() {
       {/* ── Main Panel ── */}
       <main className="players-main">
         <div className="players-panel">
+          {/* Empty state */}
           {!selectedPlayer && (
             <p className="players-placeholder">
               Select a player to view their career stats.
@@ -468,6 +403,7 @@ export default function Players() {
                     )}
                   </div>
 
+                  {/* Latest season highlight stats */}
                   {loadingCareer && (
                     <p className="players-loading">Loading stats…</p>
                   )}
@@ -521,47 +457,55 @@ export default function Players() {
               {/* ── Career Stats Table ── */}
               {careerStats && careerStats.seasons.length > 0 && (
                 <>
-                  <div className="players-career-title-row">
-                    <p className="players-career-title">Career Stats</p>
-                    {sort.key && (
-                      <button
-                        className="sort-reset-btn"
-                        onClick={() => setSort({ key: null, direction: null })}
-                        title="Reset to chronological order"
-                      >
-                        Reset order
-                      </button>
-                    )}
-                  </div>
+                  <p className="players-career-title">Career Stats</p>
                   <div className="players-career-table-wrap">
                     <table className="players-career-table">
                       <thead>
                         <tr>
-                          <Th label="Season" sortKey="season" />
-                          <Th label="Team" sortKey="team" />
-                          <Th label="GP" sortKey="gamesPlayed" />
-                          <Th label="GS" sortKey="gamesStarted" />
-                          <Th label="MIN" sortKey="minutes" />
-                          <Th label="PTS" sortKey="points" />
-                          <Th label="REB" sortKey="rebounds" />
-                          <Th label="AST" sortKey="assists" />
-                          <Th label="STL" sortKey="steals" />
-                          <Th label="BLK" sortKey="blocks" />
-                          <Th label="TOV" sortKey="turnovers" />
-                          <Th label="FG%" sortKey="fgPct" className="players-pct-cell" />
-                          <Th label="3P%" sortKey="fg3Pct" className="players-pct-cell" />
-                          <Th label="FT%" sortKey="ftPct" className="players-pct-cell" />
+                          {(
+                            [
+                              ['Season', 'season'],
+                              ['Team', 'team'],
+                              ['GP', 'gamesPlayed'],
+                              ['GS', 'gamesStarted'],
+                              ['MIN', 'minutes'],
+                              ['PTS', 'points'],
+                              ['REB', 'rebounds'],
+                              ['AST', 'assists'],
+                              ['STL', 'steals'],
+                              ['BLK', 'blocks'],
+                              ['TOV', 'turnovers'],
+                              ['FG%', 'fgPct'],
+                              ['3P%', 'fg3Pct'],
+                              ['FT%', 'ftPct'],
+                            ] as [string, SortKey][]
+                          ).map(([label, key]) => {
+                            const isActive = sort.key === key;
+                            return (
+                              <th
+                                key={key}
+                                onClick={() => handleSort(key)}
+                                style={{
+                                  cursor: 'pointer',
+                                  userSelect: 'none',
+                                  whiteSpace: 'nowrap',
+                                  color: isActive ? colors.secondary : undefined,
+                                  transition: 'color 0.15s',
+                                }}
+                              >
+                                {label}
+                                <SortIcon direction={sort.direction} active={isActive} color={colors.secondary} />
+                              </th>
+                            );
+                          })}
                         </tr>
                       </thead>
                       <tbody>
-                        {sortedSeasons.map((s, i) => {
-                          // Highlight most recent season only when in chronological order
-                          const isNewest = !sort.key && i === 0;
-                          return (
-                            <tr
-                              key={`${s.season}-${s.team}-${i}`}
-                              className={isNewest ? 'highlight-row' : ''}
-                            >
+                        {sortedSeasons.map((s, i) => (
+                          <tr
+                            key={`${s.season}-${s.team}-${i}`}
+                            className={!sort.key && i === 0 ? 'highlight-row' : ''}
+                          >
                               <td className="season-col">{s.season}</td>
                               <td className="team-col">{s.team || '—'}</td>
                               <td>{fmtStat(s.gamesPlayed)}</td>
@@ -590,8 +534,7 @@ export default function Players() {
                                 {fmtPct(s.ftPct)}
                               </td>
                             </tr>
-                          );
-                        })}
+                          ))}
                       </tbody>
                     </table>
                   </div>
