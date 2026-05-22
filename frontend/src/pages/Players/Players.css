@@ -433,3 +433,59 @@
   color: #444;
   margin-top: 0.1rem;
 }
+
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+
+.sortable-th:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sortable-th.sort-active {
+  /* color is set inline via the team accent */
+}
+
+.th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sort-icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+  position: relative;
+  top: 0px;
+}
+
+/* Title row with reset button */
+.players-career-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.sort-reset-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  letter-spacing: 0.03em;
+}
+
+.sort-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+}
