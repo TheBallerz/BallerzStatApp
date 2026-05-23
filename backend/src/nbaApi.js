@@ -205,7 +205,12 @@ async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = nu
           // Already have an entry — add this row's numeric values to the existing ones.
           const existing = map.get(id);
           for (let i = 0; i < row.length; i++) {
-            if (i !== idIndex && typeof row[i] === 'number' && typeof existing[i] === 'number') {
+            if (
+              i !== idIndex &&
+              typeof row[i] === 'number' &&
+              typeof existing[i] === 'number' &&
+              !headers[i].endsWith('_ID')
+            ) {
               existing[i] += row[i];
             }
           }

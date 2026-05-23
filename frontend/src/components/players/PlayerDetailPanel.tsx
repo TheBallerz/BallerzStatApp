@@ -43,6 +43,7 @@ export default function PlayerDetailPanel({
         const r = await fetch(
           `${import.meta.env.VITE_API_BASE}/players/${nbaPlayerId}/stats`,
         );
+        if (r.status === 404) return;
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         setStats(await r.json());
       } catch (err) {
@@ -106,7 +107,7 @@ export default function PlayerDetailPanel({
         {loading ? (
           <p className="pdp-status">Loading…</p>
         ) : error || !stats ? (
-          <p className="pdp-status">{error || 'No data found'}</p>
+          <p className="pdp-status">{error || 'No stats available for this season'}</p>
         ) : (
           <>
             <p className="pdp-section-label">Season Averages</p>
