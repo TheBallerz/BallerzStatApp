@@ -1,5 +1,4 @@
-/* ── HomeTeamPanel ───────────────────────────────────────────── */
-
+/* ── Panel shell ─────────────────────────────────────────────────────────── */
 .htp-panel {
   display: flex;
   flex-direction: column;
@@ -7,36 +6,25 @@
   overflow: hidden;
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
-
+/* ── Header ──────────────────────────────────────────────────────────────── */
 .htp-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 18px 14px;
+  padding: 12px 16px 16px 18px;
   flex-shrink: 0;
 }
 
 .htp-identity {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 3px;
   min-width: 0;
-}
-
-.htp-logo {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.htp-name-wrap {
-  min-width: 0;
+  flex: 1;
 }
 
 .htp-name {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
@@ -47,21 +35,46 @@
 }
 
 .htp-division {
-  font-size: 11px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
-/* ── Close + heart button stack ─────────────────────────────── */
+.htp-header-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-shrink: 0;
+}
 
+/* Logo in black circle */
+.htp-logo-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #000;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.htp-logo {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+/* Close + heart buttons */
 .htp-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .htp-close {
@@ -123,20 +136,121 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ── Divider ─────────────────────────────────────────────────── */
+/* ── Chart section ───────────────────────────────────────────────────────── */
+.htp-graph-section {
+  padding: 10px 14px 8px;
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+}
 
+.htp-graph-controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.htp-stat-select {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 24px 4px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.htp-stat-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.htp-stat-select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.htp-chart-wrap {
+  flex: 1;
+  min-height: 0;
+}
+
+.htp-chart-skeleton {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: htp-shimmer 1.4s infinite;
+}
+
+@keyframes htp-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.htp-chart-empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 28px 0;
+  margin: 0;
+}
+
+/* Recharts tooltip */
+.htp-tooltip {
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.htp-tooltip-date {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.htp-tooltip-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
 .htp-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
 
-/* ── Body ────────────────────────────────────────────────────── */
-
+/* ── Body (season stats) ─────────────────────────────────────────────────── */
 .htp-body {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 18px;
+  padding: 12px 14px 14px;
   scrollbar-width: none;
 }
 
@@ -144,39 +258,68 @@
   display: none;
 }
 
-/* ── Stat rows ───────────────────────────────────────────────── */
-
-.htp-stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.htp-stat-row:last-child {
-  border-bottom: none;
-}
-
-.htp-stat-label {
-  font-size: 12px;
+.htp-section-label {
+  font-size: 10px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.38);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
 }
 
-.htp-stat-value {
-  font-size: 15px;
-  font-weight: 700;
+/* 2×3 stat tile grid */
+.htp-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.htp-stat-tile {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 12px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.htp-tile-value {
+  font-size: 22px;
+  font-weight: 800;
   color: #ffffff;
+  line-height: 1;
 }
 
-/* ── Loading / error states ──────────────────────────────────── */
+.htp-tile-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
 
+.htp-tile-diff {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.htp-tile-diff.pos {
+  color: #4ade80;
+}
+
+.htp-tile-diff.neg {
+  color: #f87171;
+}
+
+/* Status / fallback messages */
 .htp-status {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.4);
   padding: 16px 0;
   text-align: center;
+  margin: 0;
 }

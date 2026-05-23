@@ -110,9 +110,9 @@
   width: 360px;
 }
 
-/* Two panels — each narrower */
+/* Two panels — same width as single panel */
 .fp-panels-container.panels-2 .fp-panel {
-  width: 268px;
+  width: 360px;
 }
 
 .fp-panel {

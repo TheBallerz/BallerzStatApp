@@ -186,9 +186,9 @@
   width: 360px;
 }
 
-/* Two panels — each narrower to fit side by side */
+/* Two panels — same width as single panel */
 .stats-panels-container.panels-2 .stats-panel {
-  width: 268px;
+  width: 360px;
 }
 
 /* ── Individual stats panel ─────────────────────────────── */
