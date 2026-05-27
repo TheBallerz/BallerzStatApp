@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Players.css';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -121,12 +122,30 @@ export default function Players() {
   const [careerStats, setCareerStats] = useState<CareerStats | null>(null);
   const [loadingCareer, setLoadingCareer] = useState(false);
   const [errorCareer, setErrorCareer] = useState<string | null>(null);
+  const location = useLocation();
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
 
   // ── 1. Fetch player list ───────────────────────────────────────────────────
   // GET /api/players?search=&currentOnly=0|1
+  useEffect(() => {
+    const state = location.state;
+
+    if (!state?.openPlayer) return;
+
+    setSelectedPlayer({
+      playerId: state.nbaPlayerId,
+      fullName: state.playerName,
+      teamId: 0,
+      team: state.teamAbbr,
+      teamName: '',
+      fromYear: '',
+      toYear: '',
+      rosterStatus: 1,
+    });
+  }, [location.state]);
+
   useEffect(() => {
     const load = async () => {
       setLoadingPlayers(true);

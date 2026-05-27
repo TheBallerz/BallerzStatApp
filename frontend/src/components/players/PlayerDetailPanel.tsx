@@ -107,7 +107,9 @@ export default function PlayerDetailPanel({
         {loading ? (
           <p className="pdp-status">Loading…</p>
         ) : error || !stats ? (
-          <p className="pdp-status">{error || 'No stats available for this season'}</p>
+          <p className="pdp-status">
+            {error || 'No stats available for this season'}
+          </p>
         ) : (
           <>
             <p className="pdp-section-label">Season Averages</p>

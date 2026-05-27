@@ -19,3 +19,19 @@ export async function fetchTeam(teamId: number | string) {
 
   return res.json();
 }
+
+export async function fetchPlayers(teamMongoId: string) {
+  if (!teamMongoId) {
+    throw new Error('fetchPlayers requires a teamMongoId');
+  }
+
+  const res = await fetch(
+    `${API_BASE}/players?teamId=${teamMongoId}&includeStats=1`,
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch players: ${res.status}`);
+  }
+
+  return res.json();
+}
