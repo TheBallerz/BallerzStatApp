@@ -143,6 +143,7 @@ router.get('/teams/:teamId', async (req, res) => {
       ppg:          stats?.avgPoints   ?? 0,
       rpg:          stats?.avgRebounds ?? 0,
       apg:          stats?.avgAssists  ?? 0,
+      fg3m:         stats?.avgFg3m     ?? 0,
       fgPct:        stats?.fgPct       ?? 0,
     });
   } catch (error) {
@@ -252,6 +253,34 @@ router.get('/teams/:nbaTeamId/summary', async (req, res) => {
   } catch (error) {
     console.error('Error fetching team summary:', error.message);
     res.status(500).json({ error: 'Failed to fetch team summary', details: error.message });
+  }
+});
+
+router.get('/teams/:nbaTeamId/games', async (req, res) => {
+  try {
+    const nbaTeamId = Number(req.params.nbaTeamId);
+    if (isNaN(nbaTeamId)) return res.status(400).json({ error: 'Invalid team ID' });
+
+    const team = await Team.findOne({ nbaId: nbaTeamId }).select('_id').lean();
+    if (!team) return res.status(404).json({ error: 'Team not found' });
+
+    const games = await TeamGameStats.find({ teamId: team._id })
+      .sort({ gameDate: 1 })
+      .select('gameDate points rebounds assists steals blocks turnovers threePointersMade')
+      .lean();
+
+    res.json(games.map((g) => ({
+      date: g.gameDate,
+      pts:  g.points,
+      reb:  g.rebounds,
+      ast:  g.assists,
+      stl:  g.steals,
+      blk:  g.blocks,
+      tov:  g.turnovers,
+      fg3m: g.threePointersMade,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch team game log' });
   }
 });
 
