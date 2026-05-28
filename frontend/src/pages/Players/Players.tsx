@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Players.css';
+import PlayerBio from './PlayerBio';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -488,6 +489,12 @@ export default function Players() {
                       ))}
                     </div>
                   )}
+
+                  <PlayerBio
+                    playerId={selectedPlayer.playerId}
+                    fullName={selectedPlayer.fullName}
+                    team={selectedPlayer.team}
+                  />
 
                   {!loadingCareer && !careerStats && !errorCareer && (
                     <p className="players-placeholder">No stats available.</p>
