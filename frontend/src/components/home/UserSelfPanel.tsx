@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
 import './userSelfPanel.css';
 import { getMySeasonStats, getMyGames } from '../../services/userStatsService';
 import type {
@@ -75,11 +74,13 @@ function fmt(val: number): string {
   return val.toFixed(1);
 }
 
-function ChartTooltip({
-  active,
-  payload,
-  label,
-}: TooltipProps<number, string>) {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}
+
+function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="usp-tooltip">
@@ -245,10 +246,10 @@ export default function UserSelfPanel({
                   axisLine={{ stroke: 'rgba(255,255,255,0.15)' }}
                   tickLine={false}
                   tickFormatter={(v: number) => String(v)}
-                  domain={([min, max]: [number, number]) => {
+                  domain={([min, max]: readonly [number, number]) => {
                     const lo = Math.floor(min / 5) * 5;
                     const hi = Math.ceil(max / 5) * 5;
-                    return [lo, hi];
+                    return [lo, hi] as [number, number];
                   }}
                   ticks={(() => {
                     const vals = chartData.map(

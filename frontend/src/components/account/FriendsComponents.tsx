@@ -94,7 +94,9 @@ interface FriendRowMenuProps {
 
 function FriendRowMenu({ onRemove, onBlock }: FriendRowMenuProps) {
   const [open, setOpen] = useState(false);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   const cancelClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -158,8 +160,12 @@ function AddFriends({ onRequestSent }: AddFriendsProps) {
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [showDropdown, setShowDropdown] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   const visibleResults = query.length >= 2 ? results : [];
   const isDropdownOpen = query.length >= 2 && showDropdown;
