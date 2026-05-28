@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
 import './playerDetailPanel.css';
 import { getTeamAsset } from '../../assets/teamAssets';
 
@@ -71,11 +70,13 @@ function fmtDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function ChartTooltip({
-  active,
-  payload,
-  label,
-}: TooltipProps<number, string>) {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}
+
+function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="pdp-tooltip">
@@ -253,10 +254,10 @@ export default function PlayerDetailPanel({
                   tickLine={false}
                   tickCount={undefined}
                   tickFormatter={(v: number) => String(v)}
-                  domain={([min, max]: [number, number]) => {
+                  domain={([min, max]: readonly [number, number]) => {
                     const lo = Math.floor(min / 5) * 5;
                     const hi = Math.ceil(max / 5) * 5;
-                    return [lo, hi];
+                    return [lo, hi] as [number, number];
                   }}
                   ticks={(() => {
                     const vals = games.map((g) => g[selectedStat] as number);
