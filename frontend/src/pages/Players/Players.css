@@ -493,3 +493,35 @@
   color: rgba(255, 255, 255, 0.8);
   border-color: rgba(255, 255, 255, 0.3);
 }
+
+.player-chart-section {
+  margin-top: 32px;
+}
+
+.player-chart-section h2 {
+  margin-bottom: 16px;
+}
+
+.player-chart-wrap {
+  width: 100%;
+  height: 320px;
+}
+.player-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.player-chart-header h2 {
+  margin-right: 16px;
+}
+
+.player-chart-select {
+  background: #1f1f1f;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
