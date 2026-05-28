@@ -52,6 +52,10 @@ app.use("/api", gamesRoutes);
 app.use("/api", standingsRoutes);
 app.use("/api/players", playerBioRoutes);
 app.use('/api/admin', adminRoutes);
+const userStatsRoutes = require('./routes/userStats');
+const friendsRoutes   = require('./routes/friends');
+app.use('/api/user', userStatsRoutes);
+app.use('/api/friends', friendsRoutes);
 //hard coded used for testing front to back response
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: 'backend is alive' });
