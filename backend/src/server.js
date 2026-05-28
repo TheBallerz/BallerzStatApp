@@ -51,6 +51,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", gamesRoutes);
 app.use("/api", standingsRoutes);
 app.use("/api/players", playerBioRoutes);
+app.use('/api/admin', adminRoutes);
 //hard coded used for testing front to back response
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: 'backend is alive' });
