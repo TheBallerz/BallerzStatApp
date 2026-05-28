@@ -10,9 +10,15 @@ import StandingsPage from '../pages/Standings/StandingsPage';
 import SchedulePage from '../pages/Schedule/SchedulePage';
 import AccountPage from '../pages/AccountPage';
 import './App.css';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import Fantasy from '../pages/Fantasy/Fantasy';
+import { getToken } from '../services/authService';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (!getToken()) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
 
 function App() {
   return (
@@ -22,22 +28,24 @@ function App() {
       <Route path="/login-form" element={<LoginFormPage />} />
       <Route path="/get-started" element={<GetStartedPage />} />
 
-      {/* All other routes share the fixed nav Layout */}
+      {/* All other routes require authentication */}
       <Route
         path="/*"
         element={
-          <Layout>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/teams" element={<TeamsPage />} />
-              <Route path="/players" element={<Players />} />
-              <Route path="/favorites" element={<FavoritesPage />} />
-              <Route path="/standings" element={<StandingsPage />} />
-              <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="/account" element={<AccountPage />} />
-              <Route path="/fantasy" element={<Fantasy />} />
-            </Routes>
-          </Layout>
+          <ProtectedRoute>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/teams" element={<TeamsPage />} />
+                <Route path="/players" element={<Players />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/standings" element={<StandingsPage />} />
+                <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/account" element={<AccountPage />} />
+                <Route path="/fantasy" element={<Fantasy />} />
+              </Routes>
+            </Layout>
+          </ProtectedRoute>
         }
       />
     </Routes>
