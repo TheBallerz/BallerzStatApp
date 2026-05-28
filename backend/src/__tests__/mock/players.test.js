@@ -93,14 +93,22 @@ describe('GET /players', () => {
     expect(mockPopulate).toHaveBeenCalledWith('teamId', 'nbaId abbreviation name city');
     expect(res.json).toHaveBeenCalledWith([
       {
-        playerId:     203999,
-        fullName:     'Nikola Jokic',
-        teamId:       1610612743,
-        team:         'DEN',
-        teamName:     'Nuggets',
-        fromYear:     '',
-        toYear:       '',
-        rosterStatus: 1,
+        mongoId:       'mongo-id-jokic',
+        nbaId:         203999,
+        playerId:      203999,
+        firstName:     'Nikola',
+        lastName:      'Jokic',
+        fullName:      'Nikola Jokic',
+        imageUrl:      undefined,
+        jerseyNumber:  undefined,
+        position:      undefined,
+        rosterStatus:  1,
+        teamMongoId:   'mongo-id-den',
+        teamId:        1610612743,
+        team:          'DEN',
+        teamName:      'Nuggets',
+        fromYear:      '',
+        toYear:        '',
       },
     ]);
   });
