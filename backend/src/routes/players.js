@@ -136,10 +136,21 @@ router.get('/players/top', async (req, res) => {
 router.get('/players', async (req, res) => {
   try {
     const search = normalizeText(req.query.search || '');
+    const { teamId, includeStats } = req.query;
+    const mongoose = require('mongoose');
 
     // Build a filter: if a search term is provided, match it case-insensitively
     // against either part of the player's name. No search = return everyone.
     const filter = {};
+
+    // if teamId is queried then filter by teamId
+    if (teamId) {
+      if (!mongoose.Types.ObjectId.isValid(teamId)) {
+        return res.status(400).json({ error: 'teamId must be a valid Mongo ObjectId' });
+      }
+      filter.teamId = teamId;
+    }
+
     if (search) {
       const regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       filter.$or = [{ firstName: regex }, { lastName: regex }];
@@ -151,10 +162,20 @@ router.get('/players', async (req, res) => {
 
     const result = players.map((p) => ({
       playerId:     p.nbaId,
+      nbaId: p.nbaId,
+      mongoId: p._id,
       fullName:     `${p.firstName} ${p.lastName}`,
+      firstName: p.firstName,
+      lastName: p.lastName,
+      position: p.position,
+      jerseyNumber: p.jerseyNumber,
+      imageUrl: p.imageUrl,
+
+      teamMongoId: p.teamId?._id,
       teamId:       p.teamId?.nbaId        ?? 0,
       team:         p.teamId?.abbreviation ?? '',
       teamName:     p.teamId?.name         ?? '',
+      
       // fromYear / toYear / rosterStatus are not stored in the Player model.
       // The frontend renders fromYear–toYear as "–" when both are empty, and
       // always shows the Active badge since rosterStatus is always 1 here.
@@ -163,7 +184,38 @@ router.get('/players', async (req, res) => {
       rosterStatus: 1,
     }));
 
-    res.json(result);
+    if (includeStats !== '1') {
+      return res.json(result);
+    }
+    
+    const nbaPlayerIds = result.map((player) => player.playerId);
+    
+    const stats = await PlayerSeasonStats.find({
+      nbaPlayerId: { $in: nbaPlayerIds },
+    }).lean();
+    
+    const statsByNbaPlayerId = new Map(
+      stats.map((stat) => [stat.nbaPlayerId, stat]),
+    );
+    
+    const resultWithStats = result.map((player) => {
+      const stat = statsByNbaPlayerId.get(player.playerId);
+    
+      return {
+        ...player,
+        seasonStats: {
+          ppg: stat?.avgPoints ?? 0,
+          rpg: stat?.avgRebounds ?? 0,
+          apg: stat?.avgAssists ?? 0,
+          spg: stat?.avgSteals ?? 0,
+          bpg: stat?.avgBlocks ?? 0,
+          fgPct: stat?.fgPct ?? 0,
+          threePct: stat?.fg3Pct ?? 0,
+        },
+      };
+    });
+    
+    res.json(resultWithStats);
   } catch (error) {
     console.error('Error fetching players:', error.message);
     res.status(500).json({ error: 'Failed to fetch players', details: error.message });

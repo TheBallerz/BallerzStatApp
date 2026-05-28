@@ -5,6 +5,7 @@ import { fetchTeams } from '../../services/nbaApi';
 import './TeamsPage.css';
 
 type SelectedTeam = {
+  mongoId: string;
   name: string;
   division: string;
   teamId: number;
@@ -14,6 +15,7 @@ type SelectedTeam = {
 };
 
 type Team = {
+  mongoId: string;
   teamId: number;
   teamName: string;
   teamAbbreviation: string;
@@ -49,6 +51,7 @@ function groupTeamsByDivision(teams: Team[]): Division[] {
     teams: teams
       .filter((team) => abbreviations.includes(team.teamAbbreviation))
       .map((team) => ({
+        mongoId: team.mongoId,
         name: team.teamName,
         division: divisionName,
         teamId: team.teamId,
@@ -76,6 +79,7 @@ export default function TeamsPage() {
         console.log('RAW TEAMS API:', data);
 
         const mappedTeams: Team[] = data.map((team: Team) => ({
+          mongoId: team.mongoId,
           teamId: team.teamId,
           teamName: team.teamName,
           teamAbbreviation: team.teamAbbreviation,
