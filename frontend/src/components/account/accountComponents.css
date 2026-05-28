@@ -1,0 +1,520 @@
+/* ── ProfileHeader ──────────────────────────────────────────────────────────── */
+
+.aph-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 4px;
+}
+
+.aph-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #555;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.aph-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aph-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.aph-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aph-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aph-name {
+  font-size: 30px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  line-height: 1.1;
+}
+.aph-email {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.aph-counts {
+  display: flex;
+  gap: 32px;
+}
+
+.aph-count-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aph-count-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.aph-count-num {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.aph-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.aph-edit-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.aph-edit-btn:hover {
+  background: #fff;
+}
+
+.aph-logout-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.aph-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── StatTiles ──────────────────────────────────────────────────────────────── */
+
+.ast-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.ast-tile {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 90px;
+}
+
+.ast-label {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ast-value {
+  font-size: 40px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  margin-top: 20px;
+}
+
+.ast-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: ast-shimmer 1.4s infinite;
+}
+
+@keyframes ast-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── GameLogTable ───────────────────────────────────────────────────────────── */
+
+.agl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.agl-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: left;
+}
+
+.agl-table tbody tr {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+}
+.agl-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.agl-table td {
+  padding: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: left;
+  vertical-align: middle;
+}
+.agl-date-cell {
+  text-align: left;
+}
+
+.agl-edit-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 3px 9px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.agl-edit-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.agl-delete-btn {
+  background: none;
+  border: 1px solid rgba(220, 60, 60, 0.25);
+  border-radius: 6px;
+  color: rgba(220, 100, 100, 0.7);
+  padding: 3px 9px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  margin-left: 4px;
+  margin-right: -54px;
+}
+.agl-delete-btn:hover {
+  background: rgba(220, 60, 60, 0.15);
+  color: rgba(240, 120, 120, 1);
+}
+
+.agl-empty {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  padding: 28px 0;
+  margin: 0;
+}
+
+/* ── GameLogModal ───────────────────────────────────────────────────────────── */
+
+.glm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+.glm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.glm-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.glm-input {
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.glm-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.glm-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.glm-input[type='number'] {
+  -moz-appearance: textfield;
+}
+.glm-input[type='number']::-webkit-outer-spin-button,
+.glm-input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.glm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.glm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.glm-error {
+  font-size: 12px;
+  color: #f87171;
+  margin: 0;
+}
+
+.glm-save-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.glm-save-btn:hover:not(:disabled) {
+  background: #fff;
+}
+.glm-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.glm-cancel-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.glm-cancel-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+.glm-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── EditProfileModal ───────────────────────────────────────────────────────── */
+
+.epm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+.epm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.epm-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.epm-input {
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.epm-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.epm-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.epm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.epm-error {
+  font-size: 12px;
+  color: #f87171;
+  margin: 0;
+}
+
+.epm-save-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.epm-save-btn:hover:not(:disabled) {
+  background: #fff;
+}
+.epm-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.epm-cancel-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.epm-cancel-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+.epm-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.epm-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 4px;
+}
+
+.epm-avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.epm-avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.epm-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.epm-upload-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 6px 14px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.epm-upload-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.epm-remove-btn {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0 2px;
+  align-self: flex-start;
+  transition: color 0.15s;
+}
+.epm-remove-btn:hover {
+  color: #fca5a5;
+}
+
+.epm-avatar-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+}

@@ -45,6 +45,13 @@ interface HomeTeamPanelProps {
   onClose: () => void;
   isFavorited?: boolean;
   onToggleFavorite?: () => void;
+  showCompare?: boolean;
+  onCompareYourself?: (stats: {
+    pts: number;
+    ast: number;
+    reb: number;
+    fg3m: number;
+  }) => void;
 }
 
 const STAT_OPTIONS: { key: keyof GameLog; label: string }[] = [
@@ -85,6 +92,8 @@ export default function HomeTeamPanel({
   onClose,
   isFavorited,
   onToggleFavorite,
+  showCompare,
+  onCompareYourself,
 }: HomeTeamPanelProps) {
   const [team, setTeam] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -351,6 +360,25 @@ export default function HomeTeamPanel({
           </>
         )}
       </div>
+
+      {/* ── Compare Yourself ── */}
+      {showCompare && team && onCompareYourself && (
+        <div className="htp-compare-wrap">
+          <button
+            className="htp-compare-btn"
+            onClick={() =>
+              onCompareYourself({
+                pts: team.ppg,
+                ast: team.apg,
+                reb: team.rpg,
+                fg3m: team.fg3m,
+              })
+            }
+          >
+            Compare Yourself
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,580 @@
+/* ── ConfirmModal ───────────────────────────────────────────────────────────── */
+
+.cfm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+.cfm-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.5;
+}
+.cfm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.cfm-cancel-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cfm-cancel-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+.cfm-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cfm-confirm-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cfm-confirm-btn:hover:not(:disabled) {
+  background: #fff;
+}
+.cfm-confirm-btn.cfm-danger {
+  background: #f87171;
+  color: #fff;
+}
+.cfm-confirm-btn.cfm-danger:hover:not(:disabled) {
+  background: #ef4444;
+}
+.cfm-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── FriendRowMenu ──────────────────────────────────────────────────────────── */
+
+.arm-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.arm-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 14px;
+  letter-spacing: 2px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  font-family: inherit;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.arm-trigger:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.arm-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  z-index: 50;
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  width: 160px;
+  padding: 4px 0;
+  animation: arm-fadein 0.1s ease;
+}
+
+@keyframes arm-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.arm-item {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 0.1s;
+}
+.arm-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.arm-item.arm-danger {
+  color: #f87171;
+}
+.arm-item.arm-danger:hover {
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.arm-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 0;
+  border: none;
+}
+
+/* ── AddFriends ─────────────────────────────────────────────────────────────── */
+
+.aaf-search-wrap {
+  position: relative;
+}
+
+.aaf-input {
+  width: 100%;
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.aaf-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.aaf-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.aaf-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.aaf-result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  transition: background 0.1s;
+}
+.aaf-result-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aaf-avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  flex-shrink: 0;
+}
+
+.aaf-name {
+  flex: 1;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Request button — blue */
+.aaf-request-btn {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.aaf-request-btn:hover {
+  background: rgba(96, 165, 250, 0.25);
+}
+
+/* Shared base for disabled status buttons */
+.aaf-status-btn {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: default;
+  border: 1px solid transparent;
+}
+
+/* Already requested — grey */
+.aaf-status-requested {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Already a friend — green */
+.aaf-status-friend {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.25);
+}
+
+/* Toast notification — fixed top-right */
+.aaf-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 500;
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: aaf-toast-in 0.2s ease;
+}
+
+@keyframes aaf-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── FriendRequests ─────────────────────────────────────────────────────────── */
+
+.afr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.afr-row:last-child {
+  border-bottom: none;
+}
+
+.afr-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  flex-shrink: 0;
+}
+
+.afr-name {
+  flex: 1;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.afr-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.afr-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.afr-accept {
+  background: rgba(74, 222, 128, 0.18);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+.afr-accept:hover:not(:disabled) {
+  background: rgba(74, 222, 128, 0.28);
+}
+.afr-decline {
+  background: rgba(248, 113, 113, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+}
+.afr-decline:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.24);
+}
+
+/* ── FriendsList ────────────────────────────────────────────────────────────── */
+
+.afl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.afl-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: center;
+}
+.afl-table thead th:nth-child(2) {
+  text-align: left;
+}
+
+.afl-row {
+  position: relative;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  transition: background 0.1s;
+}
+.afl-row:last-child {
+  border-bottom: none;
+}
+
+.afl-row td {
+  padding: 9px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  vertical-align: middle;
+}
+.afl-row td:nth-child(2) {
+  text-align: left;
+}
+
+.afl-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.afl-avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+/* ── Leaderboard ────────────────────────────────────────────────────────────── */
+
+.alb-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.alb-row:last-child {
+  border-bottom: none;
+}
+
+.alb-self-row {
+  padding-left: 4px;
+  padding-right: 0px;
+  border-radius: 8px;
+}
+
+.alb-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.alb-gold {
+  background: #f59e0b;
+  color: #000;
+}
+.alb-silver {
+  background: #9ca3af;
+  color: #000;
+}
+.alb-bronze {
+  background: #b45309;
+  color: #fff;
+}
+
+.alb-rank-num {
+  width: 36px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.alb-entry-line {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+}
+.alb-entry-line strong {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.alb-empty {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+.alb-stat-select {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 4px 24px 4px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.alb-stat-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.alb-stat-select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* ── FriendsPanel ───────────────────────────────────────────────────────────── */
+
+.afp-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  margin: -4px 0 -10px;
+}
+
+.afp-panel {
+  gap: 12px;
+}
+
+.afp-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin: 0 -16px;
+}
+
+.afp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.afp-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.afp-section-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.afp-req-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+}
+
+.afp-empty {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  padding: 12px 0;
+  margin: 0;
+}

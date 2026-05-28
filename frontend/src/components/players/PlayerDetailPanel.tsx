@@ -35,6 +35,13 @@ interface PlayerDetailPanelProps {
   onClose: () => void;
   isFavorited?: boolean;
   onToggleFavorite?: () => void;
+  showCompare?: boolean;
+  onCompareYourself?: (stats: {
+    pts: number;
+    ast: number;
+    reb: number;
+    fg3m: number;
+  }) => void;
 }
 
 const STAT_OPTIONS: { key: keyof GameLog; label: string }[] = [
@@ -85,6 +92,8 @@ export default function PlayerDetailPanel({
   onClose,
   isFavorited,
   onToggleFavorite,
+  showCompare,
+  onCompareYourself,
 }: PlayerDetailPanelProps) {
   const asset = getTeamAsset(teamAbbr);
   const headshotUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${nbaPlayerId}.png`;
@@ -317,6 +326,25 @@ export default function PlayerDetailPanel({
           </>
         )}
       </div>
+
+      {/* ── Compare Yourself ── */}
+      {showCompare && stats && onCompareYourself && (
+        <div className="pdp-compare-wrap">
+          <button
+            className="pdp-compare-btn"
+            onClick={() =>
+              onCompareYourself({
+                pts: stats.seasonAvg.pts,
+                ast: stats.seasonAvg.ast,
+                reb: stats.seasonAvg.reb,
+                fg3m: stats.seasonAvg.fg3m,
+              })
+            }
+          >
+            Compare Yourself
+          </button>
+        </div>
+      )}
     </div>
   );
 }

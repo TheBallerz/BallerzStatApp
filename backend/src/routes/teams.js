@@ -279,7 +279,7 @@ router.get('/teams/:nbaTeamId/games', async (req, res) => {
       tov:  g.turnovers,
       fg3m: g.threePointersMade,
     })));
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch team game log' });
   }
 });

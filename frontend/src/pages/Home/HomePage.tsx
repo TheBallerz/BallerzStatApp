@@ -12,9 +12,12 @@ import FavoriteTeamCard, {
 } from '../../components/teams/FavoriteTeamCard';
 import PlayerDetailPanel from '../../components/players/PlayerDetailPanel';
 import HomeTeamPanel from '../../components/teams/HomeTeamPanel';
+import UserSelfPanel from '../../components/home/UserSelfPanel';
 import { getToken } from '../../services/authService';
 import { saveFavorites } from '../../services/favoritesService';
 import { getTeamNbaId } from '../../assets/teamAssets';
+import { getMySeasonStats } from '../../services/userStatsService';
+import type { UserSeasonStats } from '../../services/userStatsService';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -34,7 +37,16 @@ type SelectedPlayerCard = {
   teamAbbr: string;
 };
 
-type SelectedCard = SelectedTeamCard | SelectedPlayerCard;
+type SelectedUserCard = {
+  type: 'user';
+  id: 'user-self';
+  label: string;
+  compareStats: { pts: number; ast: number; reb: number; fg3m: number };
+  userName: string;
+  userAvatar: string | null;
+};
+
+type SelectedCard = SelectedTeamCard | SelectedPlayerCard | SelectedUserCard;
 
 interface TeamInfo {
   abbr: string;
@@ -78,6 +90,12 @@ const TOP_PLAYER_COLUMNS = [
 export default function HomePage() {
   // ── Selection state (for stats panels) ──────────────────────────────────────
   const [selected, setSelected] = useState<SelectedCard[]>([]);
+
+  // ── Current user season stats (for Compare Yourself feature) ─────────────────
+  const [userSeasonStats, setUserSeasonStats] =
+    useState<UserSeasonStats | null>(null);
+  const [userName, setUserName] = useState<string>('');
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   // ── Recent games state ───────────────────────────────────────────────────────
   const [recentDays, setRecentDays] = useState<RecentGameDay[]>([]);
@@ -145,6 +163,15 @@ export default function HomePage() {
     return () => controller.abort();
   }, []);
 
+  // Fetch the logged-in user's season stats on mount (enables Compare Yourself button).
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    getMySeasonStats()
+      .then(setUserSeasonStats)
+      .catch(() => {});
+  }, []);
+
   // ── Favorites state ──────────────────────────────────────────────────────────
   const [favoritePlayers, setFavoritePlayers] = useState<FavoritePlayer[]>([]);
   const [favoriteTeams, setFavoriteTeams] = useState<FavoriteTeam[]>([]);
@@ -174,6 +201,10 @@ export default function HomePage() {
         console.log('[Favorites] /api/auth/me response:', data);
         setFavoritePlayers(data.user.favoritePlayers ?? []);
         setFavoriteTeams(data.user.favoriteTeams ?? []);
+        setUserName(
+          `${data.user.firstName ?? ''} ${data.user.lastName ?? ''}`.trim(),
+        );
+        setUserAvatar(data.user.avatar ?? null);
       } catch (err) {
         console.error('[Favorites] fetch error:', err);
       }
@@ -262,6 +293,26 @@ export default function HomePage() {
   };
 
   const isActive = (id: string) => selected.some((s) => s.id === id);
+
+  // ── Compare Yourself ─────────────────────────────────────────────────────────
+  // Show the button only when the user is logged in and has at least 1 game logged.
+  const showCompare = (userSeasonStats?.gamesPlayed ?? 0) > 0;
+
+  const handleCompareYourself = (stats: {
+    pts: number;
+    ast: number;
+    reb: number;
+    fg3m: number;
+  }) => {
+    handleCardClick({
+      type: 'user',
+      id: 'user-self',
+      label: userName || 'You',
+      compareStats: stats,
+      userName: userName || 'You',
+      userAvatar,
+    });
+  };
 
   // ── Grey-filter logic ────────────────────────────────────────────────────────
   // Based on the most recently opened panel's type, grey out cards of the
@@ -496,8 +547,10 @@ export default function HomePage() {
                     (t) => t.nbaId === item.nbaTeamId,
                   )}
                   onToggleFavorite={() => toggleTeamFavorite(item.nbaTeamId)}
+                  showCompare={showCompare}
+                  onCompareYourself={handleCompareYourself}
                 />
-              ) : (
+              ) : item.type === 'player' ? (
                 <PlayerDetailPanel
                   nbaPlayerId={item.nbaPlayerId}
                   playerName={item.playerName}
@@ -509,6 +562,15 @@ export default function HomePage() {
                   onToggleFavorite={() =>
                     togglePlayerFavorite(item.nbaPlayerId)
                   }
+                  showCompare={showCompare}
+                  onCompareYourself={handleCompareYourself}
+                />
+              ) : (
+                <UserSelfPanel
+                  compareStats={item.compareStats}
+                  userName={item.userName}
+                  userAvatar={item.userAvatar}
+                  onClose={() => handleCardClick(item)}
                 />
               )}
             </div>

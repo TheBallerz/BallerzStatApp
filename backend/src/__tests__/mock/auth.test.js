@@ -425,6 +425,8 @@ jest.mock('bcryptjs', () => ({
         firstName: 'Ken',
         lastName: 'Suon',
         email: 'ken@example.com',
+        avatar: null,
+        friends: [],
         favoritePlayers: [23],
         favoriteTeams:   [1],
       };
