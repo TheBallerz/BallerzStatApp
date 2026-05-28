@@ -37,6 +37,14 @@ interface CareerStats {
   seasons: CareerSeason[];
 }
 
+type SortDirection = 'asc' | 'desc' | null;
+type SortKey = keyof CareerSeason;
+
+interface SortState {
+  key: SortKey | null;
+  direction: SortDirection;
+}
+
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -108,6 +116,20 @@ function useDebounce<T>(value: T, delay: number): T {
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
+function SortIcon({ direction, active, color }: { direction: SortDirection; active: boolean; color: string }) {
+  const dimColor = 'rgba(255,255,255,0.18)';
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: '1px', marginLeft: '4px', verticalAlign: 'middle' }}>
+      <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
+        <path d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z" fill={active && direction === 'asc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+      </svg>
+      <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
+        <path d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z" fill={active && direction === 'desc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+      </svg>
+    </span>
+  );
+}
+
 export default function Players() {
   // ── Sidebar state ──────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState('');
@@ -121,6 +143,7 @@ export default function Players() {
   const [careerStats, setCareerStats] = useState<CareerStats | null>(null);
   const [loadingCareer, setLoadingCareer] = useState(false);
   const [errorCareer, setErrorCareer] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortState>({ key: null, direction: null });
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
@@ -158,6 +181,7 @@ export default function Players() {
       setLoadingCareer(true);
       setErrorCareer(null);
       setCareerStats(null);
+      setSort({ key: null, direction: null });
       try {
         const res = await fetch(
           `${API_BASE}/players/${selectedPlayer.playerId}/career`,
@@ -188,6 +212,28 @@ export default function Players() {
   const handleSelectPlayer = useCallback((player: Player) => {
     setSelectedPlayer(player);
   }, []);
+
+  const handleSort = useCallback((key: SortKey) => {
+    setSort((prev) => {
+      if (prev.key !== key) return { key, direction: 'desc' };
+      if (prev.direction === 'desc') return { key, direction: 'asc' };
+      return { key: null, direction: null }; // reset to chronological
+    });
+  }, []);
+
+const sortedSeasons = (() => {
+    if (!careerStats?.seasons) return [];
+    const base = [...careerStats.seasons].sort((a, b) => b.season.localeCompare(a.season));
+    if (!sort.key || !sort.direction) return base;
+    return [...base].sort((a, b) => {
+      const aVal = a[sort.key!] ?? 0;
+      const bVal = b[sort.key!] ?? 0;
+      if (typeof aVal === 'string' && typeof bVal === 'string')
+        return sort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      const diff = (aVal as number) - (bVal as number);
+      return sort.direction === 'asc' ? diff : -diff;
+    });
+  })();
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -416,30 +462,50 @@ export default function Players() {
                     <table className="players-career-table">
                       <thead>
                         <tr>
-                          <th>Season</th>
-                          <th>Team</th>
-                          <th>GP</th>
-                          <th>GS</th>
-                          <th>MIN</th>
-                          <th>PTS</th>
-                          <th>REB</th>
-                          <th>AST</th>
-                          <th>STL</th>
-                          <th>BLK</th>
-                          <th>TOV</th>
-                          <th>FG%</th>
-                          <th>3P%</th>
-                          <th>FT%</th>
+                          {(
+                            [
+                              ['Season', 'season'],
+                              ['Team', 'team'],
+                              ['GP', 'gamesPlayed'],
+                              ['GS', 'gamesStarted'],
+                              ['MIN', 'minutes'],
+                              ['PTS', 'points'],
+                              ['REB', 'rebounds'],
+                              ['AST', 'assists'],
+                              ['STL', 'steals'],
+                              ['BLK', 'blocks'],
+                              ['TOV', 'turnovers'],
+                              ['FG%', 'fgPct'],
+                              ['3P%', 'fg3Pct'],
+                              ['FT%', 'ftPct'],
+                            ] as [string, SortKey][]
+                          ).map(([label, key]) => {
+                            const isActive = sort.key === key;
+                            return (
+                              <th
+                                key={key}
+                                onClick={() => handleSort(key)}
+                                style={{
+                                  cursor: 'pointer',
+                                  userSelect: 'none',
+                                  whiteSpace: 'nowrap',
+                                  color: isActive ? colors.secondary : undefined,
+                                  transition: 'color 0.15s',
+                                }}
+                              >
+                                {label}
+                                <SortIcon direction={sort.direction} active={isActive} color={colors.secondary} />
+                              </th>
+                            );
+                          })}
                         </tr>
                       </thead>
                       <tbody>
-                        {[...careerStats.seasons]
-                          .sort((a, b) => b.season.localeCompare(a.season))
-                          .map((s, i) => (
-                            <tr
-                              key={`${s.season}-${s.team}-${i}`}
-                              className={i === 0 ? 'highlight-row' : ''}
-                            >
+                        {sortedSeasons.map((s, i) => (
+                          <tr
+                            key={`${s.season}-${s.team}-${i}`}
+                            className={!sort.key && i === 0 ? 'highlight-row' : ''}
+                          >
                               <td className="season-col">{s.season}</td>
                               <td className="team-col">{s.team || '—'}</td>
                               <td>{fmtStat(s.gamesPlayed)}</td>
