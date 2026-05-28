@@ -192,13 +192,13 @@ export default function Players() {
   const location = useLocation();
   const [sort, setSort] = useState<SortState>({ key: null, direction: null });
   const [selectedGraphStat, setSelectedGraphStat] =
-  useState<GraphStatKey>('points');
+    useState<GraphStatKey>('points');
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
   const selectedGraphLabel =
-  GRAPH_STAT_OPTIONS.find((option) => option.key === selectedGraphStat)?.label ??
-  'Points';
+    GRAPH_STAT_OPTIONS.find((option) => option.key === selectedGraphStat)
+      ?.label ?? 'Points';
   // ── 1. Fetch player list ───────────────────────────────────────────────────
   // GET /api/players?search=&currentOnly=0|1
   useEffect(() => {
@@ -527,45 +527,47 @@ export default function Players() {
               </div>
 
               {careerStats && careerStats.seasons.length > 0 && (
- <section className="player-chart-section">
- <div className="player-chart-header">
-   <h2>{selectedGraphLabel} Over Time</h2>
+                <section className="player-chart-section">
+                  <div className="player-chart-header">
+                    <h2>{selectedGraphLabel} Over Time</h2>
 
-   <select
-     className="player-chart-select"
-     value={selectedGraphStat}
-     onChange={(e) => setSelectedGraphStat(e.target.value as GraphStatKey)}
-   >
-     {GRAPH_STAT_OPTIONS.map((option) => (
-       <option key={option.key} value={option.key}>
-         {option.label}
-       </option>
-     ))}
-   </select>
- </div>
+                    <select
+                      className="player-chart-select"
+                      value={selectedGraphStat}
+                      onChange={(e) =>
+                        setSelectedGraphStat(e.target.value as GraphStatKey)
+                      }
+                    >
+                      {GRAPH_STAT_OPTIONS.map((option) => (
+                        <option key={option.key} value={option.key}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
- <div className="player-chart-wrap">
-   <ResponsiveContainer width="100%" height="100%">
-     <LineChart
-       data={[...careerStats.seasons].sort((a, b) =>
-         a.season.localeCompare(b.season)
-       )}
-     >
-       <CartesianGrid strokeDasharray="3 3" />
-       <XAxis dataKey="season" />
-       <YAxis />
-       <Tooltip />
-       <Line
-         type="monotone"
-         dataKey={selectedGraphStat}
-         strokeWidth={2}
-         dot
-       />
-     </LineChart>
-   </ResponsiveContainer>
- </div>
-</section>
-)}
+                  <div className="player-chart-wrap">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={[...careerStats.seasons].sort((a, b) =>
+                          a.season.localeCompare(b.season),
+                        )}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="season" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={selectedGraphStat}
+                          strokeWidth={2}
+                          dot
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+              )}
               {/* Divider */}
               <div
                 className="players-divider"

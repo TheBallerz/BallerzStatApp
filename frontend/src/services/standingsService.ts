@@ -30,10 +30,10 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function fetchStandings(
   season = '2025-26',
-  type: 'season' | 'finals' = 'season'
+  type: 'season' | 'finals' = 'season',
 ): Promise<StandingsResponse> {
   const response = await fetch(
-    `${API_BASE}/standings?season=${season}&type=${type}`
+    `${API_BASE}/standings?season=${season}&type=${type}`,
   );
 
   if (!response.ok) {

@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const API_BASE = 'http://localhost:3000/api';
 
@@ -14,7 +13,11 @@ type BioResponse = {
   sourceUrl?: string;
 };
 
-export default function PlayerBio({ playerId, fullName, team }: PlayerBioProps) {
+export default function PlayerBio({
+  playerId,
+  fullName,
+  team,
+}: PlayerBioProps) {
   const [bioData, setBioData] = useState<BioResponse | null>(null);
 
   useEffect(() => {
@@ -22,10 +25,12 @@ export default function PlayerBio({ playerId, fullName, team }: PlayerBioProps) 
       try {
         const params = new URLSearchParams({
           fullName,
-          team: team || "",
+          team: team || '',
         });
 
-        const res = await fetch(`${API_BASE}/players/${playerId}/bio?${params}`);
+        const res = await fetch(
+          `${API_BASE}/players/${playerId}/bio?${params}`,
+        );
 
         if (!res.ok) {
           throw new Error(`Bio request failed: ${res.status}`);
@@ -36,7 +41,7 @@ export default function PlayerBio({ playerId, fullName, team }: PlayerBioProps) 
       } catch (err) {
         console.error(err);
         setBioData({
-          bio: "Biography unavailable.",
+          bio: 'Biography unavailable.',
         });
       }
     }
