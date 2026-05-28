@@ -1,12 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout, getToken } from '../services/authService';
+import { logout, getToken, type AuthUser } from '../services/authService';
+import {
+  getMySeasonStats,
+  getMyGames,
+  addGame,
+  updateGame,
+  deleteGame,
+  type UserSeasonStats,
+  type UserGameLog,
+} from '../services/userStatsService';
 import {
   getUsers,
   deleteUser,
   setUserAdmin,
   type AdminUser,
 } from '../services/adminService';
+import {
+  ProfileHeader,
+  StatTiles,
+  GameLogTable,
+  GameLogModal,
+  EditProfileModal,
+} from '../components/account/AccountComponents';
+import { FriendsPanel } from '../components/account/FriendsComponents';
 import './accountPage.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -17,6 +34,10 @@ interface MeUser {
   lastName: string;
   email: string;
   isAdmin: boolean;
+  avatar: string | null;
+  friends: string[];
+  favoritePlayers: unknown[];
+  favoriteTeams: unknown[];
 }
 
 // ── Admin panel sub-component ──────────────────────────────────────────────────
@@ -29,12 +50,10 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Track which row is mid-request so we can disable its controls
   const [busy, setBusy] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
-
     async function fetchUsers() {
       try {
         const data = await getUsers();
@@ -48,7 +67,6 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
         if (!cancelled) setLoading(false);
       }
     }
-
     fetchUsers();
     return () => {
       cancelled = true;
@@ -97,10 +115,8 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
   return (
     <div className="admin-section">
       <p className="admin-section-title">Admin — User Management</p>
-
       {loading && <p className="admin-status">Loading users…</p>}
       {error && <p className="admin-error">{error}</p>}
-
       {!loading && !error && (
         <table className="admin-table">
           <thead>
@@ -114,10 +130,8 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
             {users.map((user) => {
               const isSelf = user._id === currentUserId;
               const isRowBusy = busy.has(user._id);
-
               return (
                 <tr key={user._id}>
-                  {/* Name + email */}
                   <td>
                     <div className="admin-user-name">
                       {user.firstName} {user.lastName}
@@ -127,8 +141,6 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
                     </div>
                     <div className="admin-user-email">{user.email}</div>
                   </td>
-
-                  {/* Admin toggle */}
                   <td>
                     <div className="toggle-wrap">
                       <label className="toggle">
@@ -145,8 +157,6 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
                       </span>
                     </div>
                   </td>
-
-                  {/* Delete */}
                   <td>
                     <button
                       className="admin-delete-btn"
@@ -177,47 +187,125 @@ function AdminPanel({ currentUserId }: AdminPanelProps) {
 export default function AccountPage() {
   const navigate = useNavigate();
 
+  // ── User / profile state ────────────────────────────────────────────────────
   const [user, setUser] = useState<MeUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-  // Fetch the live user record from the backend on mount so isAdmin is always
-  // up-to-date (localStorage may be stale if the flag was changed since login).
-  useEffect(() => {
+  // ── Stats state ─────────────────────────────────────────────────────────────
+  const [seasonStats, setSeasonStats] = useState<UserSeasonStats | null>(null);
+  const [games, setGames] = useState<UserGameLog[]>([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingGames, setLoadingGames] = useState(true);
+
+  // ── Modal state ─────────────────────────────────────────────────────────────
+  const [gameModalOpen, setGameModalOpen] = useState(false);
+  const [gameModalMode, setGameModalMode] = useState<'add' | 'edit'>('add');
+  const [editingGame, setEditingGame] = useState<UserGameLog | undefined>();
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+  // ── Fetch me ────────────────────────────────────────────────────────────────
+  const fetchMe = useCallback(async () => {
     const token = getToken();
     if (!token) {
-      setLoading(false);
+      setLoadingUser(false);
       return;
     }
-
-    let cancelled = false;
-
-    async function fetchMe() {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled) setUser(data.user);
-      } catch {
-        // silently fall back to no user
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setUser(data.user);
+    } catch {
+      // silently fall back
+    } finally {
+      setLoadingUser(false);
     }
-
-    fetchMe();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
+  const fetchStats = useCallback(async () => {
+    setLoadingStats(true);
+    try {
+      const s = await getMySeasonStats();
+      setSeasonStats(s);
+    } catch {
+      // keep null
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
+
+  const fetchGames = useCallback(async () => {
+    setLoadingGames(true);
+    try {
+      const g = await getMyGames();
+      setGames(g);
+    } catch {
+      // keep empty
+    } finally {
+      setLoadingGames(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMe();
+    fetchStats();
+    fetchGames();
+  }, [fetchMe, fetchStats, fetchGames]);
+
+  // ── Game log mutations ───────────────────────────────────────────────────────
+  const handleSaveGame = async (entry: Parameters<typeof addGame>[0]) => {
+    if (gameModalMode === 'add') {
+      await addGame(entry);
+    } else if (editingGame) {
+      await updateGame(editingGame._id, entry);
+    }
+    await Promise.all([fetchStats(), fetchGames()]);
+    setGameModalOpen(false);
+  };
+
+  const handleEditGame = (game: UserGameLog) => {
+    setEditingGame(game);
+    setGameModalMode('edit');
+    setGameModalOpen(true);
+  };
+
+  const handleDeleteGame = async (gameId: string) => {
+    await deleteGame(gameId);
+    await Promise.all([fetchStats(), fetchGames()]);
+  };
+
+  const openAddGameModal = () => {
+    setEditingGame(undefined);
+    setGameModalMode('add');
+    setGameModalOpen(true);
+  };
+
+  // ── Profile update ───────────────────────────────────────────────────────────
+  const handleProfileSave = async (updated: AuthUser) => {
+    await fetchMe();
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            firstName: updated.firstName,
+            lastName: updated.lastName,
+            email: updated.email,
+          }
+        : prev,
+    );
+    setProfileModalOpen(false);
+  };
+
+  // ── Logout ───────────────────────────────────────────────────────────────────
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  if (loading) {
+  // ── Loading state ─────────────────────────────────────────────────────────────
+  if (loadingUser) {
     return (
       <div className="account-page">
         <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>Loading…</p>
@@ -225,30 +313,91 @@ export default function AccountPage() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="account-page">
+        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+          Not logged in.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="account-page">
-      {/* ── Profile section ──────────────────────────── */}
-      <div className="account-section">
-        <p className="account-section-title">Account</p>
+      <div className="account-two-col">
+        {/* ── Left column — single card ──────────────────────────────────── */}
+        <div className="account-left">
+          <div className="account-card account-left-card">
+            {/* Profile header */}
+            <ProfileHeader
+              user={{
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                avatar: user.avatar,
+              }}
+              friendCount={user.friends.length}
+              favPlayerCount={user.favoritePlayers.length}
+              favTeamCount={user.favoriteTeams.length}
+              onEditProfile={() => setProfileModalOpen(true)}
+              onLogout={handleLogout}
+            />
 
-        {user ? (
-          <>
-            <p className="account-name">
-              {user.firstName} {user.lastName}
-            </p>
-            <p className="account-email">{user.email}</p>
-          </>
-        ) : (
-          <p className="account-email">Not logged in.</p>
-        )}
+            <hr className="account-inner-divider" />
 
-        <button className="logout-btn" type="button" onClick={handleLogout}>
-          Log Out
-        </button>
+            {/* Season averages */}
+            <div className="account-inner-section">
+              <p className="account-sub-label">Your Average Stats</p>
+              <StatTiles stats={seasonStats} loading={loadingStats} />
+            </div>
+
+            <hr className="account-inner-divider" />
+
+            {/* Game log */}
+            <div className="account-inner-section">
+              <div className="account-card-header">
+                <p className="account-sub-label">Your Game Log</p>
+                <button className="agl-new-btn" onClick={openAddGameModal}>
+                  New Game +
+                </button>
+              </div>
+              <GameLogTable
+                games={games}
+                loading={loadingGames}
+                onEdit={handleEditGame}
+                onDelete={handleDeleteGame}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right column ──────────────────────────────────────────────── */}
+        <div className="account-right">
+          <FriendsPanel currentUserId={user._id} />
+        </div>
       </div>
 
-      {/* ── Admin panel (visible to admins only) ─────── */}
-      {user?.isAdmin && <AdminPanel currentUserId={user._id} />}
+      {/* ── Admin panel (admin users only) ──────────────────────────────── */}
+      {user.isAdmin && <AdminPanel currentUserId={user._id} />}
+
+      {/* ── Modals ──────────────────────────────────────────────────────── */}
+      {gameModalOpen && (
+        <GameLogModal
+          mode={gameModalMode}
+          initial={editingGame}
+          onSave={handleSaveGame}
+          onClose={() => setGameModalOpen(false)}
+        />
+      )}
+
+      {profileModalOpen && (
+        <EditProfileModal
+          user={user}
+          onSave={handleProfileSave}
+          onClose={() => setProfileModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
