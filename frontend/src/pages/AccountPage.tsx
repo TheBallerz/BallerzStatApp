@@ -316,9 +316,15 @@ export default function AccountPage() {
   if (!user) {
     return (
       <div className="account-page">
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
-          Not logged in.
-        </p>
+        <div className="account-logged-out">
+          <p className="account-logged-out-msg">You are not logged in.</p>
+          <button
+            className="account-login-btn"
+            onClick={() => navigate('/login')}
+          >
+            Log In
+          </button>
+        </div>
       </div>
     );
   }

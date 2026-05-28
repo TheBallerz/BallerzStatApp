@@ -386,3 +386,38 @@
   flex-direction: column;
   gap: 16px;
 }
+
+/* ── Logged-out state ──────────────────────────────────────────────────────── */
+
+.account-logged-out {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex: 1;
+  min-height: 60vh;
+}
+
+.account-logged-out-msg {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+.account-login-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.account-login-btn:hover {
+  background: #ffffff;
+}
