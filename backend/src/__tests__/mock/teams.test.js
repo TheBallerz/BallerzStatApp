@@ -194,6 +194,7 @@ describe('GET /teams/:teamId', () => {
       ppg:          120.6,
       rpg:          46.2,
       apg:          29.1,
+      fg3m:         0,
       fgPct:        0.487,
     });
   });

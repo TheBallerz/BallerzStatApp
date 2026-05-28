@@ -14,6 +14,7 @@ export interface AuthUser {
   lastName: string;
   email: string;
   isAdmin: boolean;
+  avatar?: string | null;
 }
 
 // Shape of every successful auth response from the backend
@@ -82,4 +83,29 @@ export function getUser(): AuthUser | null {
 // Attach this to the Authorization header when making authenticated requests.
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
+}
+
+// Updates the authenticated user's profile. Sends only provided fields.
+// On success, refreshes the stored user object in localStorage.
+export async function updateProfile(payload: {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  avatar?: string;
+}): Promise<AuthUser> {
+  const token = getToken();
+  if (!token) throw new Error('Not authenticated.');
+  const res = await fetch(`${API_BASE}/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Profile update failed.');
+  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  return data.user;
 }

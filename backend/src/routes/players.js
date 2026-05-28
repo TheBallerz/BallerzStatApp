@@ -324,4 +324,36 @@ router.get('/players/:nbaPlayerId/stats', async (req, res) => {
   }
 });
 
+router.get('/players/:nbaPlayerId/games', async (req, res) => {
+  try {
+    const nbaPlayerId = Number(req.params.nbaPlayerId);
+    if (isNaN(nbaPlayerId)) {
+      return res.status(400).json({ error: 'nbaPlayerId must be a numeric NBA player ID' });
+    }
+
+    const player = await Player.findOne({ nbaId: nbaPlayerId }).select('_id').lean();
+    if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    const games = await PlayerGameStats.find({ playerId: player._id })
+      .sort({ gameDate: 1 })
+      .select('gameDate points rebounds assists steals blocks turnovers threePointersMade minutes')
+      .lean();
+
+    res.json(games.map((g) => ({
+      date: g.gameDate,
+      pts:  g.points,
+      reb:  g.rebounds,
+      ast:  g.assists,
+      stl:  g.steals,
+      blk:  g.blocks,
+      tov:  g.turnovers,
+      fg3m: g.threePointersMade,
+      min:  Math.round(g.minutes),
+    })));
+  } catch (error) {
+    console.error('Error fetching player game log:', error.message);
+    res.status(500).json({ error: 'Failed to fetch game log' });
+  }
+});
+
 module.exports = router;
