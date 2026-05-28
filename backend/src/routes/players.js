@@ -137,6 +137,7 @@ router.get('/players', async (req, res) => {
   try {
     const search = normalizeText(req.query.search || '');
     const { teamId, includeStats } = req.query;
+    const mongoose = require('mongoose');
 
     // Build a filter: if a search term is provided, match it case-insensitively
     // against either part of the player's name. No search = return everyone.
@@ -144,6 +145,9 @@ router.get('/players', async (req, res) => {
 
     // if teamId is queried then filter by teamId
     if (teamId) {
+      if (!mongoose.Types.ObjectId.isValid(teamId)) {
+        return res.status(400).json({ error: 'teamId must be a valid Mongo ObjectId' });
+      }
       filter.teamId = teamId;
     }
 
