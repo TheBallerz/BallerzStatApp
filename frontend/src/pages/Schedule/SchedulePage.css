@@ -412,3 +412,13 @@
 .sched-team-picker:focus {
   border-color: #444;
 }
+
+.sched-table th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sched-table th:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
