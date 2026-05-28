@@ -117,15 +117,39 @@ function useDebounce<T>(value: T, delay: number): T {
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-function SortIcon({ direction, active, color }: { direction: SortDirection; active: boolean; color: string }) {
+function SortIcon({
+  direction,
+  active,
+  color,
+}: {
+  direction: SortDirection;
+  active: boolean;
+  color: string;
+}) {
   const dimColor = 'rgba(255,255,255,0.18)';
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: '1px', marginLeft: '4px', verticalAlign: 'middle' }}>
+    <span
+      style={{
+        display: 'inline-flex',
+        flexDirection: 'column',
+        gap: '1px',
+        marginLeft: '4px',
+        verticalAlign: 'middle',
+      }}
+    >
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z" fill={active && direction === 'asc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+        <path
+          d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z"
+          fill={active && direction === 'asc' ? color : dimColor}
+          style={{ transition: 'fill 0.15s' }}
+        />
       </svg>
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z" fill={active && direction === 'desc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+        <path
+          d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z"
+          fill={active && direction === 'desc' ? color : dimColor}
+          style={{ transition: 'fill 0.15s' }}
+        />
       </svg>
     </span>
   );
@@ -240,15 +264,19 @@ export default function Players() {
     });
   }, []);
 
-const sortedSeasons = (() => {
+  const sortedSeasons = (() => {
     if (!careerStats?.seasons) return [];
-    const base = [...careerStats.seasons].sort((a, b) => b.season.localeCompare(a.season));
+    const base = [...careerStats.seasons].sort((a, b) =>
+      b.season.localeCompare(a.season),
+    );
     if (!sort.key || !sort.direction) return base;
     return [...base].sort((a, b) => {
       const aVal = a[sort.key!] ?? 0;
       const bVal = b[sort.key!] ?? 0;
       if (typeof aVal === 'string' && typeof bVal === 'string')
-        return sort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        return sort.direction === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
       const diff = (aVal as number) - (bVal as number);
       return sort.direction === 'asc' ? diff : -diff;
     });
@@ -508,12 +536,18 @@ const sortedSeasons = (() => {
                                   cursor: 'pointer',
                                   userSelect: 'none',
                                   whiteSpace: 'nowrap',
-                                  color: isActive ? colors.secondary : undefined,
+                                  color: isActive
+                                    ? colors.secondary
+                                    : undefined,
                                   transition: 'color 0.15s',
                                 }}
                               >
                                 {label}
-                                <SortIcon direction={sort.direction} active={isActive} color={colors.secondary} />
+                                <SortIcon
+                                  direction={sort.direction}
+                                  active={isActive}
+                                  color={colors.secondary}
+                                />
                               </th>
                             );
                           })}
@@ -523,37 +557,39 @@ const sortedSeasons = (() => {
                         {sortedSeasons.map((s, i) => (
                           <tr
                             key={`${s.season}-${s.team}-${i}`}
-                            className={!sort.key && i === 0 ? 'highlight-row' : ''}
+                            className={
+                              !sort.key && i === 0 ? 'highlight-row' : ''
+                            }
                           >
-                              <td className="season-col">{s.season}</td>
-                              <td className="team-col">{s.team || '—'}</td>
-                              <td>{fmtStat(s.gamesPlayed)}</td>
-                              <td>{fmtStat(s.gamesStarted)}</td>
-                              <td>{fmtStat(s.minutes)}</td>
-                              <td
-                                style={{
-                                  color: colors.secondary,
-                                  fontWeight: 700,
-                                }}
-                              >
-                                {fmtStat(s.points)}
-                              </td>
-                              <td>{fmtStat(s.rebounds)}</td>
-                              <td>{fmtStat(s.assists)}</td>
-                              <td>{fmtStat(s.steals)}</td>
-                              <td>{fmtStat(s.blocks)}</td>
-                              <td>{fmtStat(s.turnovers)}</td>
-                              <td className="players-pct-cell">
-                                {fmtPct(s.fgPct)}
-                              </td>
-                              <td className="players-pct-cell">
-                                {fmtPct(s.fg3Pct)}
-                              </td>
-                              <td className="players-pct-cell">
-                                {fmtPct(s.ftPct)}
-                              </td>
-                            </tr>
-                          ))}
+                            <td className="season-col">{s.season}</td>
+                            <td className="team-col">{s.team || '—'}</td>
+                            <td>{fmtStat(s.gamesPlayed)}</td>
+                            <td>{fmtStat(s.gamesStarted)}</td>
+                            <td>{fmtStat(s.minutes)}</td>
+                            <td
+                              style={{
+                                color: colors.secondary,
+                                fontWeight: 700,
+                              }}
+                            >
+                              {fmtStat(s.points)}
+                            </td>
+                            <td>{fmtStat(s.rebounds)}</td>
+                            <td>{fmtStat(s.assists)}</td>
+                            <td>{fmtStat(s.steals)}</td>
+                            <td>{fmtStat(s.blocks)}</td>
+                            <td>{fmtStat(s.turnovers)}</td>
+                            <td className="players-pct-cell">
+                              {fmtPct(s.fgPct)}
+                            </td>
+                            <td className="players-pct-cell">
+                              {fmtPct(s.fg3Pct)}
+                            </td>
+                            <td className="players-pct-cell">
+                              {fmtPct(s.ftPct)}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>

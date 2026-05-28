@@ -434,12 +434,13 @@
   margin-top: 0.1rem;
 }
 
-
 .sortable-th {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .sortable-th:hover {
@@ -480,7 +481,10 @@
   padding: 2px 8px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
   letter-spacing: 0.03em;
 }
 

@@ -193,7 +193,7 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
                       className="team-roster-headshot"
                     />
                     <span className="team-roster-number">
-                      #{player.jerseyNumber}  {player.position}
+                      #{player.jerseyNumber} {player.position}
                     </span>
 
                     <span className="team-roster-name">{player.fullName}</span>

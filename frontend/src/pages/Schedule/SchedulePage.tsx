@@ -47,20 +47,69 @@ interface SortState {
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const ALL_TEAMS = [
-  'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW',
-  'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK',
-  'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS',
+  'ATL',
+  'BOS',
+  'BKN',
+  'CHA',
+  'CHI',
+  'CLE',
+  'DAL',
+  'DEN',
+  'DET',
+  'GSW',
+  'HOU',
+  'IND',
+  'LAC',
+  'LAL',
+  'MEM',
+  'MIA',
+  'MIL',
+  'MIN',
+  'NOP',
+  'NYK',
+  'OKC',
+  'ORL',
+  'PHI',
+  'PHX',
+  'POR',
+  'SAC',
+  'SAS',
+  'TOR',
+  'UTA',
+  'WAS',
 ];
 
 const NBA_CDN_IDS: Record<string, string> = {
-  LAL: '1610612747', GSW: '1610612744', BOS: '1610612738', CHI: '1610612741',
-  MIA: '1610612748', NYK: '1610612752', LAC: '1610612746', PHX: '1610612756',
-  DEN: '1610612743', MIL: '1610612749', DAL: '1610612742', PHI: '1610612755',
-  BKN: '1610612751', TOR: '1610612761', ATL: '1610612737', CLE: '1610612739',
-  IND: '1610612754', CHA: '1610612766', ORL: '1610612753', WAS: '1610612764',
-  MEM: '1610612763', NOP: '1610612740', SAS: '1610612759', OKC: '1610612760',
-  UTA: '1610612762', POR: '1610612757', SAC: '1610612758', MIN: '1610612750',
-  HOU: '1610612745', DET: '1610612765',
+  LAL: '1610612747',
+  GSW: '1610612744',
+  BOS: '1610612738',
+  CHI: '1610612741',
+  MIA: '1610612748',
+  NYK: '1610612752',
+  LAC: '1610612746',
+  PHX: '1610612756',
+  DEN: '1610612743',
+  MIL: '1610612749',
+  DAL: '1610612742',
+  PHI: '1610612755',
+  BKN: '1610612751',
+  TOR: '1610612761',
+  ATL: '1610612737',
+  CLE: '1610612739',
+  IND: '1610612754',
+  CHA: '1610612766',
+  ORL: '1610612753',
+  WAS: '1610612764',
+  MEM: '1610612763',
+  NOP: '1610612740',
+  SAS: '1610612759',
+  OKC: '1610612760',
+  UTA: '1610612762',
+  POR: '1610612757',
+  SAC: '1610612758',
+  MIN: '1610612750',
+  HOU: '1610612745',
+  DET: '1610612765',
 };
 
 function getLogoUrl(team: Team): string {
@@ -130,22 +179,47 @@ function teamFromAbbr(abbr: string): Team {
   return { _id: abbr, abbreviation: abbr, name: '', city: '' };
 }
 
-function SortIcon({ direction, active, color }: { direction: SortDirection; active: boolean; color: string }) {
+function SortIcon({
+  direction,
+  active,
+  color,
+}: {
+  direction: SortDirection;
+  active: boolean;
+  color: string;
+}) {
   const dimColor = 'rgba(255,255,255,0.18)';
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: '1px', marginLeft: '4px', verticalAlign: 'middle' }}>
+    <span
+      style={{
+        display: 'inline-flex',
+        flexDirection: 'column',
+        gap: '1px',
+        marginLeft: '4px',
+        verticalAlign: 'middle',
+      }}
+    >
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z" fill={active && direction === 'asc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+        <path
+          d="M3.5 0.5L6.5 4.5H0.5L3.5 0.5Z"
+          fill={active && direction === 'asc' ? color : dimColor}
+          style={{ transition: 'fill 0.15s' }}
+        />
       </svg>
       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-        <path d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z" fill={active && direction === 'desc' ? color : dimColor} style={{ transition: 'fill 0.15s' }} />
+        <path
+          d="M3.5 4.5L0.5 0.5H6.5L3.5 4.5Z"
+          fill={active && direction === 'desc' ? color : dimColor}
+          style={{ transition: 'fill 0.15s' }}
+        />
       </svg>
     </span>
   );
 }
 
 export default function SchedulePage() {
-  const [currentSeason, setCurrentSeason] = useState<string>(deriveCurrentSeason);
+  const [currentSeason, setCurrentSeason] =
+    useState<string>(deriveCurrentSeason);
   const [favoriteTeams, setFavoriteTeams] = useState<Team[]>([]);
   const [loadingFavs, setLoadingFavs] = useState(true);
   const [favoritesAvail, setFavoritesAvail] = useState(true);
@@ -157,7 +231,8 @@ export default function SchedulePage() {
   const [teamSchedule, setTeamSchedule] = useState<TeamGame[]>([]);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
   const [errorSchedule, setErrorSchedule] = useState<string | null>(null);
-  const [selectedScheduleGame, setSelectedScheduleGame] = useState<TeamGame | null>(null);
+  const [selectedScheduleGame, setSelectedScheduleGame] =
+    useState<TeamGame | null>(null);
   const [sort, setSort] = useState<SortState>({ key: null, direction: null });
 
   useEffect(() => {
@@ -252,7 +327,9 @@ export default function SchedulePage() {
       const aVal = a[sort.key!] ?? 0;
       const bVal = b[sort.key!] ?? 0;
       if (typeof aVal === 'string' && typeof bVal === 'string')
-        return sort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        return sort.direction === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
       const diff = (aVal as number) - (bVal as number);
       return sort.direction === 'asc' ? diff : -diff;
     });
@@ -289,7 +366,13 @@ export default function SchedulePage() {
                 style={{ width: 28, height: 28, objectFit: 'contain' }}
               />
               <div>
-                <div style={{ fontWeight: 800, fontSize: '0.9rem', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontWeight: 800,
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   {selectedScheduleGame.isHome ? 'vs' : '@'}{' '}
                   {selectedScheduleGame.opponentTeamId.abbreviation}
                 </div>
@@ -309,7 +392,9 @@ export default function SchedulePage() {
             >
               <div>
                 <span style={{ color: '#666' }}>Result:</span>{' '}
-                <span className={`sched-result ${selectedScheduleGame.wl === 'W' ? 'win' : 'loss'}`}>
+                <span
+                  className={`sched-result ${selectedScheduleGame.wl === 'W' ? 'win' : 'loss'}`}
+                >
                   {selectedScheduleGame.wl}
                 </span>
               </div>
@@ -320,10 +405,22 @@ export default function SchedulePage() {
                   {selectedScheduleGame.oppPoints ?? '—'}
                 </span>
               </div>
-              <div><span style={{ color: '#666' }}>REB:</span> {selectedScheduleGame.rebounds}</div>
-              <div><span style={{ color: '#666' }}>AST:</span> {selectedScheduleGame.assists}</div>
-              <div><span style={{ color: '#666' }}>STL:</span> {selectedScheduleGame.steals}</div>
-              <div><span style={{ color: '#666' }}>BLK:</span> {selectedScheduleGame.blocks}</div>
+              <div>
+                <span style={{ color: '#666' }}>REB:</span>{' '}
+                {selectedScheduleGame.rebounds}
+              </div>
+              <div>
+                <span style={{ color: '#666' }}>AST:</span>{' '}
+                {selectedScheduleGame.assists}
+              </div>
+              <div>
+                <span style={{ color: '#666' }}>STL:</span>{' '}
+                {selectedScheduleGame.steals}
+              </div>
+              <div>
+                <span style={{ color: '#666' }}>BLK:</span>{' '}
+                {selectedScheduleGame.blocks}
+              </div>
               <div>
                 <span style={{ color: '#666' }}>+/-:</span>{' '}
                 <span
@@ -354,7 +451,8 @@ export default function SchedulePage() {
             <div className="sched-team-list">
               {favoriteTeams.map((team) => {
                 const c = getColors(team.abbreviation);
-                const isActive = selectedTeam?.abbreviation === team.abbreviation;
+                const isActive =
+                  selectedTeam?.abbreviation === team.abbreviation;
                 return (
                   <button
                     key={team._id}
@@ -380,17 +478,27 @@ export default function SchedulePage() {
                         background: `radial-gradient(circle at center, ${c.primary}88, transparent)`,
                       }}
                     >
-                      <img src={getLogoUrl(team)} alt={team.abbreviation} className="sched-team-logo" />
+                      <img
+                        src={getLogoUrl(team)}
+                        alt={team.abbreviation}
+                        className="sched-team-logo"
+                      />
                     </div>
                     <div className="sched-team-text">
-                      <span className="sched-team-abbr">{team.abbreviation}</span>
-                      <span className="sched-team-next">{team.city} {team.name}</span>
+                      <span className="sched-team-abbr">
+                        {team.abbreviation}
+                      </span>
+                      <span className="sched-team-next">
+                        {team.city} {team.name}
+                      </span>
                     </div>
                   </button>
                 );
               })}
               {!loadingFavs && favoriteTeams.length === 0 && (
-                <p className="sched-placeholder">No favorite teams added yet.</p>
+                <p className="sched-placeholder">
+                  No favorite teams added yet.
+                </p>
               )}
             </div>
           </>
@@ -415,7 +523,9 @@ export default function SchedulePage() {
             >
               <option value="">— pick a team —</option>
               {ALL_TEAMS.map((a) => (
-                <option key={a} value={a}>{a}</option>
+                <option key={a} value={a}>
+                  {a}
+                </option>
               ))}
             </select>
           </div>
@@ -462,7 +572,9 @@ export default function SchedulePage() {
                     {scoreLabel ? (
                       <span className="sched-score">{scoreLabel}</span>
                     ) : (
-                      <span className={`sched-status ${game.status === 'Live' ? 'live' : ''}`}>
+                      <span
+                        className={`sched-status ${game.status === 'Live' ? 'live' : ''}`}
+                      >
                         {game.status === 'Live' ? '● LIVE' : game.status}
                       </span>
                     )}
@@ -477,7 +589,8 @@ export default function SchedulePage() {
           <section className="sched-full-section">
             {!selectedTeam && (
               <p className="sched-placeholder">
-                Select a team from the left to view their {currentSeason} schedule.
+                Select a team from the left to view their {currentSeason}{' '}
+                schedule.
               </p>
             )}
 
@@ -499,25 +612,38 @@ export default function SchedulePage() {
                     )}
                   </div>
                   <div>
-                    <h3 className="sched-full-title" style={{ color: colors.secondary }}>
+                    <h3
+                      className="sched-full-title"
+                      style={{ color: colors.secondary }}
+                    >
                       {selectedTeam.city
                         ? `${selectedTeam.city} ${selectedTeam.name}`
                         : selectedTeam.abbreviation}{' '}
                       — {currentSeason}
                     </h3>
                     {teamSchedule.length > 0 && (
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>
+                      <p
+                        style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}
+                      >
                         {wins}–{losses} ({teamSchedule.length} games)
                       </p>
                     )}
                   </div>
                 </div>
 
-                {loadingSchedule && <p className="sched-loading">Loading schedule…</p>}
-                {errorSchedule && <p className="sched-error">{errorSchedule}</p>}
-                {!loadingSchedule && teamSchedule.length === 0 && !errorSchedule && (
-                  <p className="sched-placeholder">No games found for this season.</p>
+                {loadingSchedule && (
+                  <p className="sched-loading">Loading schedule…</p>
                 )}
+                {errorSchedule && (
+                  <p className="sched-error">{errorSchedule}</p>
+                )}
+                {!loadingSchedule &&
+                  teamSchedule.length === 0 &&
+                  !errorSchedule && (
+                    <p className="sched-placeholder">
+                      No games found for this season.
+                    </p>
+                  )}
 
                 {teamSchedule.length > 0 && (
                   <div className="sched-table-wrap">
@@ -551,7 +677,11 @@ export default function SchedulePage() {
                                 }}
                               >
                                 {label}
-                                <SortIcon direction={sort.direction} active={isActive} color={accentColor} />
+                                <SortIcon
+                                  direction={sort.direction}
+                                  active={isActive}
+                                  color={accentColor}
+                                />
                               </th>
                             );
                           })}
@@ -573,7 +703,9 @@ export default function SchedulePage() {
                                     : undefined,
                               }}
                             >
-                              <td className="sched-date-col">{formatDate(game.gameDate)}</td>
+                              <td className="sched-date-col">
+                                {formatDate(game.gameDate)}
+                              </td>
                               <td>
                                 <div className="sched-opp-cell">
                                   <span className="sched-ha-badge">
@@ -584,23 +716,38 @@ export default function SchedulePage() {
                                     alt={opp.abbreviation}
                                     className="sched-opp-logo"
                                     onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display = 'none';
+                                      (
+                                        e.target as HTMLImageElement
+                                      ).style.display = 'none';
                                     }}
                                   />
-                                  <span className="sched-opp-abbr">{opp.abbreviation}</span>
+                                  <span className="sched-opp-abbr">
+                                    {opp.abbreviation}
+                                  </span>
                                 </div>
                               </td>
                               <td>
-                                <span className={`sched-result ${won ? 'win' : 'loss'}`}>
+                                <span
+                                  className={`sched-result ${won ? 'win' : 'loss'}`}
+                                >
                                   {game.wl}
                                 </span>
                               </td>
                               <td className="sched-score">
-                                <span style={{ color: won ? '#4ade80' : '#f87171', fontWeight: 700 }}>
+                                <span
+                                  style={{
+                                    color: won ? '#4ade80' : '#f87171',
+                                    fontWeight: 700,
+                                  }}
+                                >
                                   {game.points ?? '—'}
                                 </span>
                                 <span style={{ color: '#444' }}> – </span>
-                                <span>{game.oppPoints != null ? game.oppPoints : '—'}</span>
+                                <span>
+                                  {game.oppPoints != null
+                                    ? game.oppPoints
+                                    : '—'}
+                                </span>
                               </td>
                               <td>{game.rebounds}</td>
                               <td>{game.assists}</td>
