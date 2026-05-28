@@ -2,6 +2,7 @@ import { TEAM_LOGOS } from '../../assets/teamLogos';
 import './divisionCard.css';
 
 type SelectedTeam = {
+  mongoId: string;
   name: string;
   division: string;
   teamId: number;
