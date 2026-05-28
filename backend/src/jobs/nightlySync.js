@@ -190,6 +190,7 @@ async function syncTeamGames(teamByNbaId, teamByAbbr, shouldUpdateSeasonStats, d
       threePointersAttempted:  row.FG3A       ?? 0,
       freeThrowsMade:          row.FTM        ?? 0,
       freeThrowsAttempted:     row.FTA        ?? 0,
+      seasonType: row.SEASON_TYPE || 'Regular Season',
     });
 
     if (shouldUpdateSeasonStats) {

@@ -13,12 +13,20 @@ const teamGameStatsSchema = new mongoose.Schema(
       required: true,
     },
 
+
+
     // --- NEW FIELD ---
     // The NBA season this game belongs to (e.g., '2025-26').
     // Stored on every game doc so we can efficiently query "all team games
     // this season" without relying on date range arithmetic.
     season: {
       type: String,
+      required: true,
+    },
+
+    seasonType: {
+      type: String,
+      enum: ['Regular Season', 'Playoffs'],
       required: true,
     },
 

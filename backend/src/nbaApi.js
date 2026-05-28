@@ -169,12 +169,21 @@ async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = nu
 
   // Extract the target result set from each successful response.
   const resultSets = [regularResult, playoffResult]
-    .filter((r) => r.status === 'fulfilled')
-    .map((r) => {
-      const data = r.value;
-      return data.resultSets?.find((s) => s.name === rsName) ?? data.resultSets?.[0];
-    })
-    .filter(Boolean);
+  .map((r, index) => {
+    if (r.status !== 'fulfilled') return null;
+
+    const data = r.value;
+    const resultSet =
+      data.resultSets?.find((s) => s.name === rsName) ?? data.resultSets?.[0];
+
+    if (!resultSet) return null;
+
+    return {
+      ...resultSet,
+      seasonType: index === 0 ? 'Regular Season' : 'Playoffs',
+    };
+  })
+  .filter(Boolean);
 
   if (resultSets.length === 0) {
     throw new Error(`Both Regular Season and Playoffs requests failed for ${endpoint}`);
@@ -222,8 +231,23 @@ async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = nu
   } else {
     // Game log strategy: simple concatenation. Each game belongs to exactly one
     // season type, so there are no duplicate GAME_IDs across the two result sets.
-    const rowSet = resultSets.flatMap((rs) => rs.rowSet ?? []);
-    mergedResultSet = { ...resultSets[0], rowSet };
+    const headers = resultSets[0].headers;
+const seasonTypeIndex = headers.indexOf('SEASON_TYPE');
+const mergedHeaders =
+  seasonTypeIndex === -1 ? [...headers, 'SEASON_TYPE'] : headers;
+
+const rowSet = resultSets.flatMap((rs) => {
+  const type = rs.seasonType;
+  return (rs.rowSet ?? []).map((row) =>
+    seasonTypeIndex === -1 ? [...row, type] : row
+  );
+});
+
+mergedResultSet = {
+  ...resultSets[0],
+  headers: mergedHeaders,
+  rowSet,
+};
   }
 
   return { resultSets: [mergedResultSet] };
