@@ -11,6 +11,7 @@
     "sync:players": "node src/scripts/enrichPlayers.js",
     "sync": "node src/scripts/manualSync.js",
     "backfill:team-games": "node src/scripts/backfillTeamGameStats.js",
+    "backfill:player-games": "node src/scripts/backfillPlayerGameStats.js",
     "fix:player-stats": "node src/scripts/fixPlayerStats.js",
     "test": "jest --config jest.config.js",
     "test:real": "jest --config jest.config.real.js",

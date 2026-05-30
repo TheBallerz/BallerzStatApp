@@ -1,11 +1,5 @@
 const mongoose = require('mongoose');
 
-// Two weeks expressed in seconds, used for the TTL (time-to-live) index below.
-// MongoDB automatically deletes documents older than this threshold, keeping
-// the player game log collection at a manageable size (~3,000–6,000 documents
-// at any given time rather than accumulating 36,000+ over a full season).
-const TWO_WEEKS_SECONDS = 60 * 60 * 24 * 14; // 1,209,600 seconds
-
 const playerGameStatsSchema = new mongoose.Schema(
   {
     // --- NEW FIELD ---
@@ -100,7 +94,6 @@ const playerGameStatsSchema = new mongoose.Schema(
     freeThrowsAttempted: { type: Number, default: 0, min: 0 },
   },
   // timestamps: true adds createdAt and updatedAt automatically.
-  // The createdAt field is what the TTL index monitors for expiry.
   { timestamps: true },
 );
 
@@ -111,15 +104,11 @@ const playerGameStatsSchema = new mongoose.Schema(
 // existing (playerId, nbaGameId) pair.
 playerGameStatsSchema.index({ playerId: 1, nbaGameId: 1 }, { unique: true });
 
-// --- NEW INDEX ---
-// TTL index that instructs MongoDB to automatically delete documents once
-// their createdAt value is older than TWO_WEEKS_SECONDS.
-// Individual game records are only needed for the "recent games" UI view.
-// Full-season aggregates live in PlayerSeasonStats and are not affected.
-playerGameStatsSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: TWO_WEEKS_SECONDS },
-);
+// NOTE: The old 14-day TTL index on createdAt has been removed. The full
+// season of game logs is now retained so the game history chart can display
+// the complete season. If you have an existing MongoDB collection with
+// this index still active, drop it manually:
+//   db.playerGameStats.dropIndex('createdAt_1')
 
 // The third argument pins the MongoDB collection name to 'playerGameStats'.
 // Without it, Mongoose auto-lowercases the model name to 'playergamestats',
