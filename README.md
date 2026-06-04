@@ -1,5 +1,4 @@
 # Ballerz Stat App
-![Workflow Name](https://github.com/{owner}/{repo}/actions/workflows/{workflow-file}.yml/badge.svg)   
 
 A full-stack NBA statistics application that lets users create an account, save favorite teams, and browse live team and player stats across the current NBA season. Data is sourced directly from the NBA Stats API and stored in MongoDB, with a nightly sync job that keeps everything current.
 
