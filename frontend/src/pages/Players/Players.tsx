@@ -183,6 +183,8 @@ export default function Players() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loadingPlayers, setLoadingPlayers] = useState(false);
   const [errorPlayers, setErrorPlayers] = useState<string | null>(null);
+  // Tracks player IDs whose career stats fetch returned no seasons data
+  const [emptyStatPlayerIds, setEmptyStatPlayerIds] = useState<Set<number>>(new Set());
 
   // ── Detail state ───────────────────────────────────────────────────────────
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -199,6 +201,12 @@ export default function Players() {
   const selectedGraphLabel =
     GRAPH_STAT_OPTIONS.find((option) => option.key === selectedGraphStat)
       ?.label ?? 'Points';
+
+  // ── Derived: filter out players with no stats when in active-only mode ─────
+  const visiblePlayers = activeOnly
+    ? players.filter((p) => !emptyStatPlayerIds.has(p.playerId))
+    : players;
+
   // ── 1. Fetch player list ───────────────────────────────────────────────────
   // GET /api/players?search=&currentOnly=0|1
   useEffect(() => {
@@ -257,9 +265,27 @@ export default function Players() {
         if (!res.ok) throw new Error(`${res.status}`);
         const data: CareerStats = await res.json();
         setCareerStats(data);
+
+        // If the response came back with no seasons, mark this player so they
+        // are hidden from the active list going forward.
+        if (!data.seasons || data.seasons.length === 0) {
+          setEmptyStatPlayerIds((prev) => {
+            const next = new Set(prev);
+            next.add(selectedPlayer.playerId);
+            return next;
+          });
+        }
       } catch (err) {
         setErrorCareer('Could not load career stats.');
         console.error(err);
+        // Hide this player from the active list since we couldn't load their stats
+        if (activeOnly) {
+          setEmptyStatPlayerIds((prev) => {
+            const next = new Set(prev);
+            next.add(selectedPlayer.playerId);
+            return next;
+          });
+        }
       } finally {
         setLoadingCareer(false);
       }
@@ -345,15 +371,15 @@ export default function Players() {
         {errorPlayers && <p className="players-error">{errorPlayers}</p>}
 
         {/* Count */}
-        {!loadingPlayers && players.length > 0 && (
+        {!loadingPlayers && visiblePlayers.length > 0 && (
           <p className="players-count-badge">
-            {players.length} player{players.length !== 1 ? 's' : ''}
+            {visiblePlayers.length} player{visiblePlayers.length !== 1 ? 's' : ''}
           </p>
         )}
 
         {/* List */}
         <div className="players-list" ref={listRef}>
-          {players.map((player) => {
+          {visiblePlayers.map((player) => {
             const c = getColors(player.team);
             const isActive = selectedPlayer?.playerId === player.playerId;
             return (
@@ -389,7 +415,7 @@ export default function Players() {
             );
           })}
 
-          {!loadingPlayers && players.length === 0 && !errorPlayers && (
+          {!loadingPlayers && visiblePlayers.length === 0 && !errorPlayers && (
             <p className="players-placeholder">No players found.</p>
           )}
         </div>
