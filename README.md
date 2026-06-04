@@ -1,5 +1,7 @@
 # Ballerz Stat App
 
+[![Azure Static Web Apps CI/CD](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml/badge.svg)](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml)
+
 A full-stack NBA statistics application that lets users create an account, save favorite teams, and browse live team and player stats across the current NBA season. Data is sourced directly from the NBA Stats API and stored in MongoDB, with a nightly sync job that keeps everything current.
 
 ---
