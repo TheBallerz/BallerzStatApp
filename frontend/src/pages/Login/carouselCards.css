@@ -226,8 +226,12 @@
   margin-top: 2px;
 }
 
-.cc-mini-tile-diff.pos { color: #4ade80; }
-.cc-mini-tile-diff.neg { color: #f87171; }
+.cc-mini-tile-diff.pos {
+  color: #4ade80;
+}
+.cc-mini-tile-diff.neg {
+  color: #f87171;
+}
 
 .cc-mini-compare-wrap {
   padding: 5px 8px 6px;
@@ -278,13 +282,21 @@
 }
 
 .cc-tp-card--lal {
-  background:
-    linear-gradient(135deg, rgba(85, 32, 152, 0.9) 0%, rgba(253, 185, 39, 0.25) 60%, #0d0d0d 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(85, 32, 152, 0.9) 0%,
+    rgba(253, 185, 39, 0.25) 60%,
+    #0d0d0d 100%
+  );
 }
 
 .cc-tp-card--gsw {
-  background:
-    linear-gradient(135deg, rgba(29, 66, 186, 0.9) 0%, rgba(255, 199, 44, 0.25) 60%, #0d0d0d 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(29, 66, 186, 0.9) 0%,
+    rgba(255, 199, 44, 0.25) 60%,
+    #0d0d0d 100%
+  );
 }
 
 .cc-tp-left {
@@ -340,12 +352,16 @@
   letter-spacing: 0.04em;
 }
 
-.cc-tp-th:first-child { text-align: left; }
+.cc-tp-th:first-child {
+  text-align: left;
+}
 
 .cc-tp-stat-row {
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
-.cc-tp-stat-row:last-child { border-bottom: none; }
+.cc-tp-stat-row:last-child {
+  border-bottom: none;
+}
 
 .cc-tp-stat-label {
   font-size: 11px;
@@ -369,8 +385,12 @@
   font-weight: 600;
   text-align: center;
 }
-.cc-tp-diff--pos { color: #4ade80; }
-.cc-tp-diff--neg { color: #f87171; }
+.cc-tp-diff--pos {
+  color: #4ade80;
+}
+.cc-tp-diff--neg {
+  color: #f87171;
+}
 
 /* ── Card 2 — Team Stats ─────────────────────────────────────────────────── */
 
@@ -381,8 +401,17 @@
   flex-direction: column;
   background-color: #1a1a1a;
   background-image:
-    radial-gradient(circle at top left, rgba(134, 0, 56, 0.65) 0%, transparent 45%),
-    linear-gradient(135deg, rgba(134, 0, 56, 0.25) 0%, rgba(253, 187, 48, 0.12) 40%, #1a1a1a 70%);
+    radial-gradient(
+      circle at top left,
+      rgba(134, 0, 56, 0.65) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(134, 0, 56, 0.25) 0%,
+      rgba(253, 187, 48, 0.12) 40%,
+      #1a1a1a 70%
+    );
 }
 
 .cc-ts-header {
@@ -578,7 +607,9 @@
   padding: 8px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-.cc-af-result-row:last-child { border-bottom: none; }
+.cc-af-result-row:last-child {
+  border-bottom: none;
+}
 
 .cc-af-avatar {
   width: 28px;
@@ -642,7 +673,9 @@
   padding: 6px 0;
   border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
 }
-.cc-af-friend-row:last-child { border-bottom: none; }
+.cc-af-friend-row:last-child {
+  border-bottom: none;
+}
 
 .cc-af-friend-avatar {
   width: 28px;

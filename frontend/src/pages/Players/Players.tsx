@@ -184,7 +184,9 @@ export default function Players() {
   const [loadingPlayers, setLoadingPlayers] = useState(false);
   const [errorPlayers, setErrorPlayers] = useState<string | null>(null);
   // Tracks player IDs whose career stats fetch returned no seasons data
-  const [emptyStatPlayerIds, setEmptyStatPlayerIds] = useState<Set<number>>(new Set());
+  const [emptyStatPlayerIds, setEmptyStatPlayerIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   // ── Detail state ───────────────────────────────────────────────────────────
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -373,7 +375,8 @@ export default function Players() {
         {/* Count */}
         {!loadingPlayers && visiblePlayers.length > 0 && (
           <p className="players-count-badge">
-            {visiblePlayers.length} player{visiblePlayers.length !== 1 ? 's' : ''}
+            {visiblePlayers.length} player
+            {visiblePlayers.length !== 1 ? 's' : ''}
           </p>
         )}
 

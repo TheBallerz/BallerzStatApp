@@ -56,33 +56,113 @@ function MiniChart({
 
 // Player game-log data (approximate, visually representative)
 const curryPoints: [number, number][] = [
-  [0, 40], [1, 38], [2, 49], [3, 32], [4, 27], [5, 48], [6, 22],
-  [7, 30], [8, 35], [9, 26], [10, 41], [11, 28], [12, 20], [13, 33],
-  [14, 26], [15, 30], [16, 22], [17, 28], [18, 24],
+  [0, 40],
+  [1, 38],
+  [2, 49],
+  [3, 32],
+  [4, 27],
+  [5, 48],
+  [6, 22],
+  [7, 30],
+  [8, 35],
+  [9, 26],
+  [10, 41],
+  [11, 28],
+  [12, 20],
+  [13, 33],
+  [14, 26],
+  [15, 30],
+  [16, 22],
+  [17, 28],
+  [18, 24],
 ];
 
 const brownPoints: [number, number][] = [
-  [0, 38], [1, 27], [2, 50], [3, 35], [4, 22], [5, 40], [6, 30],
-  [7, 28], [8, 45], [9, 24], [10, 32], [11, 36], [12, 20], [13, 30],
-  [14, 28], [15, 35], [16, 22], [17, 18], [18, 22],
+  [0, 38],
+  [1, 27],
+  [2, 50],
+  [3, 35],
+  [4, 22],
+  [5, 40],
+  [6, 30],
+  [7, 28],
+  [8, 45],
+  [9, 24],
+  [10, 32],
+  [11, 36],
+  [12, 20],
+  [13, 30],
+  [14, 28],
+  [15, 35],
+  [16, 22],
+  [17, 18],
+  [18, 22],
 ];
 
 const clePoints: [number, number][] = [
-  [0, 148], [1, 118], [2, 140], [3, 125], [4, 138], [5, 110], [6, 135],
-  [7, 122], [8, 148], [9, 115], [10, 130], [11, 118], [12, 95],
-  [13, 128], [14, 122], [15, 140], [16, 108], [17, 125], [18, 118],
+  [0, 148],
+  [1, 118],
+  [2, 140],
+  [3, 125],
+  [4, 138],
+  [5, 110],
+  [6, 135],
+  [7, 122],
+  [8, 148],
+  [9, 115],
+  [10, 130],
+  [11, 118],
+  [12, 95],
+  [13, 128],
+  [14, 122],
+  [15, 140],
+  [16, 108],
+  [17, 125],
+  [18, 118],
 ];
 
 const okcPoints: [number, number][] = [
-  [0, 140], [1, 125], [2, 148], [3, 118], [4, 130], [5, 143], [6, 122],
-  [7, 135], [8, 120], [9, 148], [10, 128], [11, 118], [12, 88],
-  [13, 135], [14, 125], [15, 145], [16, 118], [17, 130], [18, 128],
+  [0, 140],
+  [1, 125],
+  [2, 148],
+  [3, 118],
+  [4, 130],
+  [5, 143],
+  [6, 122],
+  [7, 135],
+  [8, 120],
+  [9, 148],
+  [10, 128],
+  [11, 118],
+  [12, 88],
+  [13, 135],
+  [14, 125],
+  [15, 145],
+  [16, 118],
+  [17, 130],
+  [18, 128],
 ];
 
 const userPoints: [number, number][] = [
-  [0, 22], [1, 14], [2, 28], [3, 18], [4, 12], [5, 24], [6, 20],
-  [7, 16], [8, 30], [9, 18], [10, 22], [11, 14], [12, 26],
-  [13, 20], [14, 16], [15, 24], [16, 18], [17, 22], [18, 16],
+  [0, 22],
+  [1, 14],
+  [2, 28],
+  [3, 18],
+  [4, 12],
+  [5, 24],
+  [6, 20],
+  [7, 16],
+  [8, 30],
+  [9, 18],
+  [10, 22],
+  [11, 14],
+  [12, 26],
+  [13, 20],
+  [14, 16],
+  [15, 24],
+  [16, 18],
+  [17, 22],
+  [18, 16],
 ];
 
 // ── Card 1 — Track Players ────────────────────────────────────────────────
@@ -96,7 +176,13 @@ function PlayerRow({
   name: string;
   team: string;
   cardClass: string;
-  stats: { label: string; avg: string; last: string; diff: string; pos: boolean }[];
+  stats: {
+    label: string;
+    avg: string;
+    last: string;
+    diff: string;
+    pos: boolean;
+  }[];
 }) {
   return (
     <div className={`cc-tp-card ${cardClass}`}>
@@ -120,7 +206,9 @@ function PlayerRow({
                 <td className="cc-tp-stat-label">{s.label}</td>
                 <td className="cc-tp-stat-val">{s.avg}</td>
                 <td className="cc-tp-stat-val">{s.last}</td>
-                <td className={`cc-tp-diff ${s.pos ? 'cc-tp-diff--pos' : 'cc-tp-diff--neg'}`}>
+                <td
+                  className={`cc-tp-diff ${s.pos ? 'cc-tp-diff--pos' : 'cc-tp-diff--neg'}`}
+                >
                   {s.diff}
                 </td>
               </tr>
@@ -143,9 +231,9 @@ export function TrackPlayersCard() {
           cardClass="cc-tp-card--lal"
           stats={[
             { label: 'PTS', avg: '21.3', last: '24', diff: '+2.7', pos: true },
-            { label: '3PM', avg: '1.3',  last: '2',  diff: '+0.7', pos: true },
-            { label: 'AST', avg: '7.2',  last: '3',  diff: '-4.2', pos: false },
-            { label: 'REB', avg: '6.2',  last: '12', diff: '+5.8', pos: true },
+            { label: '3PM', avg: '1.3', last: '2', diff: '+0.7', pos: true },
+            { label: 'AST', avg: '7.2', last: '3', diff: '-4.2', pos: false },
+            { label: 'REB', avg: '6.2', last: '12', diff: '+5.8', pos: true },
           ]}
         />
         <PlayerRow
@@ -154,9 +242,9 @@ export function TrackPlayersCard() {
           cardClass="cc-tp-card--gsw"
           stats={[
             { label: 'PTS', avg: '26.6', last: '24', diff: '-2.6', pos: false },
-            { label: '3PM', avg: '4.4',  last: '4',  diff: '-0.4', pos: false },
-            { label: 'AST', avg: '4.7',  last: '3',  diff: '-1.7', pos: false },
-            { label: 'REB', avg: '3.6',  last: '6',  diff: '+2.4', pos: true },
+            { label: '3PM', avg: '4.4', last: '4', diff: '-0.4', pos: false },
+            { label: 'AST', avg: '4.7', last: '3', diff: '-1.7', pos: false },
+            { label: 'REB', avg: '3.6', last: '6', diff: '+2.4', pos: true },
           ]}
         />
       </div>
@@ -183,10 +271,10 @@ export function TeamStatsCard() {
       <div className="cc-ts-body">
         {[
           ['Record', '60-40'],
-          ['PPG',    '117.5'],
-          ['RPG',    '43.8'],
-          ['APG',    '27'],
-          ['FG%',    '47.7%'],
+          ['PPG', '117.5'],
+          ['RPG', '43.8'],
+          ['APG', '27'],
+          ['FG%', '47.7%'],
         ].map(([label, value]) => (
           <div key={label} className="cc-ts-stat-row">
             <span className="cc-ts-stat-label">{label}</span>
@@ -195,9 +283,24 @@ export function TeamStatsCard() {
         ))}
         <div className="cc-ts-roster-title">Roster</div>
         {[
-          { initials: 'DM', jersey: '#10 G', name: 'D. Mitchell', stat: '18.8 PPG' },
-          { initials: 'JA', jersey: '#31 C', name: 'J. Allen',    stat: '14.7 PPG' },
-          { initials: 'MG', jersey: '#2 G',  name: 'M. Garland',  stat: '10.2 PPG' },
+          {
+            initials: 'DM',
+            jersey: '#10 G',
+            name: 'D. Mitchell',
+            stat: '18.8 PPG',
+          },
+          {
+            initials: 'JA',
+            jersey: '#31 C',
+            name: 'J. Allen',
+            stat: '14.7 PPG',
+          },
+          {
+            initials: 'MG',
+            jersey: '#2 G',
+            name: 'M. Garland',
+            stat: '10.2 PPG',
+          },
         ].map((p) => (
           <div key={p.initials} className="cc-ts-roster-row">
             <div className="cc-ts-roster-avatar">{p.initials}</div>
@@ -242,7 +345,10 @@ function MiniPanel({
   threeCol?: boolean;
 }) {
   return (
-    <div className="cc-mini-panel" style={{ background: 'rgba(255,255,255,0.03)' }}>
+    <div
+      className="cc-mini-panel"
+      style={{ background: 'rgba(255,255,255,0.03)' }}
+    >
       <div className="cc-mini-header">
         <div className="cc-mini-identity">
           <p className="cc-mini-name">{name}</p>
@@ -252,7 +358,11 @@ function MiniPanel({
           <div className="cc-mini-avatar">{avatarLabel}</div>
           <div className="cc-mini-actions">
             <div className="cc-mini-btn">×</div>
-            <div className={`cc-mini-btn ${heartFilled ? 'cc-mini-heart-filled' : ''}`}>♥</div>
+            <div
+              className={`cc-mini-btn ${heartFilled ? 'cc-mini-heart-filled' : ''}`}
+            >
+              ♥
+            </div>
           </div>
         </div>
       </div>
@@ -267,13 +377,17 @@ function MiniPanel({
       <div className="cc-mini-divider" />
       <div className="cc-mini-body">
         <p className="cc-mini-section-label">Season Averages</p>
-        <div className={`cc-mini-stats-grid${threeCol ? ' cc-mini-stats-grid--3col' : ''}`}>
+        <div
+          className={`cc-mini-stats-grid${threeCol ? ' cc-mini-stats-grid--3col' : ''}`}
+        >
           {stats.map((s) => (
             <div key={s.label} className="cc-mini-stat-tile">
               <span className="cc-mini-tile-value">{s.value}</span>
               <span className="cc-mini-tile-label">{s.label}</span>
               {s.diff && (
-                <span className={`cc-mini-tile-diff ${s.diffPos ? 'pos' : 'neg'}`}>
+                <span
+                  className={`cc-mini-tile-diff ${s.diffPos ? 'pos' : 'neg'}`}
+                >
                   {s.diff}
                 </span>
               )}
@@ -302,9 +416,9 @@ export function ComparePlayersCard() {
         chartColor="#ffffff"
         stats={[
           { value: '26.6', label: 'PTS', diff: '-2.6', diffPos: false },
-          { value: '4.7',  label: 'AST', diff: '-1.7', diffPos: false },
-          { value: '3.6',  label: 'REB', diff: '+2.4', diffPos: true  },
-          { value: '4.4',  label: '3PM', diff: '-0.4', diffPos: false },
+          { value: '4.7', label: 'AST', diff: '-1.7', diffPos: false },
+          { value: '3.6', label: 'REB', diff: '+2.4', diffPos: true },
+          { value: '4.4', label: '3PM', diff: '-0.4', diffPos: false },
         ]}
       />
       <MiniPanel
@@ -314,10 +428,10 @@ export function ComparePlayersCard() {
         chartPoints={brownPoints}
         chartColor="#ffffff"
         stats={[
-          { value: '28.4', label: 'PTS', diff: '+4.6', diffPos: true  },
-          { value: '5.0',  label: 'AST', diff: '-1.0', diffPos: false },
-          { value: '6.8',  label: 'REB', diff: '+2.2', diffPos: true  },
-          { value: '2.0',  label: '3PM', diff: '+1.0', diffPos: true  },
+          { value: '28.4', label: 'PTS', diff: '+4.6', diffPos: true },
+          { value: '5.0', label: 'AST', diff: '-1.0', diffPos: false },
+          { value: '6.8', label: 'REB', diff: '+2.2', diffPos: true },
+          { value: '2.0', label: '3PM', diff: '+1.0', diffPos: true },
         ]}
       />
     </div>
@@ -338,12 +452,12 @@ export function CompareTeamsCard() {
         chartColor="#ffffff"
         threeCol
         stats={[
-          { value: '60-40',  label: 'Record' },
-          { value: '117.5',  label: 'PPG'    },
-          { value: '43.8',   label: 'RPG'    },
-          { value: '27.0',   label: 'APG'    },
-          { value: '14.0',   label: '3PM'    },
-          { value: '47.7%',  label: 'FG%'    },
+          { value: '60-40', label: 'Record' },
+          { value: '117.5', label: 'PPG' },
+          { value: '43.8', label: 'RPG' },
+          { value: '27.0', label: 'APG' },
+          { value: '14.0', label: '3PM' },
+          { value: '47.7%', label: 'FG%' },
         ]}
       />
       <MiniPanel
@@ -354,12 +468,12 @@ export function CompareTeamsCard() {
         chartColor="#ffffff"
         threeCol
         stats={[
-          { value: '74-20',  label: 'Record' },
-          { value: '118.9',  label: 'PPG'    },
-          { value: '43.8',   label: 'RPG'    },
-          { value: '25.9',   label: 'APG'    },
-          { value: '13.8',   label: '3PM',  diff: '-3.0', diffPos: false },
-          { value: '48.4%',  label: 'FG%'    },
+          { value: '74-20', label: 'Record' },
+          { value: '118.9', label: 'PPG' },
+          { value: '43.8', label: 'RPG' },
+          { value: '25.9', label: 'APG' },
+          { value: '13.8', label: '3PM', diff: '-3.0', diffPos: false },
+          { value: '48.4%', label: 'FG%' },
         ]}
       />
     </div>
@@ -377,9 +491,9 @@ export function AddFriendsCard() {
       </div>
       <div className="cc-af-dropdown">
         {[
-          { initials: 'TD', name: 'Tyler Davis',  status: 'request' },
-          { initials: 'AP', name: 'Alex Park',    status: 'request' },
-          { initials: 'JL', name: 'Jordan Lee',   status: 'friend'  },
+          { initials: 'TD', name: 'Tyler Davis', status: 'request' },
+          { initials: 'AP', name: 'Alex Park', status: 'request' },
+          { initials: 'JL', name: 'Jordan Lee', status: 'friend' },
         ].map((u) => (
           <div key={u.initials} className="cc-af-result-row">
             <div className="cc-af-avatar">{u.initials}</div>
@@ -394,8 +508,8 @@ export function AddFriendsCard() {
       </div>
       <p className="cc-af-friends-label">Your Friends</p>
       {[
-        { initials: 'MC', name: 'Marcus Cole'  },
-        { initials: 'KC', name: 'Kayla Chen'  },
+        { initials: 'MC', name: 'Marcus Cole' },
+        { initials: 'KC', name: 'Kayla Chen' },
       ].map((f) => (
         <div key={f.initials} className="cc-af-friend-row">
           <span className="cc-af-dots">···</span>
@@ -435,10 +549,10 @@ export function SeeHowYouCompareCard() {
         <p className="cc-sc-section-label">Season Averages</p>
         <div className="cc-sc-stats-grid">
           {[
-            { value: '18.2', label: 'PTS', green: true  },
-            { value: '3.1',  label: 'AST', green: false },
-            { value: '7.4',  label: 'REB', green: true  },
-            { value: '1.8',  label: '3PM', green: false },
+            { value: '18.2', label: 'PTS', green: true },
+            { value: '3.1', label: 'AST', green: false },
+            { value: '7.4', label: 'REB', green: true },
+            { value: '1.8', label: '3PM', green: false },
           ].map((s) => (
             <div
               key={s.label}
