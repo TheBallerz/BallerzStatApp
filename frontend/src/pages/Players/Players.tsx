@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Players.css';
 import PlayerBio from './PlayerBio';
+import {
+  getMySeasonStats,
+  type UserSeasonStats,
+} from '../../services/userStatsService';
 import {
   LineChart,
   Line,
@@ -198,6 +202,13 @@ export default function Players() {
   const [selectedGraphStat, setSelectedGraphStat] =
     useState<GraphStatKey>('points');
 
+  // ── Compare Yourself state ─────────────────────────────────────────────────
+  const [compareMode, setCompareMode] = useState(false);
+  const [boxesVisible, setBoxesVisible] = useState(false);
+  const [userStats, setUserStats] = useState<UserSeasonStats | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userStatsError, setUserStatsError] = useState<string | null>(null);
+
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
   const selectedGraphLabel =
@@ -260,6 +271,8 @@ export default function Players() {
       setErrorCareer(null);
       setCareerStats(null);
       setSort({ key: null, direction: null });
+      setCompareMode(false);
+      setBoxesVisible(false);
       try {
         const res = await fetch(
           `${API_BASE}/players/${selectedPlayer.playerId}/career`,
@@ -308,6 +321,36 @@ export default function Players() {
   const handleSelectPlayer = useCallback((player: Player) => {
     setSelectedPlayer(player);
   }, []);
+
+  const handleCompareToggle = useCallback(async () => {
+    if (loadingUser) return;
+
+    if (compareMode) {
+      setBoxesVisible(false);
+      setTimeout(() => setCompareMode(false), 280);
+      return;
+    }
+
+    let stats = userStats;
+    if (!stats) {
+      setLoadingUser(true);
+      setUserStatsError(null);
+      try {
+        stats = await getMySeasonStats();
+        setUserStats(stats);
+      } catch {
+        setUserStatsError(
+          'Could not load your stats. Have you logged any games?',
+        );
+        setLoadingUser(false);
+        return;
+      }
+      setLoadingUser(false);
+    }
+
+    setCompareMode(true);
+    setTimeout(() => setBoxesVisible(true), 50);
+  }, [compareMode, loadingUser, userStats]);
 
   const handleSort = useCallback((key: SortKey) => {
     setSort((prev) => {
@@ -457,12 +500,28 @@ export default function Players() {
                 </div>
 
                 <div className="players-detail-info">
-                  <h1
-                    className="players-detail-name"
-                    style={{ color: colors.secondary }}
-                  >
-                    {selectedPlayer.fullName}
-                  </h1>
+                  <div className="players-detail-top">
+                    <h1
+                      className="players-detail-name"
+                      style={{ color: colors.secondary }}
+                    >
+                      {selectedPlayer.fullName}
+                    </h1>
+                    {!!localStorage.getItem('ballerz_token') &&
+                      latestSeason && (
+                        <button
+                          className="players-compare-btn"
+                          onClick={handleCompareToggle}
+                          disabled={loadingUser}
+                        >
+                          {loadingUser
+                            ? 'Loading…'
+                            : compareMode
+                              ? 'Hide Comparison'
+                              : 'Compare Yourself'}
+                        </button>
+                      )}
+                  </div>
 
                   <div className="players-detail-meta">
                     {selectedPlayer.team ? (
@@ -513,34 +572,120 @@ export default function Players() {
                   )}
 
                   {latestSeason && (
-                    <div className="players-highlights">
-                      {[
-                        { val: fmtStat(latestSeason.points), lbl: 'PPG' },
-                        { val: fmtStat(latestSeason.rebounds), lbl: 'RPG' },
-                        { val: fmtStat(latestSeason.assists), lbl: 'APG' },
-                        { val: fmtStat(latestSeason.steals), lbl: 'SPG' },
-                        { val: fmtStat(latestSeason.blocks), lbl: 'BPG' },
-                        { val: fmtPct(latestSeason.fgPct), lbl: 'FG%' },
-                      ].map(({ val, lbl }) => (
-                        <div
-                          key={lbl}
-                          className="players-highlight-box"
-                          style={
+                    <>
+                      <div
+                        className={`players-highlights${compareMode ? ' players-highlights--compare' : ''}`}
+                      >
+                        {(
+                          [
                             {
-                              borderColor: `${colors.primary}55`,
-                            } as React.CSSProperties
-                          }
-                        >
-                          <span
-                            className="players-highlight-val"
-                            style={{ color: colors.secondary }}
-                          >
-                            {val}
-                          </span>
-                          <span className="players-highlight-lbl">{lbl}</span>
-                        </div>
-                      ))}
-                    </div>
+                              val: fmtStat(latestSeason.points),
+                              lbl: 'PPG',
+                              raw: latestSeason.points,
+                              userVal: userStats?.avgPoints ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.rebounds),
+                              lbl: 'RPG',
+                              raw: latestSeason.rebounds,
+                              userVal: userStats?.avgRebounds ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.assists),
+                              lbl: 'APG',
+                              raw: latestSeason.assists,
+                              userVal: userStats?.avgAssists ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.steals),
+                              lbl: 'SPG',
+                              raw: latestSeason.steals,
+                              userVal: userStats?.avgSteals ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.blocks),
+                              lbl: 'BPG',
+                              raw: latestSeason.blocks,
+                              userVal: userStats?.avgBlocks ?? null,
+                            },
+                            {
+                              val: fmtPct(latestSeason.fgPct),
+                              lbl: 'FG%',
+                              raw: null,
+                              userVal: null,
+                            },
+                          ] as {
+                            val: string;
+                            lbl: string;
+                            raw: number | null;
+                            userVal: number | null;
+                          }[]
+                        ).map(({ val, lbl, raw, userVal }, idx) => {
+                          const canCompare = raw != null && userVal !== null;
+                          const isGreen = canCompare && userVal >= raw;
+                          const isRed = canCompare && userVal < raw;
+                          const userDisplay =
+                            userVal !== null ? fmtStat(userVal) : '—';
+                          return (
+                            <Fragment key={lbl}>
+                              {/* Player stat box */}
+                              <div
+                                className="players-highlight-box"
+                                style={
+                                  {
+                                    borderColor: `${colors.primary}55`,
+                                  } as React.CSSProperties
+                                }
+                              >
+                                <span
+                                  className="players-highlight-val"
+                                  style={{ color: colors.secondary }}
+                                >
+                                  {val}
+                                </span>
+                                <span className="players-highlight-lbl">
+                                  {lbl}
+                                </span>
+                              </div>
+
+                              {/* User stat box — only rendered in compare mode */}
+                              {compareMode && (
+                                <div
+                                  className={[
+                                    'players-user-box',
+                                    boxesVisible
+                                      ? 'players-user-box--visible'
+                                      : '',
+                                    isGreen
+                                      ? 'players-user-box--green'
+                                      : isRed
+                                        ? 'players-user-box--red'
+                                        : '',
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                  style={{
+                                    transitionDelay: `${idx * 0.04}s`,
+                                  }}
+                                >
+                                  <span className="players-user-box-val">
+                                    {userDisplay}
+                                  </span>
+                                  <span className="players-user-lbl">
+                                    Your {lbl}
+                                  </span>
+                                </div>
+                              )}
+                            </Fragment>
+                          );
+                        })}
+                      </div>
+                      {userStatsError && (
+                        <p className="players-compare-error">
+                          {userStatsError}
+                        </p>
+                      )}
+                    </>
                   )}
 
                   <PlayerBio
