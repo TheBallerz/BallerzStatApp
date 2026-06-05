@@ -17,12 +17,12 @@ type CarouselItem = {
 };
 
 const carouselItems: CarouselItem[] = [
-  { id: 'track-players',   label: 'Track Players'       },
-  { id: 'team-stats',      label: 'View Team Stats'      },
+  { id: 'track-players', label: 'Track Players' },
+  { id: 'team-stats', label: 'View Team Stats' },
   { id: 'compare-players', label: 'Compare Players', compact: true },
-  { id: 'compare-teams',   label: 'Compare Teams',   compact: true },
-  { id: 'add-friends',     label: 'Add Friends'          },
-  { id: 'see-how',         label: 'See How You Compare'  },
+  { id: 'compare-teams', label: 'Compare Teams', compact: true },
+  { id: 'add-friends', label: 'Add Friends' },
+  { id: 'see-how', label: 'See How You Compare' },
 ];
 
 // Duplicate so the track is 2× one set wide — position resets by
@@ -34,13 +34,20 @@ const RESUME_DELAY_MS = 1200; // ms after last wheel event before auto-scroll re
 
 function cardContent(id: string) {
   switch (id) {
-    case 'track-players':   return <TrackPlayersCard />;
-    case 'team-stats':      return <TeamStatsCard />;
-    case 'compare-players': return <ComparePlayersCard />;
-    case 'compare-teams':   return <CompareTeamsCard />;
-    case 'add-friends':     return <AddFriendsCard />;
-    case 'see-how':         return <SeeHowYouCompareCard />;
-    default:                return null;
+    case 'track-players':
+      return <TrackPlayersCard />;
+    case 'team-stats':
+      return <TeamStatsCard />;
+    case 'compare-players':
+      return <ComparePlayersCard />;
+    case 'compare-teams':
+      return <CompareTeamsCard />;
+    case 'add-friends':
+      return <AddFriendsCard />;
+    case 'see-how':
+      return <SeeHowYouCompareCard />;
+    default:
+      return null;
   }
 }
 
@@ -162,9 +169,7 @@ export default function LoginPage() {
               className={`carousel-card${item.compact ? ' carousel-card--compact' : ''}`}
             >
               <span className="carousel-card-title">{item.label}</span>
-              <div className="cc-content-frame">
-                {cardContent(item.id)}
-              </div>
+              <div className="cc-content-frame">{cardContent(item.id)}</div>
             </div>
           ))}
         </div>
