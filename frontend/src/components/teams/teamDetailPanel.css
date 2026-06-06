@@ -129,7 +129,9 @@
     0 2px 8px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.03) inset;
 
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .team-stat-row:hover {
@@ -149,4 +151,90 @@
   font-size: 16px;
   font-weight: 700;
   color: #ffffff; /* full white */
+}
+
+.team-roster-section {
+  margin-top: 20px;
+}
+
+.team-roster-title {
+  color: white;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.team-roster-list {
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding-right: 6px;
+}
+
+.team-roster-player {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    40px /* headshot */
+    56px /* jersey */
+    1fr /* name */
+    56px /* ppg */
+    56px /* rpg */
+    56px /* apg */
+    56px /* spg */
+    56px /* bpg */
+    64px /* fg% */
+    64px /* 3p% */
+    40px; /* position */
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+
+  cursor: pointer;
+  text-align: left;
+
+  transition: background 0.2s ease;
+}
+
+.team-roster-stat {
+  font-size: 0.72rem;
+  opacity: 0.78;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.team-roster-player:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.team-roster-headshot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.team-roster-number,
+.team-roster-position {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.team-roster-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -2,56 +2,94 @@ const express = require("express");
 const router = express.Router();
 const TeamSeasonStats = require("../models/TeamSeasonStats");
 const Team = require("../models/Team");
+const TeamGameStats = require("../models/TeamGameStats");
 
 router.get("/standings", async (req, res) => {
   try {
     const season = req.query.season || "2025-26";
+    const type = req.query.type || "season";
 
-    const seasons = await TeamSeasonStats.distinct("season");
+    const seasonType =
+      type === "finals"
+        ? "Playoffs"
+        : "Regular Season";
 
-    const standings = await TeamSeasonStats.find({ season }).lean();
+    const gameRows = await TeamGameStats.find({
+      season,
+      seasonType,
+    }).lean();
 
     const teams = await Team.find().lean();
-    
-    const teamByNbaId = {};
-    teams.forEach((team) => {
-      teamByNbaId[team.nbaId] = team;
+
+    const seasonStatsRows = await TeamSeasonStats.find({ season }).lean();
+
+    const seasonStatsByTeamId = {};
+    seasonStatsRows.forEach((row) => {
+      seasonStatsByTeamId[String(row.teamId)] = row;
     });
 
-    const formatted = standings
-    .map((row) => {
-      const team = teamByNbaId[row.nbaTeamId];
-  
-      if (!team) return null;
-  
-      const winPct =
-        row.gamesPlayed > 0
-          ? Number((row.wins / row.gamesPlayed).toFixed(3))
-          : 0;
-  
-      return {
-        teamId: team._id,
-        nbaTeamId: row.nbaTeamId,
-        teamName: team.name,
-        abbreviation: team.abbreviation,
-        conference: team.conference,
-        division: team.division,
-        wins: row.wins,
-        losses: row.losses,
-        gamesPlayed: row.gamesPlayed,
-        winPct,
-        avgPoints: row.avgPoints,
-        avgRebounds: row.avgRebounds,
-        avgAssists: row.avgAssists,
-        avgSteals: row.avgSteals,
-        avgBlocks: row.avgBlocks,
-        avgTurnovers: row.avgTurnovers,
-        fgPct: row.fgPct,
-        fg3Pct: row.fg3Pct,
-        ftPct: row.ftPct,
-      };
-    })
-    .filter(Boolean);
+    const teamById = {};
+    teams.forEach((team) => {
+      teamById[String(team._id)] = team;
+    });
+
+    const recordByTeamId = {};
+
+    gameRows.forEach((game) => {
+      const key = String(game.teamId);
+
+      if (!recordByTeamId[key]) {
+        recordByTeamId[key] = {
+          wins: 0,
+          losses: 0,
+          gamesPlayed: 0,
+        };
+      }
+
+      recordByTeamId[key].gamesPlayed += 1;
+
+      if (game.result === "W") {
+        recordByTeamId[key].wins += 1;
+      } else if (game.result === "L") {
+        recordByTeamId[key].losses += 1;
+      }
+    });
+
+    const formatted = Object.entries(recordByTeamId)
+      .map(([teamId, record]) => {
+        const team = teamById[teamId];
+        const seasonStats = seasonStatsByTeamId[teamId] || {};
+        if (!team) return null;
+
+        const winPct =
+          record.gamesPlayed > 0
+            ? Number((record.wins / record.gamesPlayed).toFixed(3))
+            : 0;
+
+        return {
+          teamId: team._id,
+          nbaTeamId: team.nbaId,
+          teamName: team.name,
+          abbreviation: team.abbreviation,
+          conference: team.conference,
+          division: team.division,
+          wins: record.wins,
+          losses: record.losses,
+          gamesPlayed: record.gamesPlayed,
+          winPct,
+        
+          avgPoints: seasonStats.avgPoints ?? 0,
+          avgRebounds: seasonStats.avgRebounds ?? 0,
+          avgAssists: seasonStats.avgAssists ?? 0,
+          avgSteals: seasonStats.avgSteals ?? 0,
+          avgBlocks: seasonStats.avgBlocks ?? 0,
+          avgTurnovers: seasonStats.avgTurnovers ?? 0,
+          fgPct: seasonStats.fgPct ?? 0,
+          fg3Pct: seasonStats.fg3Pct ?? 0,
+          ftPct: seasonStats.ftPct ?? 0,
+        };
+      })
+      .filter(Boolean);
 
     const east = formatted
       .filter((team) => team.conference === "East" || team.conference === "Eastern")
@@ -61,7 +99,7 @@ router.get("/standings", async (req, res) => {
       .filter((team) => team.conference === "West" || team.conference === "Western")
       .sort((a, b) => b.winPct - a.winPct || b.wins - a.wins);
 
-    res.json({ season, east, west });
+    res.json({ season, type, seasonType, east, west });
   } catch (error) {
     console.error("Error fetching standings:", error.message);
     res.status(500).json({
@@ -70,5 +108,4 @@ router.get("/standings", async (req, res) => {
     });
   }
 });
-
 module.exports = router;

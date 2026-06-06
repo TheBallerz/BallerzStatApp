@@ -1,0 +1,423 @@
+/* ── Account Page ──────────────────────────────────────────────────────────── */
+
+.account-page {
+  background-color: #111;
+  min-height: 100vh;
+  padding: 20px 20px;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── Section cards ─────────────────────────────────────────────────────────── */
+
+.account-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 680px;
+}
+
+.account-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 4px;
+}
+
+/* ── Profile info ──────────────────────────────────────────────────────────── */
+
+.account-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+
+.account-email {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+/* ── Logout button ─────────────────────────────────────────────────────────── */
+
+.logout-btn {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.logout-btn:hover {
+  background: #fff;
+}
+
+/* ── Admin section ─────────────────────────────────────────────────────────── */
+
+.admin-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 165, 0, 0.18);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+}
+
+.admin-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 165, 0, 0.7);
+  margin: 0;
+}
+
+/* ── Admin table ───────────────────────────────────────────────────────────── */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table thead th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.admin-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.1s;
+}
+
+.admin-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-table td {
+  padding: 12px;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.admin-user-name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-user-email {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.38);
+  margin-top: 2px;
+}
+
+/* ── Admin badge ───────────────────────────────────────────────────────────── */
+
+.admin-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  background: rgba(255, 165, 0, 0.15);
+  border: 1px solid rgba(255, 165, 0, 0.35);
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 165, 0, 0.85);
+  vertical-align: middle;
+}
+
+/* ── Toggle switch ─────────────────────────────────────────────────────────── */
+
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle input:checked + .toggle-track {
+  background: rgba(255, 165, 0, 0.75);
+}
+
+.toggle input:disabled + .toggle-track {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  user-select: none;
+}
+
+/* ── Delete button ─────────────────────────────────────────────────────────── */
+
+.admin-delete-btn {
+  background: rgba(220, 60, 60, 0.12);
+  color: rgba(220, 100, 100, 0.9);
+  border: 1px solid rgba(220, 60, 60, 0.25);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  white-space: nowrap;
+}
+
+.admin-delete-btn:hover:not(:disabled) {
+  background: rgba(220, 60, 60, 0.22);
+  color: rgba(240, 120, 120, 1);
+}
+
+.admin-delete-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* ── Loading / error states ────────────────────────────────────────────────── */
+
+.admin-status {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 8px 0;
+}
+
+.admin-error {
+  font-size: 13px;
+  color: rgba(220, 100, 100, 0.8);
+  padding: 8px 0;
+}
+
+/* ── Two-column layout ─────────────────────────────────────────────────────── */
+
+.account-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.account-left,
+.account-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Generic card wrapper ──────────────────────────────────────────────────── */
+
+.account-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Left column — single large card; less side padding needed for the table */
+
+/* ── Inner section divider ─────────────────────────────────────────────────── */
+
+.account-inner-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin: 0 -16px;
+}
+
+/* ── Inner section wrapper ─────────────────────────────────────────────────── */
+
+.account-inner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Sub-label (plain text, not uppercase) ─────────────────────────────────── */
+
+.account-sub-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+/* ── Logout link below the left card ──────────────────────────────────────── */
+
+.account-logout-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 8px;
+  align-self: flex-start;
+  transition: color 0.15s;
+}
+.account-logout-link:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── New Game button ───────────────────────────────────────────────────────── */
+
+.agl-new-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
+  white-space: nowrap;
+}
+
+.agl-new-btn:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Shared modal overlay ──────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 28px 32px;
+  width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Logged-out state ──────────────────────────────────────────────────────── */
+
+.account-logged-out {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex: 1;
+  min-height: 60vh;
+}
+
+.account-logged-out-msg {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+.account-login-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.account-login-btn:hover {
+  background: #ffffff;
+}

@@ -3,9 +3,9 @@
 // After a successful login or registration, a JWT and a user object are persisted so
 // other parts of the app can read them without making additional network requests.
 
-const API_BASE = "http://localhost:3000/api/auth";
-const TOKEN_KEY = "ballerz_token"; // localStorage key for the JWT
-const USER_KEY = "ballerz_user";   // localStorage key for the serialized user object
+const API_BASE = `${import.meta.env.VITE_API_BASE}/auth`;
+const TOKEN_KEY = 'ballerz_token'; // localStorage key for the JWT
+const USER_KEY = 'ballerz_user'; // localStorage key for the serialized user object
 
 // Shape of the user object returned by the backend and stored locally
 export interface AuthUser {
@@ -13,6 +13,8 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   email: string;
+  isAdmin: boolean;
+  avatar?: string | null;
 }
 
 // Shape of every successful auth response from the backend
@@ -27,17 +29,17 @@ export async function register(
   firstName: string,
   lastName: string,
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ firstName, lastName, email, password }),
   });
 
   const data = await res.json();
   // Throw so the calling component can catch it and display the error message
-  if (!res.ok) throw new Error(data.message || "Registration failed.");
+  if (!res.ok) throw new Error(data.message || 'Registration failed.');
 
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -48,17 +50,17 @@ export async function register(
 // On success, persists the JWT and user object to localStorage.
 export async function login(
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
 
   const data = await res.json();
   // Throw so the calling component can catch it and display the error message
-  if (!res.ok) throw new Error(data.message || "Login failed.");
+  if (!res.ok) throw new Error(data.message || 'Login failed.');
 
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -81,4 +83,29 @@ export function getUser(): AuthUser | null {
 // Attach this to the Authorization header when making authenticated requests.
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
+}
+
+// Updates the authenticated user's profile. Sends only provided fields.
+// On success, refreshes the stored user object in localStorage.
+export async function updateProfile(payload: {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  avatar?: string;
+}): Promise<AuthUser> {
+  const token = getToken();
+  if (!token) throw new Error('Not authenticated.');
+  const res = await fetch(`${API_BASE}/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Profile update failed.');
+  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  return data.user;
 }

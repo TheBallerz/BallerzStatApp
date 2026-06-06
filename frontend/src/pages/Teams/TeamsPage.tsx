@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import DivisionCard from "../../components/teams/DivisionCard";
-import TeamDetailPanel from "../../components/teams/TeamDetailPanel";
-import { fetchTeams } from "../../services/nbaApi";
-import "./teamsPage.css";
+import { useEffect, useState } from 'react';
+import DivisionCard from '../../components/teams/DivisionCard';
+import TeamDetailPanel from '../../components/teams/TeamDetailPanel';
+import { fetchTeams } from '../../services/nbaApi';
+import './TeamsPage.css';
 
 type SelectedTeam = {
+  mongoId: string;
   name: string;
   division: string;
   teamId: number;
@@ -14,6 +15,7 @@ type SelectedTeam = {
 };
 
 type Team = {
+  mongoId: string;
   teamId: number;
   teamName: string;
   teamAbbreviation: string;
@@ -36,12 +38,12 @@ type Division = {
 
 function groupTeamsByDivision(teams: Team[]): Division[] {
   const divisionMap: Record<string, string[]> = {
-    Atlantic: ["BOS", "BKN", "NYK", "PHI", "TOR"],
-    Central: ["CHI", "CLE", "DET", "IND", "MIL"],
-    Southeast: ["ATL", "CHA", "MIA", "ORL", "WAS"],
-    Northwest: ["DEN", "MIN", "OKC", "POR", "UTA"],
-    Pacific: ["GSW", "LAC", "LAL", "PHX", "SAC"],
-    Southwest: ["DAL", "HOU", "MEM", "NOP", "SAS"],
+    Atlantic: ['BOS', 'BKN', 'NYK', 'PHI', 'TOR'],
+    Central: ['CHI', 'CLE', 'DET', 'IND', 'MIL'],
+    Southeast: ['ATL', 'CHA', 'MIA', 'ORL', 'WAS'],
+    Northwest: ['DEN', 'MIN', 'OKC', 'POR', 'UTA'],
+    Pacific: ['GSW', 'LAC', 'LAL', 'PHX', 'SAC'],
+    Southwest: ['DAL', 'HOU', 'MEM', 'NOP', 'SAS'],
   };
 
   return Object.entries(divisionMap).map(([divisionName, abbreviations]) => ({
@@ -49,6 +51,7 @@ function groupTeamsByDivision(teams: Team[]): Division[] {
     teams: teams
       .filter((team) => abbreviations.includes(team.teamAbbreviation))
       .map((team) => ({
+        mongoId: team.mongoId,
         name: team.teamName,
         division: divisionName,
         teamId: team.teamId,
@@ -63,19 +66,20 @@ export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<SelectedTeam[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadTeams() {
       try {
         setLoading(true);
-        setError("");
+        setError('');
 
         const data = await fetchTeams();
 
-        console.log("RAW TEAMS API:", data);
+        console.log('RAW TEAMS API:', data);
 
-        const mappedTeams: Team[] = data.map((team: any) => ({
+        const mappedTeams: Team[] = data.map((team: Team) => ({
+          mongoId: team.mongoId,
           teamId: team.teamId,
           teamName: team.teamName,
           teamAbbreviation: team.teamAbbreviation,
@@ -86,19 +90,19 @@ export default function TeamsPage() {
           rpg: team.rpg,
           apg: team.apg,
           fgPct: team.fgPct,
-        
+
           primaryColor: team.primaryColor,
           secondaryColor: team.secondaryColor,
           logoUrl: team.logoUrl,
         }));
 
-        console.log("MAPPED TEAMS:", mappedTeams);
-        console.log("GROUPED DIVISIONS:", groupTeamsByDivision(mappedTeams));
+        console.log('MAPPED TEAMS:', mappedTeams);
+        console.log('GROUPED DIVISIONS:', groupTeamsByDivision(mappedTeams));
 
         setTeams(mappedTeams);
       } catch (err) {
         console.error(err);
-        setError("Failed to load teams.");
+        setError('Failed to load teams.');
       } finally {
         setLoading(false);
       }
@@ -139,14 +143,16 @@ export default function TeamsPage() {
   }
 
   return (
-    <div className={`teams-page ${hasPanel ? "has-panel" : ""}`}>
+    <div className={`teams-page ${hasPanel ? 'has-panel' : ''}`}>
       {!hasPanel && (
         <div className="teams-hero">
           <div>
             <h1>Teams</h1>
-            <p>Explore NBA teams by division, view stats, and compare matchups.</p>
+            <p>
+              Explore NBA teams by division, view stats, and compare matchups.
+            </p>
           </div>
-  
+
           <div className="teams-summary">
             <div>
               <strong>30</strong>
@@ -163,8 +169,8 @@ export default function TeamsPage() {
           </div>
         </div>
       )}
-  
-      <div className={hasPanel ? "teams-list" : "division-grid"}>
+
+      <div className={hasPanel ? 'teams-list' : 'division-grid'}>
         {divisions.map((division) => (
           <DivisionCard
             key={division.name}
@@ -174,7 +180,7 @@ export default function TeamsPage() {
           />
         ))}
       </div>
-  
+
       {hasPanel && (
         <div className={`team-panels-container panels-${selectedTeams.length}`}>
           {selectedTeams.map((team) => (

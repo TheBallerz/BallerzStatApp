@@ -1,7 +1,8 @@
-import { TEAM_LOGOS } from "../../assets/teamLogos";
-import "./divisionCard.css";
+import { TEAM_LOGOS } from '../../assets/teamLogos';
+import './divisionCard.css';
 
 type SelectedTeam = {
+  mongoId: string;
   name: string;
   division: string;
   teamId: number;
@@ -40,11 +41,11 @@ export default function DivisionCard({
           return (
             <li
               key={team.name}
-              className={`team-row ${isSelected ? "selected" : ""}`}
+              className={`team-row ${isSelected ? 'selected' : ''}`}
               style={
                 {
-                  "--team-primary": team.primaryColor,
-                  "--team-secondary": team.secondaryColor,
+                  '--team-primary': team.primaryColor,
+                  '--team-secondary': team.secondaryColor,
                 } as React.CSSProperties
               }
               onClick={() => onTeamClick?.(team)}

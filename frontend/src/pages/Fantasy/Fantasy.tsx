@@ -14,7 +14,7 @@ interface FantasyPlayer {
   turnovers: number;
 }
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://ballerz-backend.azurewebsites.net/api';
 
 function fantasyScore(p: FantasyPlayer): number {
   return (
@@ -37,7 +37,7 @@ export default function Fantasy() {
         const res = await fetch(`${API_BASE}/players?currentOnly=1`);
         const data = await res.json();
 
-        const mapped = data.slice(0, 25).map((p: any) => ({
+        const mapped = data.slice(0, 25).map((p: FantasyPlayer) => ({
           playerId: p.playerId,
           fullName: p.fullName,
           team: p.team,

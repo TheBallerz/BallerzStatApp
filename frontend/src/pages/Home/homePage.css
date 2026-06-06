@@ -13,8 +13,9 @@
 .home-content {
   flex: 1;
   min-width: 0; /* allow flex child to shrink below content size */
-  padding: 24px 28px;
+  padding: 16px 28px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ── Section layout ─────────────────────────────────────── */
@@ -27,15 +28,27 @@
   font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.45);
-  margin: 0 0 8px 0;
+  margin: 0 0 0px 0;
   letter-spacing: 0.03em;
 }
 
 /* ── Games grids (Recent Games & Coming Up) ─────────────── */
 
+/* Horizontal scroll wrapper — isolates left/right swipe from the page */
+.games-scroll-wrapper {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.games-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax ensures each column is at least 180px (enabling horizontal scroll on
+     narrow viewports) while expanding to fill available space on wider ones */
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
   gap: 10px;
 }
 
@@ -55,7 +68,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: calc(2 * 90px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  height: calc(2 * 70px + 10px + 4px); /* 2 cards + 1 gap + card borders */
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
 }
@@ -69,9 +82,11 @@
   background-color: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  height: 90px;
+  height: 70px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .game-card:hover {
@@ -82,6 +97,23 @@
 .game-card.card-active {
   border-color: rgba(255, 255, 255, 0.35);
   background-color: #252525;
+}
+
+/* ── Top Players column ─────────────────────────────────── */
+
+/* Shows exactly 2 cards at a time; remaining 3 accessible by scroll.
+   Mirrors .card-scroll-container but sized for 150px player cards. */
+.top-players-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(2 * 70px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.top-players-column::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
 }
 
 /* ── Favorites section ──────────────────────────────────── */
@@ -102,7 +134,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: calc(2 * 150px + 10px + 4px); /* 2 cards + 1 gap + card borders */
+  height: calc(2 * 190px + 10px + 4px); /* 2 cards + 1 gap + card borders */
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
 }
@@ -116,9 +148,11 @@
   background-color: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  height: 150px;
+  height: 190px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .favorite-card:hover {
@@ -131,14 +165,20 @@
   background-color: #252525;
 }
 
-/* ── Stats panels container ─────────────────────────────── */
+/* ── Stats panels container — floats over page content ──── */
 
 .stats-panels-container {
+  position: fixed;
+  right: 0;
+  top: 61px; /* below the fixed nav */
+  bottom: 0;
   display: flex;
   flex-direction: row;
+  align-items: stretch;
   gap: 8px;
-  padding: 12px 12px 12px 0;
-  flex-shrink: 0;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none; /* clicks pass through the gap between panels */
 }
 
 /* Single panel */
@@ -146,9 +186,9 @@
   width: 360px;
 }
 
-/* Two panels — each narrower to fit side by side */
+/* Two panels — same width as single panel */
 .stats-panels-container.panels-2 .stats-panel {
-  width: 268px;
+  width: 360px;
 }
 
 /* ── Individual stats panel ─────────────────────────────── */
@@ -161,6 +201,7 @@
   flex-direction: column;
   overflow: hidden;
   animation: panel-slide-in 0.22s ease-out;
+  pointer-events: all; /* re-enable clicks on the panel itself */
 }
 
 @keyframes panel-slide-in {
@@ -172,22 +213,4 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-.stats-panel-header {
-  padding: 22px 22px 18px;
-}
-
-.stats-panel-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  line-height: 1.15;
-}
-
-.stats-panel-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
 }

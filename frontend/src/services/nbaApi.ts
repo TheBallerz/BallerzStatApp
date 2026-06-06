@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function fetchTeams() {
   const res = await fetch(`${API_BASE}/teams`);
@@ -15,6 +15,22 @@ export async function fetchTeam(teamId: number | string) {
 
   if (!res.ok) {
     throw new Error(`Failed to fetch team: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export async function fetchPlayers(teamMongoId: string) {
+  if (!teamMongoId) {
+    throw new Error('fetchPlayers requires a teamMongoId');
+  }
+
+  const res = await fetch(
+    `${API_BASE}/players?teamId=${teamMongoId}&includeStats=1`,
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch players: ${res.status}`);
   }
 
   return res.json();

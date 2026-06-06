@@ -5,6 +5,36 @@ const mongoose = require('mongoose');
 const { connectDB } = require('./config/database');
 const Team = require('./models/Team');
 const Player = require('./models/Player');
+const { getTeams, getPlayers } = require('./nbaApi');
+const { rowsToObjects } = require('./utils/nbaUtils');
+
+// ---------------------------------------------------------------------------
+// Helpers for NBA API enrichment
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalizes a player name for fuzzy matching between our seed data and the
+ * NBA API's display names. Handles accents, apostrophes, dots, and case.
+ * Mirrors the normalizeName() function in enrichPlayers.js.
+ */
+function normalizeName(name) {
+  return String(name || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // strip combining diacritical marks (accents)
+    .replace(/[^a-z0-9\s]/gi, '')    // strip punctuation (apostrophes, dots, hyphens)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ');           // collapse multiple spaces into one
+}
+
+/**
+ * The NBA API occasionally returns shortened city names that differ from the
+ * full names stored in our seed data. This map resolves known mismatches so
+ * the name-based team lookup still finds the correct MongoDB document.
+ */
+const TEAM_NAME_ALIASES = {
+  'LA Clippers': 'Los Angeles Clippers',
+};
 
 // ---------------------------------------------------------------------------
 // NBA team data — all 30 teams with required schema fields
@@ -409,6 +439,7 @@ async function seed() {
   // Insert players for each team and collect their _ids per team
   let totalPlayers = 0;
   const playerIdsByAbbr = {};
+  const allInsertedPlayers = []; // kept for nbaId enrichment below
 
   for (const [abbr, players] of Object.entries(rosterData)) {
     const teamId = teamIdByAbbr[abbr];
@@ -421,6 +452,7 @@ async function seed() {
     const playersWithTeam = players.map((p) => ({ ...p, teamId }));
     const inserted = await Player.insertMany(playersWithTeam);
     playerIdsByAbbr[abbr] = inserted.map((p) => p._id);
+    allInsertedPlayers.push(...inserted);
     totalPlayers += inserted.length;
   }
   console.log(`Inserted ${totalPlayers} players.`);
@@ -431,7 +463,102 @@ async function seed() {
   }
   console.log('Updated all team rosters.');
 
-  console.log('Seeding complete.');
+  // ── Phase 4: Populate team nbaIds (one API call — same as sync:team-ids) ────
+  // This is the same logic as syncTeamNbaIds.js but inlined so a fresh seed
+  // never leaves teams without an nbaId. The nightly sync requires team nbaIds
+  // to link incoming game data to the correct Team document.
+  console.log('\nFetching team nbaIds from NBA API...');
+  try {
+    const teamData = await getTeams();
+    const teamResultSet =
+      teamData.resultSets?.find((s) => s.name === 'LeagueDashTeamStats') ||
+      teamData.resultSets?.[0];
+
+    if (!teamResultSet) throw new Error('LeagueDashTeamStats result set not found');
+
+    const apiTeams = rowsToObjects(teamResultSet);
+    let teamsUpdated = 0;
+
+    for (const apiTeam of apiTeams) {
+      const nbaId    = apiTeam.TEAM_ID;
+      const teamName = TEAM_NAME_ALIASES[apiTeam.TEAM_NAME] ?? apiTeam.TEAM_NAME;
+      if (!nbaId || !teamName) continue;
+
+      const result = await Team.findOneAndUpdate(
+        { name: teamName },
+        { $set: { nbaId } },
+      );
+      if (result) teamsUpdated++;
+    }
+
+    console.log(`  ✓ Team nbaIds populated for ${teamsUpdated}/30 teams.`);
+  } catch (err) {
+    console.warn(`  ⚠ Could not fetch team nbaIds from NBA API: ${err.message}`);
+    console.warn('  Run "npm run sync:team-ids" after seeding to populate them.');
+  }
+
+  // ── Phase 5: Populate player nbaIds (ONE bulk API call) ─────────────────────
+  // commonallplayers returns every active player's PERSON_ID in a single request.
+  // We match seeded players to API players by normalized name, then write nbaId
+  // and imageUrl in one update per matched player. This replaces the need to run
+  // "npm run sync:players" (enrichPlayers.js) for basic nbaId setup — that script
+  // still adds extra profile fields (height, weight, birthDate, etc.) if desired.
+  console.log('\nFetching player nbaIds from NBA API (single bulk call)...');
+  try {
+    const playerData = await getPlayers('1');
+    const playerResultSet =
+      playerData.resultSets?.find((s) => s.name === 'CommonAllPlayers') ||
+      playerData.resultSet;
+
+    if (!playerResultSet) throw new Error('CommonAllPlayers result set not found');
+
+    // Filter to only roster-active players (same filter as enrichPlayers.js).
+    const apiPlayers = rowsToObjects(playerResultSet).filter(
+      (p) => p.ROSTERSTATUS === 1 || p.ROSTERSTATUS === '1',
+    );
+
+    // Build a normalized-name → nbaId lookup from the API response.
+    const nbaIdByNormalizedName = new Map();
+    for (const p of apiPlayers) {
+      const key = normalizeName(p.DISPLAY_FIRST_LAST);
+      nbaIdByNormalizedName.set(key, p.PERSON_ID);
+    }
+
+    let playersEnriched = 0;
+    let playersNotFound = 0;
+
+    for (const player of allInsertedPlayers) {
+      const key   = normalizeName(`${player.firstName} ${player.lastName}`);
+      const nbaId = nbaIdByNormalizedName.get(key);
+
+      if (!nbaId) {
+        // Player not on the current active roster (e.g., traded, retired, or a
+        // name mismatch between our seed data and the NBA API). Not fatal.
+        playersNotFound++;
+        continue;
+      }
+
+      await Player.findByIdAndUpdate(player._id, {
+        $set: {
+          nbaId,
+          // CDN headshot URL is deterministic from nbaId — no extra API call needed.
+          imageUrl: `https://cdn.nba.com/headshots/nba/latest/1040x760/${nbaId}.png`,
+        },
+      });
+      playersEnriched++;
+    }
+
+    console.log(`  ✓ Player nbaIds populated: ${playersEnriched} matched, ${playersNotFound} not in active roster.`);
+    if (playersNotFound > 0) {
+      console.log('  (Unmatched players may be on different teams or retired.');
+      console.log('   Run "npm run sync:players" for full roster coverage.)');
+    }
+  } catch (err) {
+    console.warn(`  ⚠ Could not fetch player nbaIds from NBA API: ${err.message}`);
+    console.warn('  Run "npm run sync:players" after seeding to populate them.');
+  }
+
+  console.log('\nSeeding complete.');
   await mongoose.disconnect();
 }
 

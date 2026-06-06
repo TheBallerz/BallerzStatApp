@@ -1,12 +1,5 @@
 const mongoose = require('mongoose');
 
-// Two weeks expressed in seconds, used for the TTL (time-to-live) index below.
-// MongoDB will automatically delete any document whose createdAt timestamp is
-// older than this value. This keeps game-level storage small while still
-// giving the frontend enough recent games to show a "last 2 weeks" view.
-// To change the retention window, update this constant and drop/recreate the index.
-const TWO_WEEKS_SECONDS = 60 * 60 * 24 * 14; // 1,209,600 seconds
-
 const teamGameStatsSchema = new mongoose.Schema(
   {
     // --- NEW FIELD ---
@@ -20,12 +13,20 @@ const teamGameStatsSchema = new mongoose.Schema(
       required: true,
     },
 
+
+
     // --- NEW FIELD ---
     // The NBA season this game belongs to (e.g., '2025-26').
     // Stored on every game doc so we can efficiently query "all team games
     // this season" without relying on date range arithmetic.
     season: {
       type: String,
+      required: true,
+    },
+
+    seasonType: {
+      type: String,
+      enum: ['Regular Season', 'Playoffs'],
       required: true,
     },
 
@@ -62,6 +63,15 @@ const teamGameStatsSchema = new mongoose.Schema(
       type: String,
       enum: ['W', 'L'],
       required: true,
+    },
+
+    // True if this team played at home, false if away.
+    // Derived from the MATCHUP string: "BOS vs. MIA" = home, "BOS @ MIA" = away.
+    // Stored so schedule and game routes can filter or label home/away games
+    // without re-parsing the raw MATCHUP string on every read.
+    isHome: {
+      type: Boolean,
+      default: false,
     },
 
     // Points this team scored in the game.
@@ -119,17 +129,11 @@ const teamGameStatsSchema = new mongoose.Schema(
 // so even if the nightly sync runs twice, only one record is ever written.
 teamGameStatsSchema.index({ teamId: 1, nbaGameId: 1 }, { unique: true });
 
-// --- NEW INDEX ---
-// TTL index on the createdAt field. MongoDB's TTL monitor checks this index
-// every 60 seconds and deletes any document where:
-//   Date.now() - createdAt >= TWO_WEEKS_SECONDS
-// This keeps the game-level collections small (rolling 2-week window) without
-// any manual cleanup. Season-level aggregates in TeamSeasonStats are preserved
-// permanently and are unaffected by this deletion.
-teamGameStatsSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: TWO_WEEKS_SECONDS },
-);
+// NOTE: The old 14-day TTL index on createdAt has been removed. The full
+// season of game logs is now retained so schedule and game history routes
+// can query any date range. If you have an existing MongoDB collection with
+// this index still active, drop it manually:
+//   db.teamGameStats.dropIndex('createdAt_1')
 
 // The third argument pins the MongoDB collection name to 'teamGameStats'.
 // Without it, Mongoose auto-lowercases the model name to 'teamgamestats',

@@ -9,6 +9,7 @@ const scheduleRoutes = require('./routes/schedule');
 const authRoutes = require('./routes/auth');
 const gamesRoutes = require('./routes/games');
 const standingsRoutes = require("./routes/standings");
+const adminRoutes = require('./routes/admin');
 const playerBioRoutes = require("./routes/playerBioRoutes");
 
 
@@ -37,8 +38,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Enable automatic parsing of JSON request bodies
-app.use(express.json());
+// Enable automatic parsing of JSON request bodies.
+// Limit raised to 5mb to accommodate base64-encoded profile picture uploads.
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Ensure prefix /api routes to routes
 app.use("/api", playersRoutes);
@@ -48,6 +51,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api", gamesRoutes);
 app.use("/api", standingsRoutes);
 app.use("/api/players", playerBioRoutes);
+app.use('/api/admin', adminRoutes);
+const userStatsRoutes = require('./routes/userStats');
+const friendsRoutes   = require('./routes/friends');
+app.use('/api/user', userStatsRoutes);
+app.use('/api/friends', friendsRoutes);
 //hard coded used for testing front to back response
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: 'backend is alive' });

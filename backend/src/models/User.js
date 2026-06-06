@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 
 // Defines the shape of a user document stored in MongoDB.
 // passwordHash stores the bcrypt-hashed password — the plaintext password is never saved.
-// favoritePlayers and favoriteTeams hold references to Player/Team documents and will be
-// populated once the NBA API integration is complete.
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -19,7 +17,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,   // enforces one account per email address
+      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -27,20 +25,32 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    favoritePlayers: [
+    // Stored as NBA API numeric IDs (Player.nbaId / Team.nbaId), not MongoDB ObjectIds.
+    favoritePlayers: [{ type: Number }],
+    favoriteTeams:   [{ type: Number }],
+    // Social features
+    avatar: {
+      type: String,
+      default: null,
+    },
+    // Confirmed friends — bidirectional: if A is in B.friends, B must be in A.friends.
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    // Incoming pending friend requests stored on the recipient's document.
+    friendRequests: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Player',
+        from:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
-    favoriteTeams: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Team',
-      },
-    ],
+    // Users this account has blocked (one-directional on storage).
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    // Grants access to the admin panel on the Account page.
+    isAdmin: {
+      type:    Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }, // automatically adds createdAt and updatedAt fields
+  { timestamps: true },
 );
 
 module.exports = mongoose.model('User', userSchema);

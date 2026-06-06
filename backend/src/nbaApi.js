@@ -21,31 +21,18 @@ const NBA_URL = 'https://stats.nba.com/stats';
 //                       common bot-detection signal.
 const NBA_HEADERS = {
   'User-Agent':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36',
   'x-nba-stats-origin': 'stats',
   'x-nba-stats-token':  'true',
-  Referer:         'https://www.nba.com/',
-  Origin:          'https://www.nba.com',
-  'Accept-Language': 'en-US,en;q=0.9',
+  Referer:              'https://www.nba.com/',
+  Origin:               'https://www.nba.com',
+  'Accept':             'application/json, text/plain, */*',
+  'Accept-Language':    'en-US,en;q=0.9',
+  'Accept-Encoding':    'gzip, deflate, br',
+  'Connection':         'keep-alive',
+  'Cache-Control':      'no-cache',
+  'Pragma':             'no-cache',
 };
-
-// Insead of hard coding "current season" we have this function to get current season
-function getCurrentSeason() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0 = Jan, 9 = Oct
-
-  if (month >= 9) {
-    // October–December → new season
-    const nextYear = (year + 1).toString().slice(-2);
-    return `${year}-${nextYear}`;
-  } else {
-    // January–September → still previous season
-    const prevYear = year - 1;
-    const nextYear = year.toString().slice(-2);
-    return `${prevYear}-${nextYear}`;
-  }
-}
 
 // Insead of hard coding "current season" we have this function to get current season
 function getCurrentSeason() {
@@ -70,11 +57,26 @@ const CURRENT_SEASON = getCurrentSeason();
 // Core HTTP helper — sends a GET request to the NBA Stats API.
 // All other functions in this module call nbaGet() rather than axios directly,
 // keeping the header spoofing and base URL in one place.
-async function nbaGet(path, params = {}) {
-   const response = await axios.get(`${NBA_URL}/${path}`, {
-    params, headers: NBA_HEADERS,
-   });
-   return response.data;
+// Retries up to 3 times with exponential backoff (2s, 4s, 8s) before throwing.
+// The NBA API frequently returns 429/500 on the first attempt but succeeds on retry.
+async function nbaGet(path, params = {}, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(`${NBA_URL}/${path}`, {
+        params,
+        headers: NBA_HEADERS,
+        timeout: 30000, // 30 s — the API can be slow
+      });
+      return response.data;
+    } catch (err) {
+      const status = err.response?.status;
+      const isRetryable = !status || status === 429 || status >= 500;
+      if (!isRetryable || attempt === retries) throw err;
+      const wait = 2000 * Math.pow(2, attempt - 1); // 2s, 4s, 8s
+      console.warn(`[nbaApi] ${path} attempt ${attempt} failed (${status ?? 'network'}), retrying in ${wait / 1000}s...`);
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+  }
 }
 
 // ── Level 1: Static / roster data ───────────────────────────────────────────
@@ -150,21 +152,38 @@ async function getPlayerInfo(nbaPlayerId) {
  * @returns {Object} Synthetic API response: { resultSets: [mergedResultSet] }
  */
 async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = null) {
-  // Fire both season type requests in parallel; use allSettled so one failure
-  // doesn't prevent the other from completing.
-  const [regularResult, playoffResult] = await Promise.allSettled([
-    nbaGet(endpoint, { ...paramsBase, SeasonType: 'Regular Season' }),
-    nbaGet(endpoint, { ...paramsBase, SeasonType: 'Playoffs' }),
-  ]);
+  // Fire requests sequentially with a short delay between them.
+  // The NBA API rate limiter treats simultaneous requests from the same IP as
+  // suspicious — sequential requests with a pause look far more like a real browser.
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const regularResult = await nbaGet(endpoint, { ...paramsBase, SeasonType: 'Regular Season' })
+    .then((v) => ({ status: 'fulfilled', value: v }))
+    .catch((e) => ({ status: 'rejected', reason: e }));
+
+  await delay(1200); // 1.2 s between the two requests
+
+  const playoffResult = await nbaGet(endpoint, { ...paramsBase, SeasonType: 'Playoffs' })
+    .then((v) => ({ status: 'fulfilled', value: v }))
+    .catch((e) => ({ status: 'rejected', reason: e }));
 
   // Extract the target result set from each successful response.
   const resultSets = [regularResult, playoffResult]
-    .filter((r) => r.status === 'fulfilled')
-    .map((r) => {
-      const data = r.value;
-      return data.resultSets?.find((s) => s.name === rsName) ?? data.resultSets?.[0];
-    })
-    .filter(Boolean);
+  .map((r, index) => {
+    if (r.status !== 'fulfilled') return null;
+
+    const data = r.value;
+    const resultSet =
+      data.resultSets?.find((s) => s.name === rsName) ?? data.resultSets?.[0];
+
+    if (!resultSet) return null;
+
+    return {
+      ...resultSet,
+      seasonType: index === 0 ? 'Regular Season' : 'Playoffs',
+    };
+  })
+  .filter(Boolean);
 
   if (resultSets.length === 0) {
     throw new Error(`Both Regular Season and Playoffs requests failed for ${endpoint}`);
@@ -195,7 +214,12 @@ async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = nu
           // Already have an entry — add this row's numeric values to the existing ones.
           const existing = map.get(id);
           for (let i = 0; i < row.length; i++) {
-            if (i !== idIndex && typeof row[i] === 'number' && typeof existing[i] === 'number') {
+            if (
+              i !== idIndex &&
+              typeof row[i] === 'number' &&
+              typeof existing[i] === 'number' &&
+              !headers[i].endsWith('_ID')
+            ) {
               existing[i] += row[i];
             }
           }
@@ -207,8 +231,23 @@ async function fetchBothSeasonTypes(endpoint, paramsBase, rsName, mergeById = nu
   } else {
     // Game log strategy: simple concatenation. Each game belongs to exactly one
     // season type, so there are no duplicate GAME_IDs across the two result sets.
-    const rowSet = resultSets.flatMap((rs) => rs.rowSet ?? []);
-    mergedResultSet = { ...resultSets[0], rowSet };
+    const headers = resultSets[0].headers;
+const seasonTypeIndex = headers.indexOf('SEASON_TYPE');
+const mergedHeaders =
+  seasonTypeIndex === -1 ? [...headers, 'SEASON_TYPE'] : headers;
+
+const rowSet = resultSets.flatMap((rs) => {
+  const type = rs.seasonType;
+  return (rs.rowSet ?? []).map((row) =>
+    seasonTypeIndex === -1 ? [...row, type] : row
+  );
+});
+
+mergedResultSet = {
+  ...resultSets[0],
+  headers: mergedHeaders,
+  rowSet,
+};
   }
 
   return { resultSets: [mergedResultSet] };
@@ -337,21 +376,23 @@ function rollingWindowStart(days = 14) {
   return formatNbaDate(date);
 }
 
-// Returns a row for every (team, game) combination within the past 14 days,
+// Returns a row for every (team, game) combination for the given season,
 // combining both Regular Season and Playoffs games into one result set.
 // PlayerOrTeam='T' selects the team-level game log.
 // Key fields: GAME_ID, TEAM_ID, MATCHUP, GAME_DATE, WL, PTS, REB, AST,
 // STL, BLK, TOV, FGM, FGA, FG3M, FG3A, FTM, FTA, PLUS_MINUS.
 // MATCHUP format is "ABBR vs. ABBR" (home) or "ABBR @ ABBR" (away).
 //
-// The 14-day window matches the 2-week TTL on TeamGameStats documents —
-// we never need box scores older than what MongoDB will auto-delete anyway.
-async function getTeamGameLog(season = CURRENT_SEASON) {
+// daysBack controls the DateFrom filter:
+//   number — fetch only games in the past N days (e.g. 14 for nightly incremental syncs)
+//   null   — no DateFrom filter; returns the full season (used on first-run syncs so
+//             TeamGameStats is populated with the complete season history)
+async function getTeamGameLog(season = CURRENT_SEASON, daysBack = 14) {
   const params = {
     Counter: '0',
-    DateFrom: rollingWindowStart(14), // only fetch the past 14 days
-    DateTo:   '',                     // empty = through today
-    Direction: 'DESC',                // most recent games first
+    DateFrom: daysBack !== null ? rollingWindowStart(daysBack) : '', // null = full season
+    DateTo:   '',                                                     // empty = through today
+    Direction: 'DESC',                                                // most recent games first
     LeagueID: '00',
     PlayerOrTeam: 'T',               // T = team-level rows
     Season: season,
@@ -362,18 +403,21 @@ async function getTeamGameLog(season = CURRENT_SEASON) {
   return fetchBothSeasonTypes('leaguegamelog', params, 'LeagueGameLog');
 }
 
-// Returns a row for every (player, game) combination within the past 14 days,
+// Returns a row for every (player, game) combination for the given season,
 // combining both Regular Season and Playoffs games into one result set.
 // PlayerOrTeam='P' selects the player-level game log.
 // Same key fields as getTeamGameLog, plus PLAYER_ID and PLAYER_NAME.
 // Minutes are returned in "MM:SS" format and converted to decimal by
 // nightlySync.js before being stored.
-async function getPlayerGameLog(season = CURRENT_SEASON) {
+//
+// daysBack follows the same semantics as getTeamGameLog — pass null for the
+// full season on a first-run sync, or a number for an incremental window.
+async function getPlayerGameLog(season = CURRENT_SEASON, daysBack = 14) {
   const params = {
     Counter: '0',
-    DateFrom: rollingWindowStart(14), // only fetch the past 14 days
-    DateTo:   '',                     // empty = through today
-    Direction: 'DESC',                // most recent games first
+    DateFrom: daysBack !== null ? rollingWindowStart(daysBack) : '', // null = full season
+    DateTo:   '',                                                     // empty = through today
+    Direction: 'DESC',                                                // most recent games first
     LeagueID: '00',
     PlayerOrTeam: 'P',               // P = player-level rows
     Season: season,
@@ -457,7 +501,6 @@ async function getTeamInfo(teamId, season = CURRENT_SEASON) {
 }
 
 module.exports = {
-  CURRENT_SEASON,
   CURRENT_SEASON,      // Exported so other modules use the same season string
   nbaGet,              // Low-level helper (available if routes need custom calls)
   // Level 1 — static/roster data

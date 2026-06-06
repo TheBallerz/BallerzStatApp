@@ -33,9 +33,16 @@
   padding-right: 4px;
 }
 
-.sched-team-list::-webkit-scrollbar { width: 4px; }
-.sched-team-list::-webkit-scrollbar-track { background: transparent; }
-.sched-team-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+.sched-team-list::-webkit-scrollbar {
+  width: 4px;
+}
+.sched-team-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sched-team-list::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
 
 .sched-team-item {
   display: flex;
@@ -198,8 +205,13 @@
 }
 
 @keyframes pulse-green {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ─── Divider ──────────────────────────────────────────────────────────────── */
@@ -340,8 +352,12 @@
   letter-spacing: 0.03em;
 }
 
-.sched-result.win  { color: #4ade80; }
-.sched-result.loss { color: #f87171; }
+.sched-result.win {
+  color: #4ade80;
+}
+.sched-result.loss {
+  color: #f87171;
+}
 
 /* Score display */
 .sched-score {
@@ -395,4 +411,14 @@
 
 .sched-team-picker:focus {
   border-color: #444;
+}
+
+.sched-table th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sched-table th:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
 }
