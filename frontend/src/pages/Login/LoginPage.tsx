@@ -1,15 +1,28 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './loginPage.css';
+import {
+  TrackPlayersCard,
+  TeamStatsCard,
+  ComparePlayersCard,
+  CompareTeamsCard,
+  AddFriendsCard,
+  SeeHowYouCompareCard,
+} from './CarouselCards';
 
-const carouselItems: string[] = [
-  'Track Players',
-  'View Team Stats',
-  'Build Teams',
-  'Compare Players',
-  'Compare Teams',
-  'Add Friends',
-  'See How You Compare',
+type CarouselItem = {
+  id: string;
+  label: string;
+  compact?: boolean;
+};
+
+const carouselItems: CarouselItem[] = [
+  { id: 'track-players', label: 'Track Players' },
+  { id: 'team-stats', label: 'View Team Stats' },
+  { id: 'compare-players', label: 'Compare Players', compact: true },
+  { id: 'compare-teams', label: 'Compare Teams', compact: true },
+  { id: 'add-friends', label: 'Add Friends' },
+  { id: 'see-how', label: 'See How You Compare' },
 ];
 
 // Duplicate so the track is 2× one set wide — position resets by
@@ -18,6 +31,25 @@ const duplicatedItems = [...carouselItems, ...carouselItems];
 
 const AUTO_SCROLL_SPEED = 0.6; // px per frame (~36 px/s at 60 fps)
 const RESUME_DELAY_MS = 1200; // ms after last wheel event before auto-scroll resumes
+
+function cardContent(id: string) {
+  switch (id) {
+    case 'track-players':
+      return <TrackPlayersCard />;
+    case 'team-stats':
+      return <TeamStatsCard />;
+    case 'compare-players':
+      return <ComparePlayersCard />;
+    case 'compare-teams':
+      return <CompareTeamsCard />;
+    case 'add-friends':
+      return <AddFriendsCard />;
+    case 'see-how':
+      return <SeeHowYouCompareCard />;
+    default:
+      return null;
+  }
+}
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -131,9 +163,13 @@ export default function LoginPage() {
         aria-label="Feature highlights"
       >
         <div ref={trackRef} className="carousel-track">
-          {duplicatedItems.map((title, i) => (
-            <div key={i} className="carousel-card">
-              <span className="carousel-card-title">{title}</span>
+          {duplicatedItems.map((item, i) => (
+            <div
+              key={i}
+              className={`carousel-card${item.compact ? ' carousel-card--compact' : ''}`}
+            >
+              <span className="carousel-card-title">{item.label}</span>
+              <div className="cc-content-frame">{cardContent(item.id)}</div>
             </div>
           ))}
         </div>

@@ -104,6 +104,7 @@ async function backfillTeamGameStats() {
   let skipped  = 0;
 
   for (const row of rows) {
+    
     const nbaGameId = Number(row.GAME_ID);
     const nbaTeamId = row.TEAM_ID;
 
@@ -117,7 +118,7 @@ async function backfillTeamGameStats() {
       skipped++;
       continue;
     }
-
+    console.log(row);
     try {
       await TeamGameStats.create({
         nbaGameId,
@@ -140,6 +141,7 @@ async function backfillTeamGameStats() {
         threePointersAttempted:  row.FG3A       ?? 0,
         freeThrowsMade:          row.FTM        ?? 0,
         freeThrowsAttempted:     row.FTA        ?? 0,
+        seasonType: row.SEASON_TYPE,
       });
       inserted++;
     } catch (err) {

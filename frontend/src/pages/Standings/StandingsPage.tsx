@@ -40,11 +40,21 @@ function StandingsTable({
                 <td>{team.wins}</td>
                 <td>{team.losses}</td>
                 <td>{team.winPct.toFixed(3)}</td>
-                <td>{team.avgPoints.toFixed(1)}</td>
-                <td>{team.avgRebounds.toFixed(1)}</td>
-                <td>{team.avgAssists.toFixed(1)}</td>
-                <td>{(team.fgPct * 100).toFixed(1)}%</td>
-                <td>{(team.fg3Pct * 100).toFixed(1)}%</td>
+                <td>{team.avgPoints?.toFixed(1) ?? '-'}</td>
+                <td>{team.avgRebounds?.toFixed(1) ?? '-'}</td>
+                <td>{team.avgAssists?.toFixed(1) ?? '-'}</td>
+
+                <td>
+                  {team.fgPct != null
+                    ? `${(team.fgPct * 100).toFixed(1)}%`
+                    : '-'}
+                </td>
+
+                <td>
+                  {team.fg3Pct != null
+                    ? `${(team.fg3Pct * 100).toFixed(1)}%`
+                    : '-'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -58,12 +68,15 @@ export default function StandingsPage() {
   const [data, setData] = useState<StandingsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [standingsType, setStandingsType] = useState<'season' | 'finals'>(
+    'season',
+  );
 
   useEffect(() => {
     async function loadStandings() {
       try {
         setLoading(true);
-        const standings = await fetchStandings();
+        const standings = await fetchStandings(undefined, standingsType);
         setData(standings);
         setError('');
       } catch (err) {
@@ -74,7 +87,7 @@ export default function StandingsPage() {
     }
 
     loadStandings();
-  }, []);
+  }, [standingsType]);
 
   if (loading) {
     return <div className="standings-page">Loading standings...</div>;
@@ -88,6 +101,14 @@ export default function StandingsPage() {
     <div className="standings-page">
       <h1 className="page-title">NBA Standings</h1>
       <p className="standings-subtitle">Season: {data?.season}</p>
+
+      <div className="standings-toggle">
+        <button onClick={() => setStandingsType('season')}>
+          Regular Season
+        </button>
+
+        <button onClick={() => setStandingsType('finals')}>Finals</button>
+      </div>
 
       <div className="standings-grid">
         <StandingsTable title="Eastern Conference" teams={data?.east ?? []} />

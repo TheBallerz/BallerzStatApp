@@ -1,6 +1,11 @@
+<img width="611" height="331" alt="Screenshot 2026-06-05 at 6 04 47 PM" src="https://github.com/user-attachments/assets/b6956505-ae5c-4327-90eb-08f223e5ab72" />
 # Ballerz Stat App
 
+[![Azure Static Web Apps CI/CD](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml/badge.svg)](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml)
+
 A full-stack NBA statistics application that lets users create an account, save favorite teams, and browse live team and player stats across the current NBA season. Data is sourced directly from the NBA Stats API and stored in MongoDB, with a nightly sync job that keeps everything current.
+
+**Product Spec: ** https://docs.google.com/document/d/1t1RAV8-V2vJKlX4UrsRD-outBDsP7GBG3nMFeY7uleU/edit?usp=sharing
 
 ---
 
@@ -322,6 +327,9 @@ npm test                # run all tests
 npm run test:coverage   # run tests with coverage report
 ```
 
+<img width="611" height="331" alt="Screenshot 2026-06-05 at 6 04 47 PM" src="https://github.com/user-attachments/assets/890060e7-b0ef-48f4-a7d8-5b7d6dea0f34" />
+
+
 ### Frontend
 
 The frontend uses [Jest](https://jestjs.io/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
@@ -331,6 +339,8 @@ Run from the `frontend/` directory:
 ```bash
 npm test
 ```
+
+<img width="738" height="654" alt="Screenshot 2026-06-05 at 6 02 38 PM" src="https://github.com/user-attachments/assets/07623f55-2d49-4962-a5a8-ee6c7d191013" />
 
 ---
 

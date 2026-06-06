@@ -1,20 +1,29 @@
 'use strict';
 
 jest.mock('../../models/Player', () => ({
-  find: jest.fn(),
+  find:    jest.fn(),
+  findOne: jest.fn(),
 }));
 
 jest.mock('../../models/PlayerSeasonStats', () => ({
   aggregate: jest.fn(),
+  findOne:   jest.fn(),
 }));
 
 jest.mock('../../models/PlayerCareerStats', () => ({
   find: jest.fn(),
 }));
 
-const router            = require('../../routes/players');
-const Player            = require('../../models/Player');
-const PlayerCareerStats = require('../../models/PlayerCareerStats');
+jest.mock('../../models/PlayerGameStats', () => ({
+  find:    jest.fn(),
+  findOne: jest.fn(),
+}));
+
+const router              = require('../../routes/players');
+const Player              = require('../../models/Player');
+const PlayerSeasonStats   = require('../../models/PlayerSeasonStats');
+const PlayerCareerStats   = require('../../models/PlayerCareerStats');
+const PlayerGameStats     = require('../../models/PlayerGameStats');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -285,5 +294,327 @@ describe('GET /players/:playerId/career', () => {
       error:   'Failed to fetch player career stats',
       details: 'career boom',
     });
+  });
+});
+
+// ── GET /players/search ───────────────────────────────────────────────────────
+
+describe('GET /players/search', () => {
+  const handler = getHandler('/players/search');
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  test('returns matching players when q is provided', async () => {
+    const searchResult = [{ _id: 'mongo-id-jokic', firstName: 'Nikola', lastName: 'Jokic', nbaId: 203999 }];
+    const leanChain = { lean: jest.fn().mockResolvedValue(searchResult) };
+    const limitChain = { limit: jest.fn().mockReturnValue(leanChain) };
+    const selectChain = { select: jest.fn().mockReturnValue(limitChain) };
+    Player.find.mockReturnValue(selectChain);
+
+    const res = mockRes();
+    await handler({ query: { q: 'jokic' } }, res);
+
+    expect(Player.find).toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith(searchResult);
+  });
+
+  test('returns empty array when q is empty', async () => {
+    const res = mockRes();
+    await handler({ query: { q: '' } }, res);
+
+    expect(Player.find).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith([]);
+  });
+
+  test('returns empty array when q is not provided', async () => {
+    const res = mockRes();
+    await handler({ query: {} }, res);
+
+    expect(Player.find).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith([]);
+  });
+
+  test('returns 500 when DB throws', async () => {
+    const leanChain = { lean: jest.fn().mockRejectedValue(new Error('search boom')) };
+    const limitChain = { limit: jest.fn().mockReturnValue(leanChain) };
+    const selectChain = { select: jest.fn().mockReturnValue(limitChain) };
+    Player.find.mockReturnValue(selectChain);
+
+    const res = mockRes();
+    await handler({ query: { q: 'jokic' } }, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      error:   'Failed to search players',
+      details: 'search boom',
+    });
+  });
+});
+
+// ── GET /players/top ──────────────────────────────────────────────────────────
+
+describe('GET /players/top', () => {
+  const handler = getHandler('/players/top');
+
+  const TOP_DOC = {
+    nbaPlayerId: 203999,
+    statValue:   26.4,
+    playerName:  'Nikola Jokic',
+    teamAbbr:    'DEN',
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  test('returns top players in all four categories', async () => {
+    PlayerSeasonStats.aggregate.mockResolvedValue([TOP_DOC]);
+
+    const res = mockRes();
+    await handler({ query: {} }, res);
+
+    expect(PlayerSeasonStats.aggregate).toHaveBeenCalledTimes(4);
+    expect(res.json).toHaveBeenCalledWith({
+      points:   [TOP_DOC],
+      threes:   [TOP_DOC],
+      assists:  [TOP_DOC],
+      rebounds: [TOP_DOC],
+    });
+  });
+
+  test('returns 500 when aggregate throws', async () => {
+    PlayerSeasonStats.aggregate.mockRejectedValue(new Error('agg boom'));
+
+    const res = mockRes();
+    await handler({ query: {} }, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      error:   'Failed to fetch top players',
+      details: 'agg boom',
+    });
+  });
+});
+
+// ── GET /players/:nbaPlayerId/stats ───────────────────────────────────────────
+
+describe('GET /players/:nbaPlayerId/stats', () => {
+  const handler = getHandler('/players/:nbaPlayerId/stats');
+
+  const SEASON_DOC = {
+    nbaPlayerId:  203999,
+    avgPoints:    26.4,
+    avgRebounds:  12.1,
+    avgAssists:   9.0,
+    avgFg3m:      1.5,
+  };
+
+  const GAME_DOC = {
+    points:            30,
+    rebounds:          14,
+    assists:           10,
+    threePointersMade: 2,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  test('returns season averages and last game stats', async () => {
+    PlayerSeasonStats.findOne.mockReturnValue({ lean: jest.fn().mockResolvedValue(SEASON_DOC) });
+
+    const playerChain = { lean: jest.fn().mockResolvedValue({ _id: 'mongo-id-jokic' }) };
+    const playerSelectChain = { select: jest.fn().mockReturnValue(playerChain) };
+    Player.findOne.mockReturnValue(playerSelectChain);
+
+    const gameChain = { lean: jest.fn().mockResolvedValue(GAME_DOC) };
+    const gameSortChain = { sort: jest.fn().mockReturnValue(gameChain) };
+    PlayerGameStats.findOne.mockReturnValue(gameSortChain);
+
+    const req = { params: { nbaPlayerId: '203999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(PlayerSeasonStats.findOne).toHaveBeenCalledWith({ nbaPlayerId: 203999 });
+    expect(res.json).toHaveBeenCalledWith({
+      seasonAvg: {
+        pts:  26.4,
+        reb:  12.1,
+        ast:  9.0,
+        fg3m: 1.5,
+      },
+      lastGame: {
+        pts:  30,
+        reb:  14,
+        ast:  10,
+        fg3m: 2,
+      },
+    });
+  });
+
+  test('returns lastGame null when no game doc found', async () => {
+    PlayerSeasonStats.findOne.mockReturnValue({ lean: jest.fn().mockResolvedValue(SEASON_DOC) });
+
+    const playerChain = { lean: jest.fn().mockResolvedValue({ _id: 'mongo-id-jokic' }) };
+    const playerSelectChain = { select: jest.fn().mockReturnValue(playerChain) };
+    Player.findOne.mockReturnValue(playerSelectChain);
+
+    const gameChain = { lean: jest.fn().mockResolvedValue(null) };
+    const gameSortChain = { sort: jest.fn().mockReturnValue(gameChain) };
+    PlayerGameStats.findOne.mockReturnValue(gameSortChain);
+
+    const req = { params: { nbaPlayerId: '203999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ lastGame: null })
+    );
+  });
+
+  test('returns 400 for non-numeric nbaPlayerId', async () => {
+    const req = { params: { nbaPlayerId: 'abc' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'nbaPlayerId must be a numeric NBA player ID',
+    });
+    expect(PlayerSeasonStats.findOne).not.toHaveBeenCalled();
+  });
+
+  test('returns 404 when no season stats found', async () => {
+    PlayerSeasonStats.findOne.mockReturnValue({ lean: jest.fn().mockResolvedValue(null) });
+
+    const req = { params: { nbaPlayerId: '9999999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'No season stats found for this player',
+    });
+  });
+
+  test('returns 500 when DB throws', async () => {
+    PlayerSeasonStats.findOne.mockReturnValue({
+      lean: jest.fn().mockRejectedValue(new Error('stats boom')),
+    });
+
+    const req = { params: { nbaPlayerId: '203999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      error:   'Failed to fetch player stats',
+      details: 'stats boom',
+    });
+  });
+});
+
+// ── GET /players/:nbaPlayerId/games ───────────────────────────────────────────
+
+describe('GET /players/:nbaPlayerId/games', () => {
+  const handler = getHandler('/players/:nbaPlayerId/games');
+
+  const GAME_LOG_DOC = {
+    gameDate:          new Date('2025-01-15'),
+    points:            28,
+    rebounds:          11,
+    assists:           8,
+    steals:            1,
+    blocks:            2,
+    turnovers:         3,
+    threePointersMade: 2,
+    minutes:           34.5,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  test('returns mapped game log for valid player', async () => {
+    const playerChain = { lean: jest.fn().mockResolvedValue({ _id: 'mongo-id-jokic' }) };
+    const playerSelectChain = { select: jest.fn().mockReturnValue(playerChain) };
+    Player.findOne.mockReturnValue(playerSelectChain);
+
+    const gameLeanChain = { lean: jest.fn().mockResolvedValue([GAME_LOG_DOC]) };
+    const gameSelectChain = { select: jest.fn().mockReturnValue(gameLeanChain) };
+    const gameSortChain = { sort: jest.fn().mockReturnValue(gameSelectChain) };
+    PlayerGameStats.find.mockReturnValue(gameSortChain);
+
+    const req = { params: { nbaPlayerId: '203999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(Player.findOne).toHaveBeenCalledWith({ nbaId: 203999 });
+    expect(res.json).toHaveBeenCalledWith([
+      {
+        date: GAME_LOG_DOC.gameDate,
+        pts:  28,
+        reb:  11,
+        ast:  8,
+        stl:  1,
+        blk:  2,
+        tov:  3,
+        fg3m: 2,
+        min:  35,
+      },
+    ]);
+  });
+
+  test('returns 400 for non-numeric nbaPlayerId', async () => {
+    const req = { params: { nbaPlayerId: 'abc' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'nbaPlayerId must be a numeric NBA player ID',
+    });
+    expect(Player.findOne).not.toHaveBeenCalled();
+  });
+
+  test('returns 404 when player not found', async () => {
+    const playerChain = { lean: jest.fn().mockResolvedValue(null) };
+    const playerSelectChain = { select: jest.fn().mockReturnValue(playerChain) };
+    Player.findOne.mockReturnValue(playerSelectChain);
+
+    const req = { params: { nbaPlayerId: '9999999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Player not found' });
+    expect(PlayerGameStats.find).not.toHaveBeenCalled();
+  });
+
+  test('returns 500 when DB throws', async () => {
+    const playerChain = { lean: jest.fn().mockRejectedValue(new Error('game log boom')) };
+    const playerSelectChain = { select: jest.fn().mockReturnValue(playerChain) };
+    Player.findOne.mockReturnValue(playerSelectChain);
+
+    const req = { params: { nbaPlayerId: '203999' } };
+    const res = mockRes();
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch game log' });
   });
 });

@@ -30,8 +30,11 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function fetchStandings(
   season = '2025-26',
+  type: 'season' | 'finals' = 'season',
 ): Promise<StandingsResponse> {
-  const response = await fetch(`${API_BASE}/standings?season=${season}`);
+  const response = await fetch(
+    `${API_BASE}/standings?season=${season}&type=${type}`,
+  );
 
   if (!response.ok) {
     throw new Error('Failed to fetch standings');

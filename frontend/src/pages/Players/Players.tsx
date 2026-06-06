@@ -1,6 +1,20 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Players.css';
+import PlayerBio from './PlayerBio';
+import {
+  getMySeasonStats,
+  type UserSeasonStats,
+} from '../../services/userStatsService';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -49,6 +63,17 @@ interface SortState {
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const API_BASE = import.meta.env.VITE_API_BASE;
+
+const GRAPH_STAT_OPTIONS = [
+  { key: 'points', label: 'Points' },
+  { key: 'rebounds', label: 'Rebounds' },
+  { key: 'assists', label: 'Assists' },
+  { key: 'steals', label: 'Steals' },
+  { key: 'blocks', label: 'Blocks' },
+  { key: 'turnovers', label: 'Turnovers' },
+] as const;
+
+type GraphStatKey = (typeof GRAPH_STAT_OPTIONS)[number]['key'];
 
 // ─── Team Colors ───────────────────────────────────────────────────────────────
 
@@ -162,6 +187,10 @@ export default function Players() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loadingPlayers, setLoadingPlayers] = useState(false);
   const [errorPlayers, setErrorPlayers] = useState<string | null>(null);
+  // Tracks player IDs whose career stats fetch returned no seasons data
+  const [emptyStatPlayerIds, setEmptyStatPlayerIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   // ── Detail state ───────────────────────────────────────────────────────────
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -170,9 +199,26 @@ export default function Players() {
   const [errorCareer, setErrorCareer] = useState<string | null>(null);
   const location = useLocation();
   const [sort, setSort] = useState<SortState>({ key: null, direction: null });
+  const [selectedGraphStat, setSelectedGraphStat] =
+    useState<GraphStatKey>('points');
+
+  // ── Compare Yourself state ─────────────────────────────────────────────────
+  const [compareMode, setCompareMode] = useState(false);
+  const [boxesVisible, setBoxesVisible] = useState(false);
+  const [userStats, setUserStats] = useState<UserSeasonStats | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userStatsError, setUserStatsError] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const listRef = useRef<HTMLDivElement>(null);
+  const selectedGraphLabel =
+    GRAPH_STAT_OPTIONS.find((option) => option.key === selectedGraphStat)
+      ?.label ?? 'Points';
+
+  // ── Derived: filter out players with no stats when in active-only mode ─────
+  const visiblePlayers = activeOnly
+    ? players.filter((p) => !emptyStatPlayerIds.has(p.playerId))
+    : players;
 
   // ── 1. Fetch player list ───────────────────────────────────────────────────
   // GET /api/players?search=&currentOnly=0|1
@@ -225,6 +271,8 @@ export default function Players() {
       setErrorCareer(null);
       setCareerStats(null);
       setSort({ key: null, direction: null });
+      setCompareMode(false);
+      setBoxesVisible(false);
       try {
         const res = await fetch(
           `${API_BASE}/players/${selectedPlayer.playerId}/career`,
@@ -232,9 +280,27 @@ export default function Players() {
         if (!res.ok) throw new Error(`${res.status}`);
         const data: CareerStats = await res.json();
         setCareerStats(data);
+
+        // If the response came back with no seasons, mark this player so they
+        // are hidden from the active list going forward.
+        if (!data.seasons || data.seasons.length === 0) {
+          setEmptyStatPlayerIds((prev) => {
+            const next = new Set(prev);
+            next.add(selectedPlayer.playerId);
+            return next;
+          });
+        }
       } catch (err) {
         setErrorCareer('Could not load career stats.');
         console.error(err);
+        // Hide this player from the active list since we couldn't load their stats
+        if (activeOnly) {
+          setEmptyStatPlayerIds((prev) => {
+            const next = new Set(prev);
+            next.add(selectedPlayer.playerId);
+            return next;
+          });
+        }
       } finally {
         setLoadingCareer(false);
       }
@@ -255,6 +321,36 @@ export default function Players() {
   const handleSelectPlayer = useCallback((player: Player) => {
     setSelectedPlayer(player);
   }, []);
+
+  const handleCompareToggle = useCallback(async () => {
+    if (loadingUser) return;
+
+    if (compareMode) {
+      setBoxesVisible(false);
+      setTimeout(() => setCompareMode(false), 280);
+      return;
+    }
+
+    let stats = userStats;
+    if (!stats) {
+      setLoadingUser(true);
+      setUserStatsError(null);
+      try {
+        stats = await getMySeasonStats();
+        setUserStats(stats);
+      } catch {
+        setUserStatsError(
+          'Could not load your stats. Have you logged any games?',
+        );
+        setLoadingUser(false);
+        return;
+      }
+      setLoadingUser(false);
+    }
+
+    setCompareMode(true);
+    setTimeout(() => setBoxesVisible(true), 50);
+  }, [compareMode, loadingUser, userStats]);
 
   const handleSort = useCallback((key: SortKey) => {
     setSort((prev) => {
@@ -320,15 +416,16 @@ export default function Players() {
         {errorPlayers && <p className="players-error">{errorPlayers}</p>}
 
         {/* Count */}
-        {!loadingPlayers && players.length > 0 && (
+        {!loadingPlayers && visiblePlayers.length > 0 && (
           <p className="players-count-badge">
-            {players.length} player{players.length !== 1 ? 's' : ''}
+            {visiblePlayers.length} player
+            {visiblePlayers.length !== 1 ? 's' : ''}
           </p>
         )}
 
         {/* List */}
         <div className="players-list" ref={listRef}>
-          {players.map((player) => {
+          {visiblePlayers.map((player) => {
             const c = getColors(player.team);
             const isActive = selectedPlayer?.playerId === player.playerId;
             return (
@@ -364,7 +461,7 @@ export default function Players() {
             );
           })}
 
-          {!loadingPlayers && players.length === 0 && !errorPlayers && (
+          {!loadingPlayers && visiblePlayers.length === 0 && !errorPlayers && (
             <p className="players-placeholder">No players found.</p>
           )}
         </div>
@@ -403,12 +500,28 @@ export default function Players() {
                 </div>
 
                 <div className="players-detail-info">
-                  <h1
-                    className="players-detail-name"
-                    style={{ color: colors.secondary }}
-                  >
-                    {selectedPlayer.fullName}
-                  </h1>
+                  <div className="players-detail-top">
+                    <h1
+                      className="players-detail-name"
+                      style={{ color: colors.secondary }}
+                    >
+                      {selectedPlayer.fullName}
+                    </h1>
+                    {!!localStorage.getItem('ballerz_token') &&
+                      latestSeason && (
+                        <button
+                          className="players-compare-btn"
+                          onClick={handleCompareToggle}
+                          disabled={loadingUser}
+                        >
+                          {loadingUser
+                            ? 'Loading…'
+                            : compareMode
+                              ? 'Hide Comparison'
+                              : 'Compare Yourself'}
+                        </button>
+                      )}
+                  </div>
 
                   <div className="players-detail-meta">
                     {selectedPlayer.team ? (
@@ -459,35 +572,127 @@ export default function Players() {
                   )}
 
                   {latestSeason && (
-                    <div className="players-highlights">
-                      {[
-                        { val: fmtStat(latestSeason.points), lbl: 'PPG' },
-                        { val: fmtStat(latestSeason.rebounds), lbl: 'RPG' },
-                        { val: fmtStat(latestSeason.assists), lbl: 'APG' },
-                        { val: fmtStat(latestSeason.steals), lbl: 'SPG' },
-                        { val: fmtStat(latestSeason.blocks), lbl: 'BPG' },
-                        { val: fmtPct(latestSeason.fgPct), lbl: 'FG%' },
-                      ].map(({ val, lbl }) => (
-                        <div
-                          key={lbl}
-                          className="players-highlight-box"
-                          style={
+                    <>
+                      <div
+                        className={`players-highlights${compareMode ? ' players-highlights--compare' : ''}`}
+                      >
+                        {(
+                          [
                             {
-                              borderColor: `${colors.primary}55`,
-                            } as React.CSSProperties
-                          }
-                        >
-                          <span
-                            className="players-highlight-val"
-                            style={{ color: colors.secondary }}
-                          >
-                            {val}
-                          </span>
-                          <span className="players-highlight-lbl">{lbl}</span>
-                        </div>
-                      ))}
-                    </div>
+                              val: fmtStat(latestSeason.points),
+                              lbl: 'PPG',
+                              raw: latestSeason.points,
+                              userVal: userStats?.avgPoints ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.rebounds),
+                              lbl: 'RPG',
+                              raw: latestSeason.rebounds,
+                              userVal: userStats?.avgRebounds ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.assists),
+                              lbl: 'APG',
+                              raw: latestSeason.assists,
+                              userVal: userStats?.avgAssists ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.steals),
+                              lbl: 'SPG',
+                              raw: latestSeason.steals,
+                              userVal: userStats?.avgSteals ?? null,
+                            },
+                            {
+                              val: fmtStat(latestSeason.blocks),
+                              lbl: 'BPG',
+                              raw: latestSeason.blocks,
+                              userVal: userStats?.avgBlocks ?? null,
+                            },
+                            {
+                              val: fmtPct(latestSeason.fgPct),
+                              lbl: 'FG%',
+                              raw: null,
+                              userVal: null,
+                            },
+                          ] as {
+                            val: string;
+                            lbl: string;
+                            raw: number | null;
+                            userVal: number | null;
+                          }[]
+                        ).map(({ val, lbl, raw, userVal }, idx) => {
+                          const canCompare = raw != null && userVal !== null;
+                          const isGreen = canCompare && userVal >= raw;
+                          const isRed = canCompare && userVal < raw;
+                          const userDisplay =
+                            userVal !== null ? fmtStat(userVal) : '—';
+                          return (
+                            <Fragment key={lbl}>
+                              {/* Player stat box */}
+                              <div
+                                className="players-highlight-box"
+                                style={
+                                  {
+                                    borderColor: `${colors.primary}55`,
+                                  } as React.CSSProperties
+                                }
+                              >
+                                <span
+                                  className="players-highlight-val"
+                                  style={{ color: colors.secondary }}
+                                >
+                                  {val}
+                                </span>
+                                <span className="players-highlight-lbl">
+                                  {lbl}
+                                </span>
+                              </div>
+
+                              {/* User stat box — only rendered in compare mode */}
+                              {compareMode && (
+                                <div
+                                  className={[
+                                    'players-user-box',
+                                    boxesVisible
+                                      ? 'players-user-box--visible'
+                                      : '',
+                                    isGreen
+                                      ? 'players-user-box--green'
+                                      : isRed
+                                        ? 'players-user-box--red'
+                                        : '',
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                  style={{
+                                    transitionDelay: `${idx * 0.04}s`,
+                                  }}
+                                >
+                                  <span className="players-user-box-val">
+                                    {userDisplay}
+                                  </span>
+                                  <span className="players-user-lbl">
+                                    Your {lbl}
+                                  </span>
+                                </div>
+                              )}
+                            </Fragment>
+                          );
+                        })}
+                      </div>
+                      {userStatsError && (
+                        <p className="players-compare-error">
+                          {userStatsError}
+                        </p>
+                      )}
+                    </>
                   )}
+
+                  <PlayerBio
+                    playerId={selectedPlayer.playerId}
+                    fullName={selectedPlayer.fullName}
+                    team={selectedPlayer.team}
+                  />
 
                   {!loadingCareer && !careerStats && !errorCareer && (
                     <p className="players-placeholder">No stats available.</p>
@@ -495,6 +700,48 @@ export default function Players() {
                 </div>
               </div>
 
+              {careerStats && careerStats.seasons.length > 0 && (
+                <section className="player-chart-section">
+                  <div className="player-chart-header">
+                    <h2>{selectedGraphLabel} Over Time</h2>
+
+                    <select
+                      className="player-chart-select"
+                      value={selectedGraphStat}
+                      onChange={(e) =>
+                        setSelectedGraphStat(e.target.value as GraphStatKey)
+                      }
+                    >
+                      {GRAPH_STAT_OPTIONS.map((option) => (
+                        <option key={option.key} value={option.key}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="player-chart-wrap">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={[...careerStats.seasons].sort((a, b) =>
+                          a.season.localeCompare(b.season),
+                        )}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="season" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={selectedGraphStat}
+                          strokeWidth={2}
+                          dot
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+              )}
               {/* Divider */}
               <div
                 className="players-divider"

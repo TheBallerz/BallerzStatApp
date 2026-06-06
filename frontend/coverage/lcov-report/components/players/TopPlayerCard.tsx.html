@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -135,8 +135,8 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,19 +161,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -190,7 +190,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,8 +207,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import './topPlayerCard.css';</span>
-<span class="cstat-no" title="statement not covered" >import { getTeamAsset } from '../../assets/teamAssets';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import './topPlayerCard.css';
+import { getTeamAsset } from '../../assets/teamAssets';
 &nbsp;
 export interface TopPlayer {
   nbaPlayerId: number;
@@ -233,19 +233,19 @@ interface TopPlayerCardProps {
  *   - Team abbreviation in small light text below the name
  *   - Per-game stat value pinned to the bottom-right corner
  */
-<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >T</span>opPlayerCard(</span>{
+export default function TopPlayerCard({
   player,
   statLabel,
   onClick,
   isGreyed,
 }: TopPlayerCardProps) {
-  const asset = <span class="cstat-no" title="statement not covered" >getTeamAsset(player.teamAbbr);</span>
-  const headshotUrl = <span class="cstat-no" title="statement not covered" >`https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`;</span>
+  const asset = getTeamAsset(player.teamAbbr);
+  const headshotUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`;
 &nbsp;
   // Team color fills the left half and fades to the card's dark background color
-  const gradient = <span class="cstat-no" title="statement not covered" >`linear-gradient(to right, ${asset.color}dd 0%, #1a1a1a 60%)`;</span>
+  const gradient = `linear-gradient(to right, ${asset.color}dd 0%, #1a1a1a 60%)`;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div
       className="tpc-card"
       style={{
@@ -261,8 +261,8 @@ interface TopPlayerCardProps {
         className="tpc-headshot"
         src={headshotUrl}
         alt={player.playerName}
-        onError={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
-          (<span class="cstat-no" title="statement not covered" >e.currentTarget as HTMLImageElement).style.visibility = 'hidden';</span>
+        onError={(e) =&gt; {
+          (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
         }}
       /&gt;
 &nbsp;
@@ -286,7 +286,7 @@ interface TopPlayerCardProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-15T21:09:19.362Z
+                at 2026-06-06T01:02:30.927Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
