@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">44.44% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>4/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>1/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>4/8</span>
             </div>
         
             
@@ -237,7 +237,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -372,8 +372,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -381,7 +381,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -399,7 +399,7 @@ export interface TeamAsset {
   logoUrl: string;
 }
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >TEAM_ASSETS: Record&lt;string, TeamAsset&gt; = {</span>
+export const TEAM_ASSETS: Record&lt;string, TeamAsset&gt; = {
   // ── Atlantic ────────────────────────────────────────────────────────────────
   BOS: {
     color: '#007A33',
@@ -534,8 +534,8 @@ export const <span class="cstat-no" title="statement not covered" >TEAM_ASSETS: 
 };
 &nbsp;
 /** Returns the TeamAsset for a given abbreviation, or a neutral fallback. */
-<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >g</span>etTeamAsset(</span>abbr: string): TeamAsset {
-<span class="cstat-no" title="statement not covered" >  return TEAM_ASSETS[abbr] ?? { color: '#333333', logoUrl: '' };</span>
+export function getTeamAsset(abbr: string): TeamAsset {
+  return TEAM_ASSETS[abbr] ?? <span class="branch-1 cbranch-no" title="branch not covered" >{ color: '#333333', logoUrl: '' };</span>
 }
 &nbsp;
 /**
@@ -543,7 +543,7 @@ export const <span class="cstat-no" title="statement not covered" >TEAM_ASSETS: 
  * Logo URLs follow the pattern: https://cdn.nba.com/logos/nba/{nbaTeamId}/...
  * Returns null if the abbreviation is unknown or the URL doesn't match.
  */
-<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >g</span>etTeamNbaId(</span>abbr: string): number | null {
+export function <span class="fstat-no" title="function not covered" >getTeamNbaId(</span>abbr: string): number | null {
   const asset = <span class="cstat-no" title="statement not covered" >TEAM_ASSETS[abbr.toUpperCase()];</span>
 <span class="cstat-no" title="statement not covered" >  if (!asset) <span class="cstat-no" title="statement not covered" >return null;</span></span>
   const match = <span class="cstat-no" title="statement not covered" >asset.logoUrl.match(/\/nba\/(\d+)\//);</span>
@@ -556,7 +556,7 @@ export const <span class="cstat-no" title="statement not covered" >TEAM_ASSETS: 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-02T21:24:08.952Z
+                at 2026-06-06T00:15:19.206Z
             </div>
         <script src="../prettify.js"></script>
         <script>
