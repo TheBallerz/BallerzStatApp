@@ -488,3 +488,155 @@ jest.mock('bcryptjs', () => ({
       expect(Team.find).not.toHaveBeenCalled();
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // PATCH /profile — protected route (requireAuth is stack[0], handler is stack[1])
+  // req.userId injected directly as a Dummy bypass of the requireAuth middleware
+  // ---------------------------------------------------------------------------
+  describe('PATCH /profile', () => {
+    const profileHandler = getMethodHandler('/profile', 'patch', 1);
+
+    function mockRes() {
+      const res = {};
+      res.status = jest.fn().mockReturnValue(res);
+      res.json   = jest.fn().mockReturnValue(res);
+      return res;
+    }
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test('updates profile successfully and returns sanitized user', async () => {
+      const updatedUser = {
+        _id:       'u1',
+        firstName: 'Ken',
+        lastName:  'Suon',
+        email:     'ken@example.com',
+        isAdmin:   false,
+        avatar:    null,
+      };
+
+      // No email conflict
+      User.findOne.mockResolvedValue(null);
+      User.findByIdAndUpdate.mockResolvedValue(updatedUser);
+
+      const req = {
+        userId: 'u1',
+        body: { firstName: 'Ken', lastName: 'Suon' },
+      };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'u1',
+        { $set: { firstName: 'Ken', lastName: 'Suon' } },
+        { new: true, select: '-passwordHash' },
+      );
+      expect(res.json).toHaveBeenCalledWith({
+        user: {
+          id:        'u1',
+          firstName: 'Ken',
+          lastName:  'Suon',
+          email:     'ken@example.com',
+          isAdmin:   false,
+          avatar:    null,
+        },
+      });
+    });
+
+    test('returns 400 when no fields provided', async () => {
+      const req = { userId: 'u1', body: {} };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'No fields provided.' });
+      expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    test('returns 409 when email already taken by another user', async () => {
+      User.findOne.mockResolvedValue({ _id: 'other-user' });
+
+      const req = {
+        userId: 'u1',
+        body: { email: 'taken@example.com' },
+      };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Email already in use.' });
+      expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    test('returns 404 when user not found after update', async () => {
+      User.findOne.mockResolvedValue(null);
+      User.findByIdAndUpdate.mockResolvedValue(null);
+
+      const req = {
+        userId: 'u1',
+        body: { firstName: 'Ghost' },
+      };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User not found.' });
+    });
+
+    test('hashes password when provided and saves it', async () => {
+      const updatedUser = {
+        _id:       'u1',
+        firstName: 'Ken',
+        lastName:  'Suon',
+        email:     'ken@example.com',
+        isAdmin:   false,
+        avatar:    null,
+      };
+
+      bcrypt.hash.mockResolvedValue('new-hashed-password');
+      User.findByIdAndUpdate.mockResolvedValue(updatedUser);
+
+      const req = {
+        userId: 'u1',
+        body: { password: 'newPassword123' },
+      };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(bcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'u1',
+        { $set: { passwordHash: 'new-hashed-password' } },
+        { new: true, select: '-passwordHash' },
+      );
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ user: expect.objectContaining({ id: 'u1' }) })
+      );
+    });
+
+    test('returns 500 when DB throws', async () => {
+      User.findOne.mockResolvedValue(null);
+      User.findByIdAndUpdate.mockRejectedValue(new Error('update boom'));
+
+      const req = {
+        userId: 'u1',
+        body: { firstName: 'Ken' },
+      };
+      const res = mockRes();
+
+      await profileHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Profile update failed.' });
+    });
+  });
