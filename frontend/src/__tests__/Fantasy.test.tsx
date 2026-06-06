@@ -62,7 +62,9 @@ describe('Fantasy', () => {
     render(<Fantasy />);
 
     await screen.findByText('Player A');
-    const ranks = screen.getAllByRole('cell').filter((c) => c.textContent === '1');
+    const ranks = screen
+      .getAllByRole('cell')
+      .filter((c) => c.textContent === '1');
     expect(ranks.length).toBeGreaterThan(0);
   });
 

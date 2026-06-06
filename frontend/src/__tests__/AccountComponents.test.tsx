@@ -125,9 +125,7 @@ const SEASON_STATS = {
 
 describe('StatTiles', () => {
   test('shows skeleton tiles while loading', () => {
-    const { container } = render(
-      <StatTiles stats={null} loading={true} />,
-    );
+    const { container } = render(<StatTiles stats={null} loading={true} />);
 
     const skeletons = container.querySelectorAll('.ast-skeleton');
     expect(skeletons.length).toBe(4);
@@ -182,7 +180,12 @@ function makeGame(overrides = {}) {
 describe('GameLogTable', () => {
   test('shows loading text while loading', () => {
     render(
-      <GameLogTable games={[]} loading={true} onEdit={() => {}} onDelete={() => {}} />,
+      <GameLogTable
+        games={[]}
+        loading={true}
+        onEdit={() => {}}
+        onDelete={() => {}}
+      />,
     );
 
     expect(screen.getByText('Loading…')).toBeInTheDocument();
@@ -230,7 +233,9 @@ describe('GameLogTable', () => {
     // Date is formatted as "Mon Day" — exact value is timezone-dependent, so
     // just verify a date-like string appears (month abbreviation + number).
     const cells = screen.getAllByRole('cell');
-    const dateCells = cells.filter((c) => /^[A-Z][a-z]+ \d+$/.test(c.textContent ?? ''));
+    const dateCells = cells.filter((c) =>
+      /^[A-Z][a-z]+ \d+$/.test(c.textContent ?? ''),
+    );
     expect(dateCells.length).toBeGreaterThan(0);
   });
 
@@ -269,9 +274,7 @@ describe('GameLogTable', () => {
 
 describe('GameLogModal', () => {
   test('shows "Log Game" title in add mode', () => {
-    render(
-      <GameLogModal mode="add" onSave={jest.fn()} onClose={() => {}} />,
-    );
+    render(<GameLogModal mode="add" onSave={jest.fn()} onClose={() => {}} />);
 
     expect(screen.getByText('Log Game')).toBeInTheDocument();
   });
@@ -308,7 +311,9 @@ describe('GameLogModal', () => {
     );
 
     // The date label is not associated via htmlFor — query the input by type
-    const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
+    const dateInput = container.querySelector(
+      'input[type="date"]',
+    ) as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: '2025-03-20' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -320,9 +325,7 @@ describe('GameLogModal', () => {
 
   test('calls onClose when Cancel button is clicked', () => {
     const onClose = jest.fn();
-    render(
-      <GameLogModal mode="add" onSave={jest.fn()} onClose={onClose} />,
-    );
+    render(<GameLogModal mode="add" onSave={jest.fn()} onClose={onClose} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onClose).toHaveBeenCalledTimes(1);

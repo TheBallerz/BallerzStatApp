@@ -72,7 +72,8 @@ describe('PlayerBio Model', () => {
   });
 
   it('rejects a document missing required playerId', async () => {
-    const { playerId: _, ...noId } = validBio();
+    const noId = validBio();
+    delete noId.playerId;
 
     await expect(PlayerBio.create(noId)).rejects.toThrow(
       mongoose.Error.ValidationError,
@@ -80,7 +81,8 @@ describe('PlayerBio Model', () => {
   });
 
   it('rejects a document missing required fullName', async () => {
-    const { fullName: _, ...noName } = validBio();
+    const noName = validBio();
+    delete noName.fullName;
 
     await expect(PlayerBio.create(noName)).rejects.toThrow(
       mongoose.Error.ValidationError,
@@ -88,7 +90,8 @@ describe('PlayerBio Model', () => {
   });
 
   it('rejects a document missing required bio', async () => {
-    const { bio: _, ...noBio } = validBio();
+    const noBio = validBio();
+    delete noBio.bio;
 
     await expect(PlayerBio.create(noBio)).rejects.toThrow(
       mongoose.Error.ValidationError,

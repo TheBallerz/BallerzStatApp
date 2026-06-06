@@ -86,9 +86,7 @@ describe('PlayerBio', () => {
   test('builds fetch URL with correct playerId and query params', async () => {
     mockFetch.mockReturnValue(makeResponse({ bio: 'Bio.' }));
 
-    render(
-      <PlayerBio playerId={2544} fullName="LeBron James" team="LAL" />,
-    );
+    render(<PlayerBio playerId={2544} fullName="LeBron James" team="LAL" />);
 
     await screen.findByText('Bio.');
 
