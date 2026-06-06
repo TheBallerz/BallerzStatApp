@@ -138,7 +138,9 @@ describe('TeamDetailPanel', () => {
 
     render(<TeamDetailPanel team={TEAM} onClose={() => {}} />);
 
-    expect(await screen.findByText('Failed to load team data.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Failed to load team data.'),
+    ).toBeInTheDocument();
   });
 
   test('calls onClose when the × button is clicked', () => {

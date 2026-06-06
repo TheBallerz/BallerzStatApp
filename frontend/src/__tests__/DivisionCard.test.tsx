@@ -48,9 +48,7 @@ describe('DivisionCard', () => {
   });
 
   test('applies selected class to teams in selectedTeams', () => {
-    render(
-      <DivisionCard division={DIVISION} selectedTeams={[TEAM_A]} />,
-    );
+    render(<DivisionCard division={DIVISION} selectedTeams={[TEAM_A]} />);
 
     const items = screen.getAllByRole('listitem');
     const celtics = items.find((li) =>
@@ -72,12 +70,7 @@ describe('DivisionCard', () => {
 
   test('calls onTeamClick with the correct team when a row is clicked', () => {
     const onTeamClick = jest.fn();
-    render(
-      <DivisionCard
-        division={DIVISION}
-        onTeamClick={onTeamClick}
-      />,
-    );
+    render(<DivisionCard division={DIVISION} onTeamClick={onTeamClick} />);
 
     fireEvent.click(screen.getByText('Boston Celtics'));
     expect(onTeamClick).toHaveBeenCalledWith(TEAM_A);
@@ -85,12 +78,7 @@ describe('DivisionCard', () => {
 
   test('calls onTeamClick with the second team when that row is clicked', () => {
     const onTeamClick = jest.fn();
-    render(
-      <DivisionCard
-        division={DIVISION}
-        onTeamClick={onTeamClick}
-      />,
-    );
+    render(<DivisionCard division={DIVISION} onTeamClick={onTeamClick} />);
 
     fireEvent.click(screen.getByText('Brooklyn Nets'));
     expect(onTeamClick).toHaveBeenCalledWith(TEAM_B);
