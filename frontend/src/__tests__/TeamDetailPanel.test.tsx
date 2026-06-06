@@ -4,6 +4,11 @@ jest.mock('../services/nbaApi', () => ({
   fetchPlayers: jest.fn(),
 }));
 
+jest.mock('../components/teams/TeamStatChart', () => ({
+  __esModule: true,
+  default: () => <div data-testid="team-stat-chart" />,
+}));
+
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
@@ -63,7 +68,14 @@ const PLAYER = {
   },
 };
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+
+  globalThis.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => [],
+  }) as jest.Mock;
+});
 
 describe('TeamDetailPanel', () => {
   test('shows loading state while fetching', () => {
