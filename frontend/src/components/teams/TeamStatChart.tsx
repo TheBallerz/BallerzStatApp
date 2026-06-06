@@ -42,11 +42,7 @@ interface ChartTooltipProps {
   label?: string;
 }
 
-function ChartTooltip({
-  active,
-  payload,
-  label,
-}: ChartTooltipProps) {
+function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
@@ -62,14 +58,10 @@ type Props = {
   color?: string;
 };
 
-export default function TeamStatChart({
-  nbaTeamId,
-  color = '#ffffff',
-}: Props) {
+export default function TeamStatChart({ nbaTeamId, color = '#ffffff' }: Props) {
   const [games, setGames] = useState<GameLog[]>([]);
   const [loadingGames, setLoadingGames] = useState(true);
-  const [selectedStat, setSelectedStat] =
-    useState<keyof GameLog>('pts');
+  const [selectedStat, setSelectedStat] = useState<keyof GameLog>('pts');
 
   useEffect(() => {
     async function loadGames() {
@@ -106,17 +98,10 @@ export default function TeamStatChart({
         <select
           className="htp-stat-select"
           value={selectedStat}
-          onChange={(e) =>
-            setSelectedStat(
-              e.target.value as keyof GameLog,
-            )
-          }
+          onChange={(e) => setSelectedStat(e.target.value as keyof GameLog)}
         >
           {STAT_OPTIONS.map((option) => (
-            <option
-              key={option.key}
-              value={option.key}
-            >
+            <option key={option.key} value={option.key}>
               {option.label}
             </option>
           ))}
@@ -126,15 +111,10 @@ export default function TeamStatChart({
       {loadingGames ? (
         <div className="htp-chart-skeleton" />
       ) : games.length === 0 ? (
-        <p className="htp-chart-empty">
-          No recent game data
-        </p>
+        <p className="htp-chart-empty">No recent game data</p>
       ) : (
         <div className="htp-chart-wrap">
-          <ResponsiveContainer
-            width="100%"
-            height="100%"
-          >
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={games}
               margin={{
@@ -152,16 +132,8 @@ export default function TeamStatChart({
                   x2="0"
                   y2="1"
                 >
-                  <stop
-                    offset="5%"
-                    stopColor={color}
-                    stopOpacity={0.5}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor={color}
-                    stopOpacity={0}
-                  />
+                  <stop offset="5%" stopColor={color} stopOpacity={0.5} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0} />
                 </linearGradient>
               </defs>
 
@@ -189,9 +161,7 @@ export default function TeamStatChart({
                 width={28}
               />
 
-              <Tooltip
-                content={<ChartTooltip />}
-              />
+              <Tooltip content={<ChartTooltip />} />
 
               <Area
                 type="linear"

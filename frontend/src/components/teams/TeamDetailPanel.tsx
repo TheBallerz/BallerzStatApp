@@ -129,10 +129,7 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
 
       <div className="team-detail-divider" />
 
-      <TeamStatChart
-        nbaTeamId={team.teamId}
-        color={team.primaryColor}
-      />
+      <TeamStatChart nbaTeamId={team.teamId} color={team.primaryColor} />
 
       <div className="team-detail-body">
         {loading ? (
