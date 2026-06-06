@@ -3,6 +3,7 @@ import { TEAM_LOGOS } from '../../assets/teamLogos';
 import { fetchTeam, fetchPlayers } from '../../services/nbaApi';
 import { useNavigate } from 'react-router-dom';
 import './teamDetailPanel.css';
+import TeamStatChart from './TeamStatChart';
 
 type SelectedTeam = {
   mongoId: string;
@@ -127,6 +128,11 @@ export default function TeamDetailPanel({ team, onClose }: Props) {
       </div>
 
       <div className="team-detail-divider" />
+
+      <TeamStatChart
+        nbaTeamId={team.teamId}
+        color={team.primaryColor}
+      />
 
       <div className="team-detail-body">
         {loading ? (
