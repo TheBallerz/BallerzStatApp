@@ -5,7 +5,7 @@
 
 A full-stack NBA statistics application that lets users create an account, save favorite teams, and browse live team and player stats across the current NBA season. Data is sourced directly from the NBA Stats API and stored in MongoDB, with a nightly sync job that keeps everything current.
 
-**Product Spec**: https://docs.google.com/document/d/1t1RAV8-V2vJKlX4UrsRD-outBDsP7GBG3nMFeY7uleU/edit?usp=sharing
+**Product Spec (Design Doc)**: https://docs.google.com/document/d/1t1RAV8-V2vJKlX4UrsRD-outBDsP7GBG3nMFeY7uleU/edit?usp=sharing
 **Final Presentation Slides**: https://docs.google.com/presentation/d/1b4oy6ogY4-VcX8F3JtBo0UESUeFtd96FO6T089YDv5Q/edit?usp=sharing
 **Video Demo**: https://youtu.be/kwRKWYrscR4
 
