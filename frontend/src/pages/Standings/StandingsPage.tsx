@@ -37,16 +37,16 @@ function StandingsTable({
           <tbody>
             {teams.map((team, index) => (
               <tr
-              key={team.teamId}
-              className="standings-team-row"
-              style={
-                {
-                  '--team-primary': team.primaryColor || '#444',
-                  '--team-secondary': team.secondaryColor || '#222',
-                } as React.CSSProperties
-              }
-              onClick={() => navigate(`/teams/${team.teamId}`)}
-            >
+                key={team.teamId}
+                className="standings-team-row"
+                style={
+                  {
+                    '--team-primary': team.primaryColor || '#444',
+                    '--team-secondary': team.secondaryColor || '#222',
+                  } as React.CSSProperties
+                }
+                onClick={() => navigate(`/teams?teamId=${team.nbaTeamId}`)}
+              >
                 <td>{index + 1}</td>
                 <td>{team.teamName}</td>
                 <td>{team.wins}</td>
@@ -115,11 +115,19 @@ export default function StandingsPage() {
       <p className="standings-subtitle">Season: {data?.season}</p>
 
       <div className="standings-toggle">
-        <button onClick={() => setStandingsType('season')}>
+        <button
+          className={standingsType === 'season' ? 'active' : ''}
+          onClick={() => setStandingsType('season')}
+        >
           Regular Season
         </button>
 
-        <button onClick={() => setStandingsType('finals')}>Finals</button>
+        <button
+          className={standingsType === 'finals' ? 'active' : ''}
+          onClick={() => setStandingsType('finals')}
+        >
+          Finals
+        </button>
       </div>
 
       <div className="standings-grid">

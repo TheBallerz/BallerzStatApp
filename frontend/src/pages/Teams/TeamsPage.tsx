@@ -3,6 +3,7 @@ import DivisionCard from '../../components/teams/DivisionCard';
 import TeamDetailPanel from '../../components/teams/TeamDetailPanel';
 import { fetchTeams } from '../../services/nbaApi';
 import './TeamsPage.css';
+import { useSearchParams } from 'react-router-dom';
 
 type SelectedTeam = {
   mongoId: string;
@@ -67,6 +68,7 @@ export default function TeamsPage() {
   const [selectedTeams, setSelectedTeams] = useState<SelectedTeam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     async function loadTeams() {
@@ -100,6 +102,28 @@ export default function TeamsPage() {
         console.log('GROUPED DIVISIONS:', groupTeamsByDivision(mappedTeams));
 
         setTeams(mappedTeams);
+
+        const targetTeamId = searchParams.get('teamId');
+
+        if (targetTeamId) {
+          const targetTeam = mappedTeams.find(
+            (team) => String(team.teamId) === targetTeamId,
+          );
+
+          if (targetTeam) {
+            setSelectedTeams([
+              {
+                mongoId: targetTeam.mongoId,
+                name: targetTeam.teamName,
+                division: '',
+                teamId: targetTeam.teamId,
+                primaryColor: targetTeam.primaryColor,
+                secondaryColor: targetTeam.secondaryColor,
+                logoUrl: targetTeam.logoUrl,
+              },
+            ]);
+          }
+        }
       } catch (err) {
         console.error(err);
         setError('Failed to load teams.');
@@ -109,7 +133,7 @@ export default function TeamsPage() {
     }
 
     loadTeams();
-  }, []);
+  }, [searchParams]);
 
   const handleTeamClick = (team: SelectedTeam) => {
     setSelectedTeams((prev) => {
