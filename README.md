@@ -262,8 +262,10 @@ npm run sync
 | `sync:team-ids` | `node src/scripts/syncTeamNbaIds.js` | Write NBA API IDs to Team docs |
 | `sync:players` | `node src/scripts/enrichPlayers.js` | Enrich/create Player docs from API |
 | `sync` | `node src/scripts/manualSync.js` | Run the full nightly sync now |
-| `test` | `jest` | Run all backend tests |
-| `test:coverage` | `jest --coverage` | Run tests with coverage report |
+| `test` | `jest --config jest.config.js` | Run all 158 mock/unit tests |
+| `test:real` | `jest --config jest.config.real.js` | Run all 70 real-DB model tests |
+| `test:coverage` | `jest --coverage` | Run mock tests with full coverage report |
+| `test:coverage:models` | `jest --config jest.config.real.js --coverage ...` | Run real-DB tests with model branch coverage |
 | `lint` | `eslint .` | Check for linting errors |
 | `lint:fix` | `eslint . --fix` | Auto-fix linting errors |
 | `format` | `prettier --write .` | Format all files |
@@ -316,42 +318,65 @@ The app uses **JWT (JSON Web Token)** authentication.
 
 ## Testing
 
-### Backend
+The project has three layers of testing: backend unit/mock tests, backend real-database tests, and frontend acceptance tests (E2E + API) via Cypress.
 
-The backend uses [Jest](https://jestjs.io/) with [mongodb-memory-server](https://github.com/typegoose/mongodb-memory-server) to run an in-memory MongoDB instance — no live database connection required.
+### Backend — Unit Tests (Mock Suite)
 
-All tests live in `backend/src/__tests__/models.test.js`. The suite covers all 7 Mongoose models (Team, Player, User, TeamGameStats, PlayerGameStats, TeamSeasonStats, PlayerSeasonStats) with 48 tests total, verifying:
-
-- Document creation and field persistence
-- Default values
-- Required field validation
-- Enum and min/max constraint enforcement
-- Unique and compound unique index enforcement
-- Read, update, and delete operations
+Uses [Jest](https://jestjs.io/) with all Mongoose models and external services mocked. Tests every route handler in isolation across 10 test files covering all route modules (`admin`, `auth`, `friends`, `games`, `playerBioRoutes`, `players`, `schedule`, `standings`, `teams`, `userStats`).
 
 Run from the `backend/` directory:
 
 ```bash
-npm test                # run all tests
-npm run test:coverage   # run tests with coverage report
+npm test                  # run all 158 mock tests
+npm run test:coverage     # run with full coverage report (91% statement, 77% branch overall)
 ```
 
-<img width="611" height="331" alt="Screenshot 2026-06-05 at 6 04 47 PM" src="https://github.com/user-attachments/assets/890060e7-b0ef-48f4-a7d8-5b7d6dea0f34" />
+### Backend — Real Database Tests
 
+Uses [mongodb-memory-server](https://github.com/typegoose/mongodb-memory-server) to spin up a real in-memory MongoDB instance — no live database connection required. Covers all 13 Mongoose models with 70 tests, verifying schema validation, unique index enforcement, default values, timestamps, and CRUD operations.
 
-### Frontend
+Run from the `backend/` directory:
 
-The frontend uses [Jest](https://jestjs.io/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+```bash
+npm run test:real                # run all 70 real-DB tests
+npm run test:coverage:models     # run with coverage scoped to src/models/ (100% branch coverage)
+```
+
+### Frontend — Unit Tests
+
+Uses [Jest](https://jestjs.io/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/). Covers 16 component/page test files with 136 tests at 53% statement coverage.
 
 Run from the `frontend/` directory:
 
 ```bash
-npm test
+npm test                  # run all 136 frontend tests
+npm run test:coverage     # run with coverage report
 ```
 
-<img width="738" height="654" alt="Screenshot 2026-06-05 at 6 02 38 PM" src="https://github.com/user-attachments/assets/07623f55-2d49-4962-a5a8-ee6c7d191013" />
+### Acceptance Tests — E2E and API (Cypress)
 
----
+Uses [Cypress](https://www.cypress.io/) for end-to-end and API acceptance testing. Test credentials are stored in `cypress/fixtures/user.json` — update this file with a valid account before running locally. **Both the frontend (`localhost:5173`) and backend (`localhost:3000`) must be running.**
+
+```bash
+# Start the backend (from backend/)
+npm run dev
+
+# Start the frontend (from frontend/)
+npm run dev
+
+# Run Cypress (from frontend/)
+npx cypress open          # interactive mode (recommended for development)
+npx cypress run           # headless mode (CI-style)
+```
+
+**E2E scenarios** (`cypress/e2e/e2e-testing.js`):
+1. **User Login** — navigates to `/login-form`, submits credentials, asserts redirect to `/`
+2. **User Views Standings** — authenticates, navigates to `/standings`, asserts East and West conference headings load
+
+**API scenarios** (`cypress/e2e/api-testing.js`):
+1. **GET /api/standings** — asserts 200 status with `east` and `west` arrays
+2. **POST /api/auth/login** — asserts 200 status with a `token` and matching `user.email`
+
 
 ## Linting and Formatting
 
