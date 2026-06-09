@@ -6,7 +6,7 @@ jest.mock('../services/standingsService', () => ({
 import { render, screen } from '@testing-library/react';
 import { fetchStandings } from '../services/standingsService';
 import StandingsPage from '../pages/Standings/StandingsPage';
-
+import { MemoryRouter } from 'react-router-dom';
 const mockFetchStandings = fetchStandings as jest.Mock;
 
 // Stub: static fixture data standing in for a real API response (Fake/Stub pattern)
@@ -63,7 +63,11 @@ describe('StandingsPage', () => {
     // Stub: never-settling promise keeps the component in the loading state
     mockFetchStandings.mockReturnValue(new Promise(() => {}));
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('Loading standings...')).toBeInTheDocument();
   });
@@ -72,7 +76,11 @@ describe('StandingsPage', () => {
     // Stub: canned successful response
     mockFetchStandings.mockResolvedValue(MOCK_STANDINGS);
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('Eastern Conference')).toBeInTheDocument();
     expect(await screen.findByText('Western Conference')).toBeInTheDocument();
@@ -81,7 +89,11 @@ describe('StandingsPage', () => {
   test('renders team names and win/loss record from the stub data', async () => {
     mockFetchStandings.mockResolvedValue(MOCK_STANDINGS);
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('Boston Celtics')).toBeInTheDocument();
     expect(await screen.findByText('OKC Thunder')).toBeInTheDocument();
@@ -94,7 +106,11 @@ describe('StandingsPage', () => {
   test('formats winPct to exactly 3 decimal places', async () => {
     mockFetchStandings.mockResolvedValue(MOCK_STANDINGS);
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     // The component calls .toFixed(3) — verify the formatted string appears, not a raw float
     expect(await screen.findByText('0.732')).toBeInTheDocument();
@@ -107,7 +123,11 @@ describe('StandingsPage', () => {
       new Error('Failed to fetch standings'),
     );
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(
       await screen.findByText('Error: Failed to fetch standings'),
@@ -118,7 +138,11 @@ describe('StandingsPage', () => {
     // Stub: a plain string thrown instead of an Error object — covers the else branch
     mockFetchStandings.mockRejectedValue('server blew up');
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('Error: Unknown error')).toBeInTheDocument();
   });
@@ -127,7 +151,11 @@ describe('StandingsPage', () => {
     // Stub: null response — covers the data?.season and data?.east ?? [] null branches
     mockFetchStandings.mockResolvedValue(null);
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('NBA Standings')).toBeInTheDocument();
     // data?.season is undefined, so no season value appears alongside the label
@@ -137,7 +165,11 @@ describe('StandingsPage', () => {
   test('calls fetchStandings exactly once on mount', async () => {
     mockFetchStandings.mockResolvedValue(MOCK_STANDINGS);
 
-    render(<StandingsPage />);
+    render(
+      <MemoryRouter>
+        <StandingsPage />
+      </MemoryRouter>,
+    );
 
     // Wait for the async effect to finish before checking call count
     await screen.findByText('Eastern Conference');

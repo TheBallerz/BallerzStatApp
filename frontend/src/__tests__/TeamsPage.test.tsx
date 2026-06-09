@@ -26,6 +26,7 @@ jest.mock('../components/teams/TeamDetailPanel', () => ({
 import { render, screen } from '@testing-library/react';
 import { fetchTeams } from '../services/nbaApi';
 import TeamsPage from '../pages/Teams/TeamsPage';
+import { MemoryRouter } from 'react-router-dom';
 
 const mockFetchTeams = fetchTeams as jest.Mock;
 
@@ -56,7 +57,11 @@ describe('TeamsPage', () => {
     // Stub: never-settling promise keeps the component in the loading state
     mockFetchTeams.mockReturnValue(new Promise(() => {}));
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('Loading teams...')).toBeInTheDocument();
   });
@@ -64,7 +69,11 @@ describe('TeamsPage', () => {
   test('renders all six division cards after data loads', async () => {
     mockFetchTeams.mockResolvedValue(MOCK_TEAMS);
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     // groupTeamsByDivision always produces all six divisions
     const cards = await screen.findAllByTestId('division-card');
@@ -74,7 +83,11 @@ describe('TeamsPage', () => {
   test('passes the correct division names to DivisionCard', async () => {
     mockFetchTeams.mockResolvedValue(MOCK_TEAMS);
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     for (const name of [
       'Atlantic',
@@ -92,7 +105,11 @@ describe('TeamsPage', () => {
     // Stub: canned error simulating a network failure
     mockFetchTeams.mockRejectedValue(new Error('Network error'));
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     expect(
       await screen.findByText('Failed to load teams.'),
@@ -102,7 +119,11 @@ describe('TeamsPage', () => {
   test('calls fetchTeams exactly once on mount', async () => {
     mockFetchTeams.mockResolvedValue(MOCK_TEAMS);
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     // Wait for the effect to complete before checking call count
     await screen.findAllByTestId('division-card');
@@ -114,7 +135,11 @@ describe('TeamsPage', () => {
   test('shows the hero section when no team is selected', async () => {
     mockFetchTeams.mockResolvedValue(MOCK_TEAMS);
 
-    render(<TeamsPage />);
+    render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+    );
 
     await screen.findAllByTestId('division-card');
 
