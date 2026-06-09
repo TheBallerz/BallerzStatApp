@@ -16,6 +16,7 @@
     "test": "jest --config jest.config.js",
     "test:real": "jest --config jest.config.real.js",
     "test:coverage": "jest --coverage",
+    "test:coverage:models": "jest --config jest.config.real.js --coverage --collectCoverageFrom='src/models/**/*.js'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

@@ -23,9 +23,13 @@ jobs:
         working-directory: backend
         run: npm run lint
 
-      - name: Test backend
+      - name: Test backend (unit tests with coverage)
         working-directory: backend
-        run: npm test
+        run: npm run test:coverage
+
+      - name: Test backend model components (branch coverage)
+        working-directory: backend
+        run: npm run test:coverage:models
 
       - name: Install frontend dependencies
         working-directory: frontend

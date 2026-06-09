@@ -227,12 +227,13 @@ describe('User Model', () => {
 describe('TeamGameStats Model', () => {
   function validTeamGameStats() {
     return {
-      nbaGameId: 22401234,
-      season: '2024-25',
-      result: 'W',
-      teamId: new mongoose.Types.ObjectId(),
+      nbaGameId:      22401234,
+      season:         '2024-25',
+      seasonType:     'Regular Season',
+      result:         'W',
+      teamId:         new mongoose.Types.ObjectId(),
       opponentTeamId: new mongoose.Types.ObjectId(),
-      gameDate: new Date('2025-01-15'),
+      gameDate:       new Date('2025-01-15'),
     };
   }
 
