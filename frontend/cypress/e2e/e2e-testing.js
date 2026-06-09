@@ -32,3 +32,32 @@ describe('User Login', () => {
     });
   });
 });
+
+/**
+ * Feature: Authenticated User Views Standings
+ *
+ * Scenario: Authenticated user navigates to the Standings page
+ *    GIVEN I am logged in
+ *    WHEN I navigate to the Standings page
+ *    THEN I can see Eastern and Western conference team data
+ */
+
+describe('Authenticated User Views Standings', () => {
+  context('Standings page displays conference data', () => {
+    it('GIVEN I am logged in, WHEN I navigate to the Standings page, THEN I can see Eastern and Western conference standings', () => {
+      // Authenticate via the programmatic login command and cache the session
+      cy.session('authSession', () => {
+        cy.login();
+      });
+      // Intercept the standings API call so we can wait for it to resolve
+      cy.intercept('GET', '**/api/standings').as('standingsRequest');
+      cy.visit('/standings');
+      // Wait for the API response before asserting page content
+      cy.wait('@standingsRequest').then(() => {
+        // Both conference headings should be visible on the standings page
+        cy.contains('East').should('exist');
+        cy.contains('West').should('exist');
+      });
+    });
+  });
+});

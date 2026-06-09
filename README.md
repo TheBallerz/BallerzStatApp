@@ -1,7 +1,9 @@
 <img width="611" height="331" alt="Screenshot 2026-06-05 at 6 04 47 PM" src="https://github.com/user-attachments/assets/b6956505-ae5c-4327-90eb-08f223e5ab72" />
 # Ballerz Stat App
 
+[![CI Testing](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/ci-testing.yml/badge.svg)](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/ci-testing.yml)
 [![Azure Static Web Apps CI/CD](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml/badge.svg)](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/azure-static-web-apps-nice-wave-0b1190a0f.yml)
+[![Backend Deploy](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/main_ballerz-backend.yml/badge.svg)](https://github.com/TheBallerz/BallerzStatApp/actions/workflows/main_ballerz-backend.yml)
 
 A full-stack NBA statistics application that lets users create an account, save favorite teams, and browse live team and player stats across the current NBA season. Data is sourced directly from the NBA Stats API and stored in MongoDB, with a nightly sync job that keeps everything current.
 
