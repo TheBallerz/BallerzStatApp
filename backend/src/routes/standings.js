@@ -87,6 +87,9 @@ router.get("/standings", async (req, res) => {
           fgPct: seasonStats.fgPct ?? 0,
           fg3Pct: seasonStats.fg3Pct ?? 0,
           ftPct: seasonStats.ftPct ?? 0,
+          primaryColor: team.primaryColor,
+          secondaryColor: team.secondaryColor,
+          logoUrl: team.logoUrl,
         };
       })
       .filter(Boolean);

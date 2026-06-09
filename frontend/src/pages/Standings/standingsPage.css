@@ -51,6 +51,25 @@
   font-size: 14px;
 }
 
-.standings-table tr:hover {
-  background: #202020;
+
+
+.standings-team-row {
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.standings-team-row:hover {
+  background: linear-gradient(
+    135deg,
+    var(--team-primary),
+    var(--team-secondary)
+  );
+}
+
+.standings-team-row:hover td {
+  background: transparent;
+  color: white;
 }

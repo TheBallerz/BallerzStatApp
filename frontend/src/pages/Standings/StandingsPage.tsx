@@ -5,6 +5,7 @@ import {
   type StandingTeam,
 } from '../../services/standingsService';
 import './standingsPage.css';
+import { useNavigate } from 'react-router-dom';
 
 function StandingsTable({
   title,
@@ -13,6 +14,7 @@ function StandingsTable({
   title: string;
   teams: StandingTeam[];
 }) {
+  const navigate = useNavigate();
   return (
     <div className="standings-section">
       <h2>{title}</h2>
@@ -34,7 +36,17 @@ function StandingsTable({
           </thead>
           <tbody>
             {teams.map((team, index) => (
-              <tr key={team.teamId}>
+              <tr
+              key={team.teamId}
+              className="standings-team-row"
+              style={
+                {
+                  '--team-primary': team.primaryColor || '#444',
+                  '--team-secondary': team.secondaryColor || '#222',
+                } as React.CSSProperties
+              }
+              onClick={() => navigate(`/teams/${team.teamId}`)}
+            >
                 <td>{index + 1}</td>
                 <td>{team.teamName}</td>
                 <td>{team.wins}</td>

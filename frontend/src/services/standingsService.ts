@@ -18,6 +18,9 @@ export type StandingTeam = {
   fgPct: number;
   fg3Pct: number;
   ftPct: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  logoUrl?: string;
 };
 
 export type StandingsResponse = {
